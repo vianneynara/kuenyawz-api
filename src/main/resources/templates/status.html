@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WZ Snack N Bites API</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-color: #505050;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .container {
+        padding: 20px;
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      footer, header {
+        font-family: Arial, sans-serif;
+        color: #ffffff;
+        background-color: #404040;
+        padding: 20px;
+        border-radius: 5px;
+        font-weight: bolder;
+      }
+
+      header {
+        margin-bottom: 20px;
+      }
+
+      footer {
+        margin-top: 20px;
+      }
+
+      footer a {
+        color: #00ff00;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+
+      pre {
+        background-color: #404040;
+        padding: 20px;
+        border-radius: 5px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        margin: 0;
+        flex: 0;
+      }
+
+      code {
+        color: #00ff00;
+        font-family: 'Courier New', Courier, monospace;
+      }
+
+      .flex {
+        display: flex;
+      }
+
+      .justify-between {
+        justify-content: space-between;
+      }
+
+      .end {
+        justify-content: flex-end;
+      }
+
+      .flex-col {
+        flex-direction: column;
+      }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="flex justify-between">
+        <div>
+            ::Header
+        </div>
+        <div>
+            Snack N' Bites API JSON Previewer
+        </div>
+    </header>
+    <pre>
+        <code>
+<span th:text="${apiMethod}"/> <span th:text="${apiPath}"/>
+        </code>
+        <code>
+<span th:text="${jsonData}"/>
+        </code>
+    </pre>
+</div>
+<div class="container flex flex-col end">
+    <footer class="flex justify-between">
+        <div>
+            ::Footer
+        </div>
+        <div>
+            <a th:href="${githubUrl}">GitHub Repository</a>
+        </div>
+    </footer>
+</div>
+</body>
+</html>
