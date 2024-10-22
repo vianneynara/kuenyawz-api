@@ -13,7 +13,7 @@ import java.math.BigInteger;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductVariant extends Auditable {
+public class ProductVariant extends Auditables {
 
 	@Id
 	@SnowFlakeIdValue(name = "product_variant_id")

@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Setter
 @Getter
-public abstract class Auditable {
+public abstract class Auditables {
 
 	@CreatedDate
 	@Column(name = "created_at", updatable = false)

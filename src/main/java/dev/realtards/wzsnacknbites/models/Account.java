@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Account extends Auditable {
+public class Account extends Auditables {
 
 	@Id
 	@SnowFlakeIdValue(name = "account_id")

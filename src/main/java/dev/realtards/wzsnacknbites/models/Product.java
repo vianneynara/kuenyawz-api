@@ -18,7 +18,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Product extends Auditable {
+public class Product extends Auditables {
 
 	@Id
 	@SnowFlakeIdValue(name = "product_id")
