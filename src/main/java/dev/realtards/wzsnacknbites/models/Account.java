@@ -28,7 +28,7 @@ public class Account extends Auditables {
 	@Column
 	private String email;
 	@Column
-	private LocalDateTime email_verified_at;
+	private LocalDateTime emailVerifiedAt;
 	@Column
 	private String phone;
 	@Column
