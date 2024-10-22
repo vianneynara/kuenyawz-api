@@ -20,9 +20,14 @@ public class UptimeTracker {
 	public String hasBeenRunningFor() {
 		LocalDateTime now = LocalDateTime.now();
 		long seconds = startTime.until(now, java.time.temporal.ChronoUnit.SECONDS);
-		long minutes = startTime.until(now, java.time.temporal.ChronoUnit.MINUTES);
-		long hours = startTime.until(now, java.time.temporal.ChronoUnit.HOURS);
-		long days = startTime.until(now, java.time.temporal.ChronoUnit.DAYS);
+		int minutes = ((int) seconds) / 60;
+		int hours = minutes / 60;
+		int days = hours / 24;
+
+		seconds = seconds % 60;
+		minutes = minutes % 60;
+		hours = hours % 24;
+
 		return String.format("%d days, %d hours, %d minutes, %d seconds", days, hours, minutes, seconds);
 	}
 }
