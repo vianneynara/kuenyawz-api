@@ -2,8 +2,10 @@ package dev.realtards.wzsnacknbites.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.realtards.wzsnacknbites.configurations.ApplicationProperties;
 import dev.realtards.wzsnacknbites.utils.UptimeTracker;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,16 +18,11 @@ import java.util.LinkedHashMap;
 
 @Controller
 @RequestMapping("/")
+@RequiredArgsConstructor
 public class IndexController extends BaseController {
 
 	private final UptimeTracker uptimeTracker;
-
-	private final String VERSION = "1.0";
-	private final String REPOSITORY = "https://github.com/vianneynara/wz-snack-n-bites-api";
-
-	public IndexController(UptimeTracker uptimeTracker) {
-		this.uptimeTracker = uptimeTracker;
-	}
+	private final ApplicationProperties applicationProperties;
 
 	@GetMapping({"/", "/status"})
 	public Object status(HttpServletRequest request, Model model) {
@@ -33,8 +30,8 @@ public class IndexController extends BaseController {
 		LinkedHashMap<String, Object> response = new LinkedHashMap<>();
 		LinkedHashMap<String, Object> systemInfo = new LinkedHashMap<>();
 
-		systemInfo.put("version", VERSION);
-		systemInfo.put("repository", REPOSITORY);
+		systemInfo.put("version", applicationProperties.getVersion());
+		systemInfo.put("repositoryUrl", applicationProperties.getRepositoryUrl());
 		systemInfo.put("systemTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		systemInfo.put("upTime", uptimeTracker.hasBeenRunningFor());
 
@@ -56,7 +53,7 @@ public class IndexController extends BaseController {
 				model.addAttribute("apiMethod", request.getMethod());
 				model.addAttribute("apiPath", request.getRequestURI());
 				model.addAttribute("jsonData", jsonString);
-				model.addAttribute("githubUrl", REPOSITORY);
+				model.addAttribute("githubUrl", applicationProperties.getRepositoryUrl());
 			} catch (JsonProcessingException e) {
 				model.addAttribute("jsonData", "Error generating JSON");
 			}
