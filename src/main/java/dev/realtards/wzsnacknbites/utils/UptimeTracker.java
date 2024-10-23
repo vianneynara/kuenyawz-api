@@ -3,6 +3,7 @@ package dev.realtards.wzsnacknbites.utils;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Component
 public class UptimeTracker {
@@ -15,6 +16,10 @@ public class UptimeTracker {
 
 	public LocalDateTime getStartTime() {
 		return startTime;
+	}
+
+	public String hasBeenRunningSince() {
+		return getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 	}
 
 	public String hasBeenRunningFor() {
