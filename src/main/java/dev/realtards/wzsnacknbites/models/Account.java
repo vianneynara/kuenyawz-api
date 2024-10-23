@@ -4,6 +4,7 @@ import dev.realtards.wzsnacknbites.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,8 @@ public class Account extends Auditables {
 	private String phone;
 	@Column
 	private Privilege privilege;
+    @Version
+    private Long version;
 
 	/**
 	 * Type of privilege of an account.
