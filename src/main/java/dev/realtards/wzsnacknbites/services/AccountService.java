@@ -11,5 +11,11 @@ public interface AccountService {
 
 	Account createAccount(AccountRegistrationDto accountRegistrationDto);
 
+	Account getAccount(long accountId);
+
+	Account updateAccount(Account account);
+
+	void deleteAccount(long accountId);
+
 	Account updatePrivilege(Account account, Account.Privilege privilege);
 }
