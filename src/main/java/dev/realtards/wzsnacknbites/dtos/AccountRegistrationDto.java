@@ -5,11 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AccountRegistrationDto {
 
 	@NotBlank(message = "Full name is required")
