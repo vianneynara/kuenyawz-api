@@ -51,7 +51,7 @@
       }
 
       pre {
-        padding: 0 20px 0; /* y x */
+        padding: 0 20px; /* y x */
         border-radius: 5px;
         overflow-x: auto;
         white-space: pre-wrap;
@@ -98,10 +98,12 @@
 </header>
 <div class="container">
     <pre class="codeblock">
-        <code><span th:text="${apiMethod}"/> <span th:text="${apiPath}"/></code>
+<code>
+<span th:text="${apiMethod}"/> <span th:text="${apiPath}"/></code>
     </pre>
     <pre class="codeblock">
-        <code><span th:text="${jsonData}"/></code>
+<code>
+<span th:text="${jsonData}"/></code>
     </pre>
 </div>
 <footer class="flex justify-between">
