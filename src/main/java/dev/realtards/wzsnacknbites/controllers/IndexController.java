@@ -32,6 +32,7 @@ public class IndexController extends BaseController {
 
 		systemInfo.put("version", applicationProperties.getVersion());
 		systemInfo.put("repositoryUrl", applicationProperties.getRepositoryUrl());
+		systemInfo.put("runningSince", uptimeTracker.hasBeenRunningSince());
 		systemInfo.put("systemTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		systemInfo.put("upTime", uptimeTracker.hasBeenRunningFor());
 
