@@ -51,19 +51,18 @@
       }
 
       pre {
-        background-color: #404040;
-        padding: 20px;
+        padding: 0 20px 0; /* y x */
         border-radius: 5px;
         overflow-x: auto;
         white-space: pre-wrap;
         word-wrap: break-word;
         margin: 0;
-        flex: 0;
       }
 
       code {
         color: #00ff00;
         font-family: 'Courier New', Courier, monospace;
+        margin: 0;
       }
 
       .flex {
@@ -81,36 +80,37 @@
       .flex-col {
         flex-direction: column;
       }
+
+      .codeblock {
+        background-color: #292929;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+      }
     </style>
 </head>
-<body>
+<header class="flex justify-between">
+    <div>
+        ::Header
+    </div>
+    <div>
+        Snack N' Bites API JSON Previewer
+    </div>
+</header>
 <div class="container">
-    <header class="flex justify-between">
-        <div>
-            ::Header
-        </div>
-        <div>
-            Snack N' Bites API JSON Previewer
-        </div>
-    </header>
-    <pre>
-        <code>
-<span th:text="${apiMethod}"/> <span th:text="${apiPath}"/>
-        </code>
-        <code>
-<span th:text="${jsonData}"/>
-        </code>
+    <pre class="codeblock">
+        <code><span th:text="${apiMethod}"/> <span th:text="${apiPath}"/></code>
+    </pre>
+    <pre class="codeblock">
+        <code><span th:text="${jsonData}"/></code>
     </pre>
 </div>
-<div class="container flex flex-col end">
-    <footer class="flex justify-between">
-        <div>
-            ::Footer
-        </div>
-        <div>
-            <a th:href="${githubUrl}">GitHub Repository</a>
-        </div>
-    </footer>
-</div>
+<footer class="flex justify-between">
+    <div>
+        ::Footer
+    </div>
+    <div>
+        <a th:href="${githubUrl}">GitHub Repository</a>
+    </div>
+</footer>
 </body>
 </html>
