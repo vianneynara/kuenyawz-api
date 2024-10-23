@@ -1,6 +1,6 @@
 package dev.realtards.wzsnacknbites.boostrappers;
 
-import dev.realtards.wzsnacknbites.dtos.AccountRegistrationDto;
+import dev.realtards.wzsnacknbites.dtos.account.AccountRegistrationDto;
 import dev.realtards.wzsnacknbites.models.Account;
 import dev.realtards.wzsnacknbites.services.AccountService;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package dev.realtards.wzsnacknbites.responses;
 
-import dev.realtards.wzsnacknbites.dtos.AccountSecureDto;
+import dev.realtards.wzsnacknbites.dtos.account.AccountSecureDto;
 
 import java.util.List;
 

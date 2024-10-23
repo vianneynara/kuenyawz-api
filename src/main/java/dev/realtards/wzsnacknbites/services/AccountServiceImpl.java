@@ -1,9 +1,9 @@
 package dev.realtards.wzsnacknbites.services;
 
-import dev.realtards.wzsnacknbites.dtos.AccountPatchDto;
-import dev.realtards.wzsnacknbites.dtos.AccountPutDto;
-import dev.realtards.wzsnacknbites.dtos.AccountRegistrationDto;
-import dev.realtards.wzsnacknbites.dtos.PasswordUpdateDto;
+import dev.realtards.wzsnacknbites.dtos.account.AccountPatchDto;
+import dev.realtards.wzsnacknbites.dtos.account.AccountPutDto;
+import dev.realtards.wzsnacknbites.dtos.account.AccountRegistrationDto;
+import dev.realtards.wzsnacknbites.dtos.account.PasswordUpdateDto;
 import dev.realtards.wzsnacknbites.exceptions.AccountExistsException;
 import dev.realtards.wzsnacknbites.exceptions.AccountNotFoundException;
 import dev.realtards.wzsnacknbites.exceptions.InvalidPasswordException;

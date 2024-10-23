@@ -1,4 +1,4 @@
-package dev.realtards.wzsnacknbites.dtos;
+package dev.realtards.wzsnacknbites.dtos.account;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

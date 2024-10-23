@@ -1,4 +1,4 @@
-package dev.realtards.wzsnacknbites.dtos;
+package dev.realtards.wzsnacknbites.dtos.account;
 
 import dev.realtards.wzsnacknbites.models.Account;
 import lombok.AllArgsConstructor;
