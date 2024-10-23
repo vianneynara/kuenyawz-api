@@ -40,10 +40,6 @@ public class SecurityConfiguration {
 //				.requestMatchers("/api/v1/**").permitAll()
 //				.anyRequest().authenticated()
 //			)
-//			// enable frame options for h2-console
-//			.headers(headers -> headers
-//				.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable())
-//			)
 //			// basic authentication for all other requests
 //			.httpBasic(Customizer.withDefaults())
 //			// prepare session management for JWT, that is stateless
@@ -55,6 +51,10 @@ public class SecurityConfiguration {
 			.csrf(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(auth -> auth
 				.anyRequest().permitAll()
+			)
+			// enable frame options for h2-console
+			.headers(headers -> headers
+				.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable())
 			);
 		return hs.build();
 	}
