@@ -13,5 +13,5 @@ public class ApplicationProperties {
 
 	// Fields and default values
 	private String version = "0.0";
-	private String repositoryUrl = "https://github.com/vianneynara/wz-snack-n-bites-api";
+	private String repositoryUrl = "https://github.com/vianneynara/*";
 }
