@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WZ Snack N Bites API</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-color: #505050;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .container {
+        padding: 20px;
+        flex: 1 0 auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      footer, header {
+        font-family: Arial, sans-serif;
+        color: #ffffff;
+        background-color: #404040;
+        padding: 20px;
+        border-radius: 5px;
+        font-weight: bolder;
+      }
+
+      header {
+        margin-bottom: 20px;
+      }
+
+      footer {
+        margin-top: 20px;
+      }
+
+      footer a {
+        color: #00ff00;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+
+      pre {
+        padding: 0 20px; /* y x */
+        border-radius: 5px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        margin: 0;
+      }
+
+      code {
+        color: #00ff00;
+        font-family: 'Courier New', Courier, monospace;
+        margin: 0;
+      }
+
+      .flex {
+        display: flex;
+      }
+
+      .justify-between {
+        justify-content: space-between;
+      }
+
+      .end {
+        justify-content: flex-end;
+      }
+
+      .flex-col {
+        flex-direction: column;
+      }
+
+      .codeblock {
+        background-color: #292929;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+      }
+    </style>
+</head>
+<header class="flex justify-between">
+    <div>
+        ::Header
+    </div>
+    <div>
+        Snack N' Bites API JSON Previewer
+    </div>
+</header>
+<div class="container">
+    <pre class="codeblock">
+<code>
+<span th:text="${apiMethod}"/> <span th:text="${apiPath}"/></code>
+    </pre>
+    <pre class="codeblock">
+<code>
+<span th:text="${jsonData}"/></code>
+    </pre>
+</div>
+<footer class="flex justify-between">
+    <div>
+        ::Footer
+    </div>
+    <div>
+        <a th:href="${githubUrl}">GitHub Repository</a>
+    </div>
+</footer>
+</body>
+</html>
