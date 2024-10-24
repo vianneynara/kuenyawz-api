@@ -1,14 +1,19 @@
 package dev.realtards.wzsnacknbites.services;
 
-import dev.realtards.wzsnacknbites.dtos.AccountRegistrationDto;
-import dev.realtards.wzsnacknbites.exceptions.EmailExistsException;
+import dev.realtards.wzsnacknbites.dtos.account.*;
+import dev.realtards.wzsnacknbites.exceptions.AccountExistsException;
+import dev.realtards.wzsnacknbites.exceptions.AccountNotFoundException;
+import dev.realtards.wzsnacknbites.exceptions.InvalidPasswordException;
+import dev.realtards.wzsnacknbites.exceptions.PasswordMismatchException;
 import dev.realtards.wzsnacknbites.models.Account;
 import dev.realtards.wzsnacknbites.repositories.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +21,7 @@ import java.util.List;
 public class AccountServiceImpl implements AccountService {
 
 	private final AccountRepository accountRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	@Override
 	public List<Account> getAllAccounts() {
@@ -25,29 +31,115 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public Account createAccount(AccountRegistrationDto accountRegistrationDto) {
 		if (accountRepository.existsByEmail(accountRegistrationDto.getEmail())) {
-			throw new EmailExistsException();
+			throw new AccountExistsException();
 		}
 
 		Account account = Account.builder()
 			.fullName(accountRegistrationDto.getFullName())
 			.email(accountRegistrationDto.getEmail().toLowerCase())
-			.password(accountRegistrationDto.getPassword())
+			.password(passwordEncoder.encode(accountRegistrationDto.getPassword()))
 			.privilege(Account.Privilege.USER)
 			.build();
 
 		account = accountRepository.save(account);
-		log.info("[CREATED]: {}", account);
+		log.info("[ACCOUNT] CREATED: {}", account);
 
 		return account;
 	}
 
 	@Override
-	public Account updatePrivilege(Account account, Account.Privilege privilege) {
-		account.setPrivilege(privilege);
+	public Account getAccount(long accountId) {
+		Optional<Account> result = accountRepository.findById(accountId);
+		if (result.isEmpty()) {
+			throw new AccountNotFoundException();
+		}
+		log.info("[ACCOUNT] RETRIEVED: {}", result.get());
 
-		account = accountRepository.save(account);
-		log.info("[PRIVILEGE UPDATED]: {}", account);
+		return result.get();
+	}
 
-		return account;
+	@Override
+	public Account updateAccount(Long accountId, AccountPutDto account) {
+		Account existingAccount = accountRepository.findById(accountId)
+			.orElseThrow(AccountNotFoundException::new);
+
+		existingAccount.setFullName(account.getFullName());
+		existingAccount.setEmail(account.getEmail());
+		existingAccount.setPhone(account.getPhone());
+		existingAccount.setPrivilege(account.getPrivilege());
+
+		existingAccount = accountRepository.save(existingAccount);
+		log.info("[ACCOUNT] UPDATED: {}", existingAccount);
+
+		return existingAccount;
+	}
+
+	@Override
+	public void deleteAccount(long accountId) {
+		accountRepository.deleteById(accountId);
+		log.info("[ACCOUNT] DELETED: {}", accountId);
+	}
+
+	@Override
+	public Account patchAccount(Long accountId, AccountPatchDto accountPatchDto) {
+		final Account existingAccount = accountRepository.findById(accountId)
+			.orElseThrow(AccountNotFoundException::new);
+
+		Optional.ofNullable(accountPatchDto.getFullName())
+			.ifPresent(existingAccount::setFullName);
+		Optional.ofNullable(accountPatchDto.getEmail())
+			.ifPresent(email -> {
+				if (accountRepository.existsByEmail(email)) {
+					throw new AccountExistsException();
+				}
+				existingAccount.setEmail(email);
+			});
+		Optional.ofNullable(accountPatchDto.getPhone())
+			.ifPresent(existingAccount::setPhone);
+		Optional.ofNullable(accountPatchDto.getPrivilege())
+			.ifPresent(existingAccount::setPrivilege);
+
+		Account savedAccount = accountRepository.save(existingAccount);
+		log.info("[ACCOUNT] PATCHED: {}", existingAccount);
+
+		return savedAccount;
+	}
+
+	@Override
+	public Account updatePassword(Long accountId, PasswordUpdateDto passwordUpdateDto) {
+		Account existingAccount = accountRepository.findById(accountId)
+			.orElseThrow(AccountNotFoundException::new);
+
+		// checks whether the current password matches
+		log.debug("DTO Current password: {}", passwordUpdateDto.getCurrentPassword());
+		log.debug("ACC Existing password: {}", existingAccount.getPassword());
+		if (!passwordEncoder.matches(passwordUpdateDto.getCurrentPassword(), existingAccount.getPassword())) {
+			throw new InvalidPasswordException();
+		}
+
+		// checks whether the new and confirm password matches
+		if (!passwordUpdateDto.getNewPassword().equals(passwordUpdateDto.getConfirmPassword())) {
+			throw new PasswordMismatchException("New password and confirm password mismatch");
+		}
+
+		String encodedPassword = passwordEncoder.encode(passwordUpdateDto.getNewPassword());
+		existingAccount.setPassword(encodedPassword);
+
+		accountRepository.save(existingAccount);
+		log.info("[ACCOUNT] PASSWORD UPDATED: {}", existingAccount);
+
+		return existingAccount;
+	}
+
+	@Override
+	public Account updatePrivilege(Long accountId, PrivilegeUpdateDto privilegeUpdateDto) {
+		Account existingAccount = accountRepository.findById(accountId)
+			.orElseThrow(AccountNotFoundException::new);
+
+		existingAccount.setPrivilege(privilegeUpdateDto.getPrivilege());
+		existingAccount = accountRepository.save(existingAccount);
+		log.info("[ACCOUNT] PRIVILEGE UPDATED: {}", existingAccount);
+
+		return existingAccount;
 	}
 }

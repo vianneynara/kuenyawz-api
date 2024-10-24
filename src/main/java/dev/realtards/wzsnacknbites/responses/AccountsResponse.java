@@ -1,14 +1,18 @@
 package dev.realtards.wzsnacknbites.responses;
 
-import dev.realtards.wzsnacknbites.dtos.AccountSecureDto;
-import lombok.AllArgsConstructor;
+import dev.realtards.wzsnacknbites.dtos.account.AccountSecureDto;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.util.List;
 
+@Schema(description = "Response containing list of accounts")
 @Getter
-@AllArgsConstructor
 public class AccountsResponse {
-
+    @Schema(description = "List of account secure information")
 	private final List<AccountSecureDto> accounts;
+
+	public AccountsResponse(List<AccountSecureDto> accounts) {
+		this.accounts = accounts;
+	}
 }

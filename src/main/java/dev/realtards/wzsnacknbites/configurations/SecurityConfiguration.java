@@ -4,11 +4,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -40,10 +38,6 @@ public class SecurityConfiguration {
 //				.requestMatchers("/api/v1/**").permitAll()
 //				.anyRequest().authenticated()
 //			)
-//			// enable frame options for h2-console
-//			.headers(headers -> headers
-//				.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable())
-//			)
 //			// basic authentication for all other requests
 //			.httpBasic(Customizer.withDefaults())
 //			// prepare session management for JWT, that is stateless
@@ -55,6 +49,10 @@ public class SecurityConfiguration {
 			.csrf(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(auth -> auth
 				.anyRequest().permitAll()
+			)
+			// enable frame options for h2-console
+			.headers(headers -> headers
+				.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable())
 			);
 		return hs.build();
 	}
