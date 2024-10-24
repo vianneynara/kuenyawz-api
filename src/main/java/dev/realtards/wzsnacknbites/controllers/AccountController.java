@@ -29,8 +29,7 @@ public class AccountController extends BaseController {
 
 	private final AccountService accountService;
 
-	@Operation(
-		summary = "Get all accounts",
+	@Operation(summary = "Get all accounts",
 		description = "Retrieves a list of all accounts with secure information"
 	)
 	@ApiResponse(responseCode = "200", description = "Successfully retrieved all accounts",
@@ -51,13 +50,11 @@ public class AccountController extends BaseController {
 
 	// CRUD operations
 
-	@Operation(
-		summary = "Create an account",
+	@Operation(summary = "Create an account",
 		description = "Creates a new account with the provided request body"
 	)
 	@ApiResponse(responseCode = "201", description = "Successfully created account",
-		content = @Content(
-			mediaType = MediaType.APPLICATION_JSON_VALUE,
+		content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
 			schema = @Schema(implementation = AccountSecureDto.class),
 			examples = @ExampleObject(value = """
 				{
@@ -81,8 +78,7 @@ public class AccountController extends BaseController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(new AccountSecureDto(account));
 	}
 
-	@Operation(
-		summary = "Get an account",
+	@Operation(summary = "Get an account",
 		description = "Retrieves an account with the provided account ID"
 	)
 	@ApiResponse(responseCode = "200", description = "Successfully retrieved account",
@@ -99,8 +95,7 @@ public class AccountController extends BaseController {
 		return ResponseEntity.ok(new AccountSecureDto(account));
 	}
 
-	@Operation(
-		summary = "Update an account",
+	@Operation(summary = "Update an account",
 		description = "Updates an account with the provided request body"
 	)
 	@ApiResponse(responseCode = "200",	description = "Successfully updated account",
@@ -118,8 +113,7 @@ public class AccountController extends BaseController {
 		return ResponseEntity.ok(new AccountSecureDto(account));
 	}
 
-	@Operation(
-		summary = "Delete an account",
+	@Operation(summary = "Delete an account",
 		description = "Deletes an account with the provided account ID"
 	)
 	@ApiResponse(responseCode = "204", description = "Successfully deleted account")
@@ -133,8 +127,7 @@ public class AccountController extends BaseController {
 
 	// PATCH
 
-	@Operation(
-		summary = "Patch an account",
+	@Operation(summary = "Patch an account",
 		description = "Patches an account with the provided request body"
 	)
 	@ApiResponse(responseCode = "200", description = "Successfully patched account",
@@ -152,8 +145,7 @@ public class AccountController extends BaseController {
 		return ResponseEntity.ok(new AccountSecureDto(account));
 	}
 
-	@Operation(
-		summary = "Patch an account's password",
+	@Operation(summary = "Patch an account's password",
 		description = "Patches an account's password with the provided request body"
 	)
 	@ApiResponse(responseCode = "204", description = "Successfully patched account's password")
@@ -166,8 +158,7 @@ public class AccountController extends BaseController {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
-	@Operation(
-		summary = "Patch an account's privilege",
+	@Operation(summary = "Patch an account's privilege",
 		description = "Patches an account's privilege with the provided request body"
 	)
 	@ApiResponse(responseCode = "204", description = "Successfully patched account's privilege")
