@@ -6,6 +6,7 @@ import dev.realtards.wzsnacknbites.responses.AccountsResponse;
 import dev.realtards.wzsnacknbites.services.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,7 +58,19 @@ public class AccountController extends BaseController {
 	@ApiResponse(responseCode = "201", description = "Successfully created account",
 		content = @Content(
 			mediaType = MediaType.APPLICATION_JSON_VALUE,
-			schema = @Schema(implementation = AccountSecureDto.class)
+			schema = @Schema(implementation = AccountSecureDto.class),
+			examples = @ExampleObject(value = """
+				{
+				  "accountId": 1221991247904768,
+				  "fullName": "Emilia",
+				  "googleId": null,
+				  "email": "emilia@example.com",
+				  "emailVerifiedAt": null,
+				  "phone": null,
+				  "privilege": "user"
+				}
+				"""
+			)
 		)
 	)
 	@PostMapping
