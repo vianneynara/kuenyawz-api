@@ -1,6 +1,7 @@
 package dev.realtards.wzsnacknbites.boostrappers;
 
 import dev.realtards.wzsnacknbites.dtos.account.AccountRegistrationDto;
+import dev.realtards.wzsnacknbites.dtos.account.PrivilegeUpdateDto;
 import dev.realtards.wzsnacknbites.models.Account;
 import dev.realtards.wzsnacknbites.services.AccountService;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class DatabaseBootstrapper implements CommandLineRunner {
 		if (iterator.hasNext()) {
 			AccountRegistrationDto accountRegistrationDto = iterator.next();
 			Account account = accountService.createAccount(accountRegistrationDto);
-			accountService.updatePrivilege(account, Account.Privilege.ADMIN);
+			accountService.updatePrivilege(account.getAccountId(), new PrivilegeUpdateDto(Account.Privilege.ADMIN));
 		}
 
 		while (iterator.hasNext()) {

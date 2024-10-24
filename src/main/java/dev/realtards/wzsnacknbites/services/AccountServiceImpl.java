@@ -1,9 +1,6 @@
 package dev.realtards.wzsnacknbites.services;
 
-import dev.realtards.wzsnacknbites.dtos.account.AccountPatchDto;
-import dev.realtards.wzsnacknbites.dtos.account.AccountPutDto;
-import dev.realtards.wzsnacknbites.dtos.account.AccountRegistrationDto;
-import dev.realtards.wzsnacknbites.dtos.account.PasswordUpdateDto;
+import dev.realtards.wzsnacknbites.dtos.account.*;
 import dev.realtards.wzsnacknbites.exceptions.AccountExistsException;
 import dev.realtards.wzsnacknbites.exceptions.AccountNotFoundException;
 import dev.realtards.wzsnacknbites.exceptions.InvalidPasswordException;
@@ -135,11 +132,11 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public Account updatePrivilege(Account account, Account.Privilege privilege) {
-		Account existingAccount = accountRepository.findById(account.getAccountId())
+	public Account updatePrivilege(Long accountId, PrivilegeUpdateDto privilegeUpdateDto) {
+		Account existingAccount = accountRepository.findById(accountId)
 			.orElseThrow(AccountNotFoundException::new);
 
-		existingAccount.setPrivilege(privilege);
+		existingAccount.setPrivilege(privilegeUpdateDto.getPrivilege());
 		existingAccount = accountRepository.save(existingAccount);
 		log.info("[ACCOUNT] PRIVILEGE UPDATED: {}", existingAccount);
 

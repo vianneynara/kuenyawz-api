@@ -1,9 +1,6 @@
 package dev.realtards.wzsnacknbites.services;
 
-import dev.realtards.wzsnacknbites.dtos.account.AccountPatchDto;
-import dev.realtards.wzsnacknbites.dtos.account.AccountRegistrationDto;
-import dev.realtards.wzsnacknbites.dtos.account.AccountPutDto;
-import dev.realtards.wzsnacknbites.dtos.account.PasswordUpdateDto;
+import dev.realtards.wzsnacknbites.dtos.account.*;
 import dev.realtards.wzsnacknbites.exceptions.AccountExistsException;
 import dev.realtards.wzsnacknbites.exceptions.AccountNotFoundException;
 import dev.realtards.wzsnacknbites.exceptions.InvalidPasswordException;
@@ -347,7 +344,7 @@ class AccountServiceImplTest {
 		when(accountRepository.save(any(Account.class))).thenReturn(updatedAccount);
 
 		// Act
-		Account result = accountService.updatePrivilege(testAccount, Account.Privilege.ADMIN);
+		Account result = accountService.updatePrivilege(testAccount.getAccountId(), new PrivilegeUpdateDto(Account.Privilege.ADMIN));
 
 		// Assert
 		assertThat(result.getPrivilege()).isEqualTo(Account.Privilege.ADMIN);
