@@ -20,7 +20,7 @@ public class OpenAPIConfig {
 				.contact(new Contact()
 					.name("Nara")
 					.email("vianneynara.github@outlook.com")
-					.url("https://github.com/vianneynara/wz-snack-n-bites-api"))
+					.url("https://github.com/vianneynara"))
 				.license(new License()
 					.name("MIT")
 					.url("https://github.com/vianneynara/wz-snack-n-bites-api/blob/main/LICENSE"))
