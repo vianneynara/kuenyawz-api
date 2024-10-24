@@ -29,7 +29,7 @@ public class AccountPutDto {
     @Pattern(regexp = "^\\+?[1-9][0-9]{7,14}$", message = "Invalid phone number format")
     private String phone;
 
-    @Schema(description = "User's privilege level", example = "user", allowableValues = {"admin", "user"})
+    @Schema(description = "User's privilege level", example = "user")
     @NotNull(message = "Privilege is required")
     private Account.Privilege privilege;
 

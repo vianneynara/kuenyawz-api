@@ -33,7 +33,7 @@ public class AccountSecureDto {
     @Schema(description = "User's phone number", example = "12345678901")
     private String phone;
 
-    @Schema(description = "User's privilege level", example = "user", allowableValues = {"admin", "user"})
+    @Schema(description = "User's privilege level", example = "user")
     private Account.Privilege privilege;
 
 	public AccountSecureDto(Account account) {
