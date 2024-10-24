@@ -2,10 +2,7 @@ package dev.realtards.wzsnacknbites.dtos.account;
 
 import dev.realtards.wzsnacknbites.models.Account;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,7 +30,7 @@ public class AccountPutDto {
     private String phone;
 
     @Schema(description = "User's privilege level", example = "user", allowableValues = {"admin", "user"})
-    @NotBlank(message = "Privilege is required")
+    @NotNull(message = "Privilege is required")
     private Account.Privilege privilege;
 
 	public AccountPutDto(Account account) {
