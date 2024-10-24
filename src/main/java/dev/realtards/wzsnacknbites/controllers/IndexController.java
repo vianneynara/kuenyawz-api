@@ -38,28 +38,29 @@ public class IndexController extends BaseController {
 	@ApiResponses(
 		{
 			@ApiResponse(responseCode = "200", description = "Successfully retrieved API status",
-				content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-					examples = @ExampleObject(value = """
-						{
-						    "message": "Welcome to Snack N' Bites API",
-						    "status": "running",
-						    "system": {
-						        "version": "1.0",
-						        "repositoryUrl": "https://github.com/vianneynara/wz-snack-n-bites-api",
-						        "runningSince": "2024-10-24 19:35:40",
-						        "systemTime": "2024-10-24 19:54:18",
-						        "upTime": "0 days, 0 hours, 18 minutes, 37 seconds"
-						    }
-						}
-						"""
+				content = {
+					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+						examples = @ExampleObject(value = """
+							{
+							    "message": "Welcome to Snack N' Bites API",
+							    "status": "running",
+							    "system": {
+							        "version": "1.0",
+							        "repositoryUrl": "https://github.com/vianneynara/wz-snack-n-bites-api",
+							        "runningSince": "2024-10-24 19:35:40",
+							        "systemTime": "2024-10-24 19:54:18",
+							        "upTime": "0 days, 0 hours, 18 minutes, 37 seconds"
+							    }
+							}
+							"""
+						)
+					),
+					@Content(mediaType = MediaType.TEXT_HTML_VALUE,
+						examples = @ExampleObject(value = "HTML page displaying API status")
 					)
-				)
-			),
-			@ApiResponse(responseCode = "200", description = "Successfully retrieved API status",
-				content = @Content(mediaType = MediaType.TEXT_HTML_VALUE)
+				}
 			)
 		}
-
 	)
 	@GetMapping({"/", "/status"})
 	public Object status(HttpServletRequest request, Model model) {
