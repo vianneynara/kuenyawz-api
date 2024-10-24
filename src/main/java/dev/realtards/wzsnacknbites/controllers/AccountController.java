@@ -1,8 +1,7 @@
 package dev.realtards.wzsnacknbites.controllers;
 
-import dev.realtards.wzsnacknbites.dtos.AccountRegistrationDto;
-import dev.realtards.wzsnacknbites.dtos.AccountSecureDto;
-import dev.realtards.wzsnacknbites.exceptions.EmailExistsException;
+import dev.realtards.wzsnacknbites.dtos.account.*;
+import dev.realtards.wzsnacknbites.exceptions.AccountExistsException;
 import dev.realtards.wzsnacknbites.models.Account;
 import dev.realtards.wzsnacknbites.responses.AccountsResponse;
 import dev.realtards.wzsnacknbites.services.AccountService;
@@ -25,7 +24,7 @@ public class AccountController extends BaseController {
 	private final AccountService accountService;
 
 	@GetMapping("/all")
-	public ResponseEntity<Object> getAccounts() {
+	public ResponseEntity<Object> getAllAccounts() {
 		List<AccountSecureDto> accounts = accountService.getAllAccounts()
 			.stream()
 			.map(AccountSecureDto::new)
@@ -45,7 +44,7 @@ public class AccountController extends BaseController {
 			return ResponseEntity
 				.ok().
 				body(Map.of("account", new AccountSecureDto(account)));
-		} catch (EmailExistsException e) {
+		} catch (AccountExistsException e) {
 			return ResponseEntity
 				.status(HttpStatus.CONFLICT)
 				.body(e.getMessage());
@@ -54,5 +53,57 @@ public class AccountController extends BaseController {
 				.badRequest()
 				.body(e.getMessage());
 		}
+	}
+
+	@GetMapping("{accountId}")
+	public ResponseEntity<Object> getAccount(
+		@PathVariable Long accountId
+	) {
+		Account account = accountService.getAccount(accountId);
+		return ResponseEntity.ok(new AccountSecureDto(account));
+	}
+
+	@PutMapping("{accountId}")
+	public ResponseEntity<Object> updateAccount(
+		@PathVariable Long accountId,
+		@Valid @RequestBody AccountPutDto accountPutDto
+	) {
+		Account account = accountService.updateAccount(accountId, accountPutDto);
+		return ResponseEntity.ok(new AccountSecureDto(account));
+	}
+
+	@DeleteMapping("{accountId}")
+	public ResponseEntity<Object> deleteAccount(
+		@PathVariable Long accountId
+	) {
+		accountService.deleteAccount(accountId);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@PatchMapping("{accountId}/account")
+	public ResponseEntity<Object> patchAccount(
+		@PathVariable Long accountId,
+		@Valid @RequestBody AccountPatchDto accountPatchDto
+	) {
+		Account account = accountService.patchAccount(accountId, accountPatchDto);
+		return ResponseEntity.ok(new AccountSecureDto(account));
+	}
+
+	@PatchMapping("{accountId}/password")
+	public ResponseEntity<Object> updatePassword(
+		@PathVariable Long accountId,
+		@Valid @RequestBody PasswordUpdateDto passwordUpdateDto
+	) {
+		accountService.updatePassword(accountId, passwordUpdateDto);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@PatchMapping("{accountId}/privilege")
+	public ResponseEntity<Object> updatePrivilege(
+		@PathVariable Long accountId,
+		@Valid @RequestBody PrivilegeUpdateDto privilegeUpdateDto
+	) {
+		accountService.updatePrivilege(accountId, privilegeUpdateDto);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }
