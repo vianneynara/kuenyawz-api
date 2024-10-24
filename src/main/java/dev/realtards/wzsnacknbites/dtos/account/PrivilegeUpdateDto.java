@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PrivilegeUpdateDto {
 
-	@Schema(description = "New privilege level to set",	example = "user", allowableValues = {"admin", "user"})
+	@Schema(description = "New privilege level to set",	example = "user")
 	@NotBlank(message = "Privilege is required")
 	@Pattern(regexp = "^(admin|user)$", message = "Privilege must be either 'admin' or 'user'")
 	private String privilege;
