@@ -1,6 +1,7 @@
 package dev.realtards.wzsnacknbites.configurations;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import javax.sql.DataSource;
  * profile, if no specific profile is provided, the program will run with in memory
  * H2 database.
  */
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class DatabaseConfiguration {
@@ -22,6 +24,7 @@ public class DatabaseConfiguration {
 	@Bean
 	@Profile("postgres")
 	public DataSource postgresDataSource() {
+		log.info("Mounted profile for postgres datasource (PostgreSQL database)");
 		return DataSourceBuilder.create()
 			.url(applicationProperties.getDatabase().getUrl())
 			.username(applicationProperties.getDatabase().getUsername())
@@ -33,6 +36,7 @@ public class DatabaseConfiguration {
 	@Bean
 	@Profile("!postgres")
 	public DataSource defaultDataSource() {
+		log.info("Mounted profile for default datasource (H2 database)");
 		return DataSourceBuilder.create()
 			.url("jdbc:h2:mem:kuenyawz")
 			.username("kuenyawz")
