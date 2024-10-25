@@ -42,7 +42,7 @@ public class AccountServiceImpl implements AccountService {
 			.build();
 
 		account = accountRepository.save(account);
-		log.info("[ACCOUNT] CREATED: {}", account);
+		log.info("CREATED: {}", account);
 
 		return account;
 	}
@@ -53,7 +53,7 @@ public class AccountServiceImpl implements AccountService {
 		if (result.isEmpty()) {
 			throw new AccountNotFoundException();
 		}
-		log.info("[ACCOUNT] RETRIEVED: {}", result.get());
+		log.info("RETRIEVED: {}", result.get());
 
 		return result.get();
 	}
@@ -69,7 +69,7 @@ public class AccountServiceImpl implements AccountService {
 		existingAccount.setPrivilege(account.getPrivilege());
 
 		existingAccount = accountRepository.save(existingAccount);
-		log.info("[ACCOUNT] UPDATED: {}", existingAccount);
+		log.info("UPDATED: {}", existingAccount);
 
 		return existingAccount;
 	}
@@ -77,7 +77,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public void deleteAccount(long accountId) {
 		accountRepository.deleteById(accountId);
-		log.info("[ACCOUNT] DELETED: {}", accountId);
+		log.info("DELETED: {}", accountId);
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class AccountServiceImpl implements AccountService {
 			.ifPresent(existingAccount::setPrivilege);
 
 		Account savedAccount = accountRepository.save(existingAccount);
-		log.info("[ACCOUNT] PATCHED: {}", existingAccount);
+		log.info("PATCHED: {}", existingAccount);
 
 		return savedAccount;
 	}
@@ -126,7 +126,7 @@ public class AccountServiceImpl implements AccountService {
 		existingAccount.setPassword(encodedPassword);
 
 		accountRepository.save(existingAccount);
-		log.info("[ACCOUNT] PASSWORD UPDATED: {}", existingAccount);
+		log.info("PASSWORD UPDATED: {}", existingAccount);
 
 		return existingAccount;
 	}
@@ -138,7 +138,7 @@ public class AccountServiceImpl implements AccountService {
 
 		existingAccount.setPrivilege(privilegeUpdateDto.getPrivilege());
 		existingAccount = accountRepository.save(existingAccount);
-		log.info("[ACCOUNT] PRIVILEGE UPDATED: {}", existingAccount);
+		log.info("PRIVILEGE UPDATED: {}", existingAccount);
 
 		return existingAccount;
 	}
