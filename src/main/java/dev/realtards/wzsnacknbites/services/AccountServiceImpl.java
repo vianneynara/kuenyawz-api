@@ -66,7 +66,6 @@ public class AccountServiceImpl implements AccountService {
 		existingAccount.setFullName(account.getFullName());
 		existingAccount.setEmail(account.getEmail());
 		existingAccount.setPhone(account.getPhone());
-		existingAccount.setPrivilege(account.getPrivilege());
 
 		existingAccount = accountRepository.save(existingAccount);
 		log.info("UPDATED: {}", existingAccount);
@@ -96,8 +95,6 @@ public class AccountServiceImpl implements AccountService {
 			});
 		Optional.ofNullable(accountPatchDto.getPhone())
 			.ifPresent(existingAccount::setPhone);
-		Optional.ofNullable(accountPatchDto.getPrivilege())
-			.ifPresent(existingAccount::setPrivilege);
 
 		Account savedAccount = accountRepository.save(existingAccount);
 		log.info("PATCHED: {}", existingAccount);

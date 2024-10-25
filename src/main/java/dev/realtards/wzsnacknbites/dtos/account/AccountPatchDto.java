@@ -29,13 +29,10 @@ public class AccountPatchDto {
     @Pattern(regexp = "^?[1-9][0-9]{7,14}$", message = "Invalid phone number format")
     private String phone;
 
-    private Account.Privilege privilege;
-
 	public AccountPatchDto(Account account) {
 		this.fullName = account.getFullName();
 		this.email = account.getEmail();
 		this.phone = account.getPhone();
-		this.privilege = account.getPrivilege();
 	}
 
 	public static AccountPatchDto fromEntity(Account account) {
