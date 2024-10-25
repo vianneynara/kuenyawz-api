@@ -1,11 +1,10 @@
-# WZ Snack And Bites API
+# KuenyaWZ API
 
-Spring Boot API for WZ Snack And Bites project.
+Spring Boot API for KuenyaWZ project.
 
 ## Main Repository
 
-This project is to be implemented for our **[WZ Snack N Bites](https://github.com/vianneynara/wz-snack-n-bites)**
-project.
+This project is to be implemented for our **[KuenyaWZ](https://github.com/vianneynara/wz-snack-n-bites)** site.
 
 ## Features/checklist
 

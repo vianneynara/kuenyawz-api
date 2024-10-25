@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>dev.realtards</groupId>
-    <artifactId>wzsnacknbites</artifactId>
+    <artifactId>kuenyawz-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>WZ Snack N Bites API</name>
-    <description>WZ Snack N Bites API</description>
+    <name>KuenyaWZ API</name>
+    <description>REST API serving KuenyaWZ web client</description>
     <url/>
     <licenses>
         <license/>
