@@ -11,8 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Arrays;
@@ -28,16 +32,17 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(AccountController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class AccountControllerTest extends BaseWebMvcTest {
 
 	private final String BASE_URL = TestUtility.BASE_URL + "account";
 
+	@Autowired
+	protected MockMvc mockMvc;
+
 	@MockBean
 	private AccountService accountService;
-
-	@InjectMocks
-	private AccountServiceImpl accountServiceImpl;
 
 	private Account testAccount;
 	private Account testAccount2;
@@ -105,7 +110,7 @@ public class AccountControllerTest extends BaseWebMvcTest {
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			// Ensure that the returned accounts size is 2 (testAccount and testAccount2)
 			.andExpect(jsonPath("$.accounts", hasSize(2)))
-			.andExpect(jsonPath("$.accounts[0].accountId").value(testAccount.getAccountId().toString()));
+			.andExpect(jsonPath("$.accounts[0].accountId").value(accounts.getFirst().getAccountId().toString()));
 	}
 
 	@Test
