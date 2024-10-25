@@ -35,7 +35,7 @@ class AccountServiceImplTest {
 	private PasswordEncoder passwordEncoder;
 
 	@InjectMocks
-	private AccountServiceImpl accountService;
+	private AccountServiceImpl accountServiceImpl;
 
 	private Account testAccount;
 	private AccountRegistrationDto testRegistrationDto;
@@ -68,7 +68,7 @@ class AccountServiceImplTest {
 		when(accountRepository.findAll()).thenReturn(expectedAccounts);
 
 		// Act
-		List<Account> actualAccounts = accountService.getAllAccounts();
+		List<Account> actualAccounts = accountServiceImpl.getAllAccounts();
 
 		// Assert
 		assertThat(actualAccounts).isEqualTo(expectedAccounts);
@@ -82,7 +82,7 @@ class AccountServiceImplTest {
 		when(accountRepository.save(any(Account.class))).thenReturn(testAccount);
 
 		// Act
-		Account createdAccount = accountService.createAccount(testRegistrationDto);
+		Account createdAccount = accountServiceImpl.createAccount(testRegistrationDto);
 
 		// Assert
 		assertThat(createdAccount).isNotNull();
@@ -98,7 +98,7 @@ class AccountServiceImplTest {
 
 		// Act & Assert
 		assertThrows(AccountExistsException.class, () ->
-			accountService.createAccount(testRegistrationDto)
+			accountServiceImpl.createAccount(testRegistrationDto)
 		);
 		verify(accountRepository).existsByEmail(testRegistrationDto.getEmail());
 		verify(accountRepository, never()).save(any(Account.class));
@@ -110,7 +110,7 @@ class AccountServiceImplTest {
 		when(accountRepository.findById(anyLong())).thenReturn(Optional.of(testAccount));
 
 		// Act
-		Account foundAccount = accountService.getAccount(1L);
+		Account foundAccount = accountServiceImpl.getAccount(1L);
 
 		// Assert
 		assertThat(foundAccount).isEqualTo(testAccount);
@@ -124,7 +124,7 @@ class AccountServiceImplTest {
 
 		// Act & Assert
 		assertThrows(AccountNotFoundException.class, () ->
-			accountService.getAccount(1L)
+			accountServiceImpl.getAccount(1L)
 		);
 		verify(accountRepository).findById(1L);
 	}
@@ -140,7 +140,7 @@ class AccountServiceImplTest {
 		when(accountRepository.save(any(Account.class))).thenReturn(updatedAccount);
 
 		// Act
-		Account result = accountService.updateAccount(updatedAccount.getAccountId(), AccountPutDto.fromEntity(updatedAccount));
+		Account result = accountServiceImpl.updateAccount(updatedAccount.getAccountId(), AccountPutDto.fromEntity(updatedAccount));
 
 		// Assert
 		assertThat(result.getFullName()).isEqualTo("Updated Name");
@@ -154,7 +154,7 @@ class AccountServiceImplTest {
 		doNothing().when(accountRepository).deleteById(anyLong());
 
 		// Act
-		accountService.deleteAccount(1L);
+		accountServiceImpl.deleteAccount(1L);
 
 		// Assert
 		verify(accountRepository).deleteById(1L);
@@ -182,7 +182,7 @@ class AccountServiceImplTest {
 		when(accountRepository.save(any(Account.class))).thenReturn(updatedAccount);
 
 		// Act
-		Account result = accountService.patchAccount(persistentId, AccountPatchDto.fromEntity(updatedAccount));
+		Account result = accountServiceImpl.patchAccount(persistentId, AccountPatchDto.fromEntity(updatedAccount));
 
 		// Assert
 		assertThat(result.getEmail()).isEqualTo(updatedAccount.getEmail());
@@ -212,7 +212,7 @@ class AccountServiceImplTest {
 
 		// Act & Assert
 		assertThrows(AccountExistsException.class, () ->
-			accountService.patchAccount(persistentId, patchDto)
+			accountServiceImpl.patchAccount(persistentId, patchDto)
 		);
 
 		// Verify
@@ -243,7 +243,7 @@ class AccountServiceImplTest {
 		when(accountRepository.save(any(Account.class))).thenReturn(existingAccount);
 
 		// Act
-		Account result = accountService.patchAccount(persistentId, patchDto);
+		Account result = accountServiceImpl.patchAccount(persistentId, patchDto);
 
 		// Assert
 		assertThat(result.getFullName()).isEqualTo("New Name");
@@ -268,7 +268,7 @@ class AccountServiceImplTest {
 		when(passwordEncoder.matches(anyString(), eq(encodedOldPassword))).thenReturn(true);
 
 		// Act
-		accountService.updatePassword(persistentId, new PasswordUpdateDto(
+		accountServiceImpl.updatePassword(persistentId, new PasswordUpdateDto(
 			"oldPassword",
 			"newPassword",
 			"newPassword"
@@ -296,7 +296,7 @@ class AccountServiceImplTest {
 
 		// Act & Assert
 		assertThrows(InvalidPasswordException.class, () ->
-			accountService.updatePassword(1L, dto)
+			accountServiceImpl.updatePassword(1L, dto)
 		);
 	}
 
@@ -322,7 +322,7 @@ class AccountServiceImplTest {
 
 		// Act & Assert
 		assertThrows(PasswordMismatchException.class, () ->
-			accountService.updatePassword(testAccount.getAccountId(), dto)
+			accountServiceImpl.updatePassword(testAccount.getAccountId(), dto)
 		);
 	}
 
@@ -344,7 +344,7 @@ class AccountServiceImplTest {
 		when(accountRepository.save(any(Account.class))).thenReturn(updatedAccount);
 
 		// Act
-		Account result = accountService.updatePrivilege(testAccount.getAccountId(), new PrivilegeUpdateDto(Account.Privilege.ADMIN));
+		Account result = accountServiceImpl.updatePrivilege(testAccount.getAccountId(), new PrivilegeUpdateDto(Account.Privilege.ADMIN));
 
 		// Assert
 		assertThat(result.getPrivilege()).isEqualTo(Account.Privilege.ADMIN);
