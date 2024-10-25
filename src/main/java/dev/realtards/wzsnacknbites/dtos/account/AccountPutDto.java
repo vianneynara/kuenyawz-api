@@ -29,15 +29,10 @@ public class AccountPutDto {
     @Pattern(regexp = "^\\+?[1-9][0-9]{7,14}$", message = "Invalid phone number format")
     private String phone;
 
-    @Schema(description = "User's privilege level", example = "user")
-    @NotNull(message = "Privilege is required")
-    private Account.Privilege privilege;
-
 	public AccountPutDto(Account account) {
 		this.fullName = account.getFullName();
 		this.email = account.getEmail();
 		this.phone = account.getPhone();
-		this.privilege = account.getPrivilege();
 	}
 
 	public static AccountPutDto fromEntity(Account account) {
