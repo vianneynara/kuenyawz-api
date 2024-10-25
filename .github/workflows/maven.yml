@@ -14,9 +14,13 @@ on:
   pull_request:
     branches: [ "develop" ]
 
+# Add these permissions
+permissions:
+  contents: write
+  deployments: write
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
