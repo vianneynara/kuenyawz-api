@@ -40,6 +40,7 @@ public class AccountControllerTest extends BaseWebMvcTest {
 	private AccountServiceImpl accountServiceImpl;
 
 	private Account testAccount;
+	private Account testAccount2;
 	private AccountRegistrationDto testRegistrationDto;
 	private AccountPutDto testPutDto;
 	private AccountPatchDto testPatchDto;
@@ -57,6 +58,14 @@ public class AccountControllerTest extends BaseWebMvcTest {
 			.accountId(idIterator.next())
 			.fullName("Test User")
 			.email("test@example.com")
+			.password("password123")
+			.privilege(Account.Privilege.USER)
+			.build();
+
+		testAccount2 = Account.builder()
+			.accountId(idIterator.next())
+			.fullName("Test User 2")
+			.email("test2@example.com")
 			.password("password123")
 			.privilege(Account.Privilege.USER)
 			.build();
@@ -88,13 +97,14 @@ public class AccountControllerTest extends BaseWebMvcTest {
 
 	@Test
 	void testGetAllAccounts() throws Exception {
-		List<Account> accounts = Arrays.asList(testAccount);
+		List<Account> accounts = Arrays.asList(testAccount, testAccount2);
 		given(accountService.getAllAccounts()).willReturn(accounts);
 
 		mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/all"))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.accounts", hasSize(1)))
+			// Ensure that the returned accounts size is 2 (testAccount and testAccount2)
+			.andExpect(jsonPath("$.accounts", hasSize(2)))
 			.andExpect(jsonPath("$.accounts[0].accountId").value(testAccount.getAccountId().toString()));
 	}
 
