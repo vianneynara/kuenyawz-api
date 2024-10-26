@@ -69,6 +69,8 @@ public class ErrorHandler {
 			.body(new ErrorResponseWithErrors("Validation failed", errors));
 	}
 
+	// TODO: Add handlers for Spring standard exceptions
+
 	/**
 	 * Unhandled exception handler.
 	 */
