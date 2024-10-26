@@ -1,6 +1,6 @@
 package dev.realtards.kuenyawz.dtos.account;
 
-import dev.realtards.kuenyawz.models.Account;
+import dev.realtards.kuenyawz.entities.Account;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,7 +1,7 @@
 package dev.realtards.kuenyawz.controllers;
 
 import dev.realtards.kuenyawz.dtos.account.*;
-import dev.realtards.kuenyawz.models.Account;
+import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.responses.AccountsResponse;
 import dev.realtards.kuenyawz.services.AccountService;
 import io.swagger.v3.oas.annotations.Operation;

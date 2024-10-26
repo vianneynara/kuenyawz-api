@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.models;
+package dev.realtards.kuenyawz.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;

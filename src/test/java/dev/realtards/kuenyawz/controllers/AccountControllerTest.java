@@ -1,7 +1,7 @@
 package dev.realtards.kuenyawz.controllers;
 
 import dev.realtards.kuenyawz.dtos.account.*;
-import dev.realtards.kuenyawz.models.Account;
+import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.services.AccountService;
 import dev.realtards.kuenyawz.testBases.BaseWebMvcTest;
 import dev.realtards.kuenyawz.testUntils.TestUtility;

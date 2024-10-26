@@ -1,7 +1,7 @@
 package dev.realtards.kuenyawz.services;
 
 import dev.realtards.kuenyawz.dtos.account.*;
-import dev.realtards.kuenyawz.models.Account;
+import dev.realtards.kuenyawz.entities.Account;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

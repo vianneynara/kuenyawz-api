@@ -3,7 +3,7 @@ package dev.realtards.kuenyawz.boostrappers;
 import dev.realtards.kuenyawz.dtos.account.AccountRegistrationDto;
 import dev.realtards.kuenyawz.dtos.account.PrivilegeUpdateDto;
 import dev.realtards.kuenyawz.exceptions.AccountExistsException;
-import dev.realtards.kuenyawz.models.Account;
+import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.services.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

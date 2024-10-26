@@ -5,7 +5,7 @@ import dev.realtards.kuenyawz.exceptions.AccountExistsException;
 import dev.realtards.kuenyawz.exceptions.AccountNotFoundException;
 import dev.realtards.kuenyawz.exceptions.InvalidPasswordException;
 import dev.realtards.kuenyawz.exceptions.PasswordMismatchException;
-import dev.realtards.kuenyawz.models.Account;
+import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.repositories.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
