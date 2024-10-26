@@ -23,24 +23,35 @@ public class Product extends Auditables {
 	@SnowFlakeIdValue(name = "product_id")
 	@Column(name = "product_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
 	private Long productId;
+
 	@Column
 	private String name;
+
 	@Column
 	private String tagline;
+
 	@Column
 	private String description;
+
 	@Column
 	private Category category;
+
 	@Column
 	private Integer minQuantity;
+
 	@Column
 	private Integer maxQuantity;
+
 	@Column
 	private boolean isAvailable;
 
 	@OneToMany(mappedBy = "product")
 	@JsonManagedReference
 	private Set<Variant> variants = new HashSet<>();
+
+	@OneToMany(mappedBy = "product")
+	@JsonManagedReference
+	private Set<ProductImage> images = new HashSet<>();
 
 	/**
 	 * This contains the category of foods available in the store.
@@ -56,6 +67,15 @@ public class Product extends Auditables {
 
 		Category(String value) {
 			this.value = value;
+		}
+
+		public static Category fromString(String value) {
+			for (Category category : Category.values()) {
+				if (category.value.equalsIgnoreCase(value)) {
+					return category;
+				}
+			}
+			throw new IllegalArgumentException("Invalid category: " + value);
 		}
 	}
 }
