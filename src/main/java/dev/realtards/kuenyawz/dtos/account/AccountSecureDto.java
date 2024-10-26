@@ -2,14 +2,12 @@ package dev.realtards.kuenyawz.dtos.account;
 
 import dev.realtards.kuenyawz.entities.Account;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Schema(description = "Secure account information returned by the API")
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
