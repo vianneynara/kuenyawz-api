@@ -1,11 +1,11 @@
 package dev.realtards.kuenyawz.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
-import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
 
 @Entity
 @Data
@@ -19,8 +19,10 @@ public class Variant extends Auditables {
 	@SnowFlakeIdValue(name = "variant_id")
 	@Column(name = "variant_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
 	private Long variantId;
+
 	@Column
-	private BigInteger price;
+	private BigDecimal price;
+
 	@Column
 	private String type;
 
