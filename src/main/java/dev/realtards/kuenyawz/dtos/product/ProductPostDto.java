@@ -52,6 +52,7 @@ public class ProductPostDto {
     @Size(min = 1, message = "At least one variant is required")
 	private List<VariantPostDto> variants;
 
+	@Schema(hidden = true)
 	@AssertTrue(message = "Minimum quantity and maximum quantity must be consistent")
 	public boolean isQuantityConsistent() {
 		return minQuantity <= maxQuantity;
