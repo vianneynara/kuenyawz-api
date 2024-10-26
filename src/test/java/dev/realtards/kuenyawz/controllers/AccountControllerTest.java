@@ -125,7 +125,7 @@ public class AccountControllerTest extends BaseWebMvcTest {
 	void getAccount_ById_ShouldReturnAccount() throws Exception {
 		given(accountService.getAccount(testAccount.getAccountId())).willReturn(testAccount);
 
-		mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/" + testAccount.getAccountId()))
+		mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/{accountId}", testAccount.getAccountId()))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.accountId").value(testAccount.getAccountId().toString()))
@@ -161,7 +161,7 @@ public class AccountControllerTest extends BaseWebMvcTest {
 		given(accountService.updateAccount(eq(testAccount.getAccountId()), any(AccountPutDto.class)))
 			.willReturn(updatedAccount);
 
-		mockMvc.perform(put(BASE_URL + "/" + testAccount.getAccountId())
+		mockMvc.perform(put(BASE_URL + "/{accountId}", testAccount.getAccountId())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(TestUtility.asJsonString(testPutDto)))
 			.andExpect(status().isOk())
@@ -180,7 +180,7 @@ public class AccountControllerTest extends BaseWebMvcTest {
 	void deleteAccount_ShouldReturnNoContent() throws Exception {
 		doNothing().when(accountService).deleteAccount(testAccount.getAccountId());
 
-		mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/" + testAccount.getAccountId()))
+		mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/{accountId}", testAccount.getAccountId()))
 			.andExpect(status().isNoContent());
 
 		verify(accountService).deleteAccount(longArgumentCaptor.capture());
@@ -197,7 +197,7 @@ public class AccountControllerTest extends BaseWebMvcTest {
 		given(accountService.patchAccount(eq(testAccount.getAccountId()), any(AccountPatchDto.class)))
 			.willReturn(patchedAccount);
 
-		mockMvc.perform(patch(BASE_URL + "/" + testAccount.getAccountId() + "/account")
+		mockMvc.perform(patch(BASE_URL + "/{accountId}/account", testAccount.getAccountId())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(TestUtility.asJsonString(testPatchDto)))
 			.andExpect(status().isOk())
@@ -222,7 +222,7 @@ public class AccountControllerTest extends BaseWebMvcTest {
 		when(accountService.updatePassword(any(Long.class), any(PasswordUpdateDto.class)))
 			.thenReturn(null);
 
-		mockMvc.perform(patch(BASE_URL + "/" + "{id}/password", 1L)
+		mockMvc.perform(patch(BASE_URL + "/{accountId}/password", 1L)
 				.content(TestUtility.asJsonBytes(passwordDto))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
@@ -239,7 +239,7 @@ public class AccountControllerTest extends BaseWebMvcTest {
 		when(accountService.updatePrivilege(any(Long.class), any(PrivilegeUpdateDto.class)))
 			.thenReturn(null);
 
-		mockMvc.perform(patch(BASE_URL + "/" + "{id}/privilege", 1L)
+		mockMvc.perform(patch(BASE_URL + "/{accountId}/privilege", 1L)
 				.content(TestUtility.asJsonBytes(Account.Privilege.USER))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
