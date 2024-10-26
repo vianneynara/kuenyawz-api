@@ -4,7 +4,7 @@ Spring Boot API for KuenyaWZ project.
 
 ## Main Repository
 
-This project is to be implemented for our **[KuenyaWZ](https://github.com/vianneynara/wz-snack-n-bites)** site.
+This project is to be implemented for our **[KuenyaWZ](https://github.com/vianneynara/kuenyawz)** site.
 
 ## Features/checklist
 
