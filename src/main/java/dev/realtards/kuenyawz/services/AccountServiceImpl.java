@@ -56,13 +56,18 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public Account getAccount(long accountId) {
-		Optional<Account> result = accountRepository.findById(accountId);
-		if (result.isEmpty()) {
-			throw new AccountNotFoundException();
-		}
-		log.info("RETRIEVED: {}", result.get());
+		Account account = accountRepository.findById(accountId)
+			.orElseThrow(AccountNotFoundException::new);
+		log.info("RETRIEVED by ID: {}", account);
+		return account;
+	}
 
-		return result.get();
+	@Override
+	public Account getAccount(String email) {
+		Account account = accountRepository.findByEmail(email)
+			.orElseThrow(AccountNotFoundException::new);
+		log.info("RETRIEVED by EMAIL: {}", account);
+		return account;
 	}
 
 	@Override

@@ -17,6 +17,9 @@ public interface AccountService {
 	@Transactional(readOnly = true)
 	Account getAccount(long accountId);
 
+	@Transactional(readOnly = true)
+	Account getAccount(String email);
+
 	@Transactional
 	Account updateAccount(Long accountId, AccountPutDto accountPutDto);
 
