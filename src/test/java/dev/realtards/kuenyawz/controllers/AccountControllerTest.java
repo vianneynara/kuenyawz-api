@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 public class AccountControllerTest extends BaseWebMvcTest {
 
-	private final String BASE_URL = TestUtility.BASE_URL + "account";
+	private final String BASE_URL = TestUtility.BASE_URL + "/account";
 
 	@Autowired
 	protected MockMvc mockMvc;
@@ -248,6 +248,6 @@ public class AccountControllerTest extends BaseWebMvcTest {
 
 		verify(accountService).updatePrivilege(any(Long.class), privilegeUpdateDtoArgumentCaptor.capture());
 
-		assertThat(privilegeUpdateDtoArgumentCaptor.getValue().getPrivilege()).isEqualTo(String.valueOf(Account.Privilege.USER));
+		assertThat(privilegeUpdateDtoArgumentCaptor.getValue().getPrivilege().toString()).isEqualTo(String.valueOf(Account.Privilege.USER));
 	}
 }
