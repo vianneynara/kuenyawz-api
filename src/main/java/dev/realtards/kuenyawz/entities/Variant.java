@@ -13,11 +13,11 @@ import java.math.BigInteger;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductVariant extends Auditables {
+public class Variant extends Auditables {
 
 	@Id
-	@SnowFlakeIdValue(name = "product_variant_id")
-	@Column(name = "product_variant_id")
+	@SnowFlakeIdValue(name = "variant_id")
+	@Column(name = "variant_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
 	private Long variantId;
 	@Column
 	private BigInteger price;
@@ -25,7 +25,7 @@ public class ProductVariant extends Auditables {
 	private String type;
 
 	@ManyToOne()
-	@JoinColumn(name = "product_id")
+	@JoinColumn(name = "product_id", nullable = false)
 	@JsonBackReference
-	private Product product = new Product();
+	private Product product;
 }

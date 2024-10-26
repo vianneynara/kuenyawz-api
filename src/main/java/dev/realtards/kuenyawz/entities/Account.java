@@ -23,6 +23,7 @@ public class Account extends Auditables {
 
 	@Id
 	@SnowFlakeIdValue(name = "account_id")
+	@Column(name = "account_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
 	private Long accountId;
 	@Column
 	private String password;

@@ -10,7 +10,6 @@ import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Data
@@ -22,9 +21,8 @@ public class Product extends Auditables {
 
 	@Id
 	@SnowFlakeIdValue(name = "product_id")
-	@Column(name = "product_id")
+	@Column(name = "product_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
 	private Long productId;
-	private UUID uuid = UUID.randomUUID();
 	@Column
 	private String name;
 	@Column
@@ -34,15 +32,15 @@ public class Product extends Auditables {
 	@Column
 	private Category category;
 	@Column
-	private Integer min_quantity;
+	private Integer minQuantity;
 	@Column
-	private Integer max_quantity;
+	private Integer maxQuantity;
 	@Column
 	private boolean isAvailable;
 
 	@OneToMany(mappedBy = "product")
 	@JsonManagedReference
-	private Set<ProductVariant> variants = new HashSet<>();
+	private Set<Variant> variants = new HashSet<>();
 
 	/**
 	 * This contains the category of foods available in the store.
