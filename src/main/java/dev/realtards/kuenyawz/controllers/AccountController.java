@@ -40,10 +40,7 @@ public class AccountController extends BaseController {
 	)
 	@GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> getAllAccounts() {
-		List<AccountSecureDto> accounts = accountService.getAllAccounts()
-			.stream()
-			.map(AccountSecureDto::new)
-			.toList();
+		List<AccountSecureDto> accounts = accountService.getAllAccounts();
 
 		return ResponseEntity.status(HttpStatus.OK).body(new AccountsResponse(accounts));
 	}

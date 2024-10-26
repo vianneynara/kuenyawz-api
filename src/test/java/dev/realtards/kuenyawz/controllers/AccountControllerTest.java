@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -28,7 +29,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AccountController.class)
@@ -110,7 +112,7 @@ public class AccountControllerTest extends BaseWebMvcTest {
 
 	@Test
 	void testGetAllAccounts() throws Exception {
-		List<Account> accounts = Arrays.asList(testAccount, testAccount2);
+		List<AccountSecureDto> accounts = Stream.of(testAccount, testAccount2).map(AccountSecureDto::new).toList();
 		given(accountService.getAllAccounts()).willReturn(accounts);
 
 		mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/all"))
