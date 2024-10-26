@@ -164,13 +164,15 @@ class AccountServiceImplTest {
 	@Test
 	void deleteAccount_ShouldDeleteAccount() {
 		// Arrange
-		doNothing().when(accountRepository).deleteById(anyLong());
+		final Long persistentId = idIterator.next();
+		when(accountRepository.existsById(persistentId)).thenReturn(true);
 
 		// Act
-		accountServiceImpl.deleteAccount(1L);
+		accountServiceImpl.deleteAccount(persistentId);
 
 		// Assert
-		verify(accountRepository).deleteById(1L);
+		verify(accountRepository).existsById(persistentId);
+		verify(accountRepository).deleteById(persistentId);
 	}
 
 	@Test
