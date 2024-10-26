@@ -1,17 +1,20 @@
 package dev.realtards.kuenyawz.services;
 
 import dev.realtards.kuenyawz.dtos.account.*;
+import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.exceptions.AccountExistsException;
 import dev.realtards.kuenyawz.exceptions.AccountNotFoundException;
 import dev.realtards.kuenyawz.exceptions.InvalidPasswordException;
 import dev.realtards.kuenyawz.exceptions.PasswordMismatchException;
-import dev.realtards.kuenyawz.entities.Account;
+import dev.realtards.kuenyawz.mapper.AccountMapper;
 import dev.realtards.kuenyawz.repositories.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -37,14 +40,21 @@ class AccountServiceImplTest {
 	@InjectMocks
 	private AccountServiceImpl accountServiceImpl;
 
+    @Spy
+    private AccountMapper accountMapper = Mappers.getMapper(AccountMapper.class);
+
+    @InjectMocks
+    private AccountServiceImpl accountService;
+
+	// To store test data globally
+
 	private Account testAccount;
 	private AccountRegistrationDto testRegistrationDto;
-	private List<Long> idIterable;
 	private ListIterator<Long> idIterator;
 
 	@BeforeEach
 	void setUp() {
-		idIterable = Arrays.asList(1L, 2L, 3L, 4L, 5L, 6L, 7L);
+		List<Long> idIterable = Arrays.asList(1L, 2L, 3L, 4L, 5L, 6L, 7L);
 		idIterator = idIterable.listIterator();
 
 		testAccount = Account.builder()
@@ -61,19 +71,22 @@ class AccountServiceImplTest {
 		testRegistrationDto.setPassword("password123");
 	}
 
-	@Test
-	void getAllAccounts_ShouldReturnAllAccounts() {
-		// Arrange
-		List<Account> expectedAccounts = Arrays.asList(testAccount);
-		when(accountRepository.findAll()).thenReturn(expectedAccounts);
+    @Test
+    void getAllAccounts_ShouldReturnAllAccounts() {
+        // Arrange
+        List<Account> accounts = List.of(testAccount);
+        when(accountRepository.findAll()).thenReturn(accounts);
 
-		// Act
-		List<Account> actualAccounts = accountServiceImpl.getAllAccounts();
+        // Act
+        List<AccountSecureDto> actualAccounts = accountService.getAllAccounts();
 
-		// Assert
-		assertThat(actualAccounts).isEqualTo(expectedAccounts);
-		verify(accountRepository).findAll();
-	}
+        // Assert
+        List<AccountSecureDto> expectedAccounts = accounts.stream()
+            .map(accountMapper::fromEntity)
+            .toList();
+        assertThat(actualAccounts).isEqualTo(expectedAccounts);
+        verify(accountRepository).findAll();
+    }
 
 	@Test
 	void createAccount_WithNewEmail_ShouldCreateAccount() {

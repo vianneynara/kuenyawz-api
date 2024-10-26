@@ -9,7 +9,7 @@ import java.util.List;
 public interface AccountService {
 
 	@Transactional(readOnly = true)
-	List<Account> getAllAccounts();
+	List<AccountSecureDto> getAllAccounts();
 
 	@Transactional
 	Account createAccount(AccountRegistrationDto accountRegistrationDto);

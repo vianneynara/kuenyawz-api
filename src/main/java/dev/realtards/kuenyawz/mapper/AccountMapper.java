@@ -6,13 +6,13 @@ import dev.realtards.kuenyawz.dtos.account.AccountSecureDto;
 import dev.realtards.kuenyawz.entities.Account;
 import org.mapstruct.*;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface AccountMapper {
 
 	@Mapping(target = "password", ignore = true)
 	Account toEntity(AccountRegistrationDto accountRegistrationDto);
 
-	AccountSecureDto toAccountSecureDto(Account account);
+	AccountSecureDto fromEntity(Account account);
 
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "emailVerifiedAt", ignore = true)

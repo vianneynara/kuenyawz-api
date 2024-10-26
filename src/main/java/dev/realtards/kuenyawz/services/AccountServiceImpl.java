@@ -1,11 +1,12 @@
 package dev.realtards.kuenyawz.services;
 
 import dev.realtards.kuenyawz.dtos.account.*;
+import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.exceptions.AccountExistsException;
 import dev.realtards.kuenyawz.exceptions.AccountNotFoundException;
 import dev.realtards.kuenyawz.exceptions.InvalidPasswordException;
 import dev.realtards.kuenyawz.exceptions.PasswordMismatchException;
-import dev.realtards.kuenyawz.entities.Account;
+import dev.realtards.kuenyawz.mapper.AccountMapper;
 import dev.realtards.kuenyawz.repositories.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +25,14 @@ public class AccountServiceImpl implements AccountService {
 
 	private final AccountRepository accountRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final AccountMapper accountMapper;
 
 	@Override
-	public List<Account> getAllAccounts() {
-		return accountRepository.findAll();
+	public List<AccountSecureDto> getAllAccounts() {
+		return accountRepository.findAll()
+			.stream()
+			.map(accountMapper::fromEntity)
+			.toList();
 	}
 
 	@Override
