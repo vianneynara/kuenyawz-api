@@ -1,6 +1,5 @@
 package dev.realtards.kuenyawz.dtos.product;
 
-import dev.realtards.kuenyawz.entities.Product;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
