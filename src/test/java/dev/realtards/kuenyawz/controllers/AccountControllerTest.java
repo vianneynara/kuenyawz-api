@@ -7,6 +7,8 @@ import dev.realtards.kuenyawz.testBases.BaseWebMvcTest;
 import dev.realtards.kuenyawz.testUntils.TestUtility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -19,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,6 +42,15 @@ public class AccountControllerTest extends BaseWebMvcTest {
 
 	@MockBean
 	private AccountService accountService;
+
+	/**
+	 * This captor is used to intercept (capture) arguments passed to a method.
+	 * In account context, it is used to capture the accountId (of type {@link Long}) passed
+	 * to service methods. More complex methods such as using DTOS as captor's generic type
+	 * can be used to capture DTOs passed to service methods for better checking.
+ 	 */
+	@Captor
+	private ArgumentCaptor<Long> longArgumentCaptor;
 
 	private Account testAccount;
 	private Account testAccount2;
@@ -120,6 +132,8 @@ public class AccountControllerTest extends BaseWebMvcTest {
 			.andExpect(jsonPath("$.fullName", is(testAccount.getFullName())));
 
 		verify(accountService).getAccount(testAccount.getAccountId());
+
+		assertThat(testAccount.getAccountId()).isEqualTo(testAccount.getAccountId());
 	}
 
 	@Test
@@ -155,7 +169,11 @@ public class AccountControllerTest extends BaseWebMvcTest {
 			.andExpect(jsonPath("$.fullName", is(testPutDto.getFullName())))
 			.andExpect(jsonPath("$.email", is(testPutDto.getEmail())));
 
-		verify(accountService).updateAccount(any(Long.class), any(AccountPutDto.class));
+		ArgumentCaptor<AccountPutDto> putDtoArgumentCaptor = ArgumentCaptor.forClass(AccountPutDto.class);
+
+		verify(accountService).updateAccount(any(Long.class), putDtoArgumentCaptor.capture());
+
+		assertThat(putDtoArgumentCaptor.getValue().getFullName()).isEqualTo(testPutDto.getFullName());
 	}
 
 	@Test
@@ -165,7 +183,9 @@ public class AccountControllerTest extends BaseWebMvcTest {
 		mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/" + testAccount.getAccountId()))
 			.andExpect(status().isNoContent());
 
-		verify(accountService).deleteAccount(testAccount.getAccountId());
+		verify(accountService).deleteAccount(longArgumentCaptor.capture());
+
+		assertThat(longArgumentCaptor.getValue()).isEqualTo(testAccount.getAccountId());
 	}
 
 	@Test
@@ -184,7 +204,11 @@ public class AccountControllerTest extends BaseWebMvcTest {
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.fullName", is(testPatchDto.getFullName())));
 
-		verify(accountService).patchAccount(any(Long.class), any(AccountPatchDto.class));
+		ArgumentCaptor<AccountPatchDto> patchDtoArgumentCaptor = ArgumentCaptor.forClass(AccountPatchDto.class);
+
+		verify(accountService).patchAccount(any(Long.class), patchDtoArgumentCaptor.capture());
+
+		assertThat(patchDtoArgumentCaptor.getValue().getFullName()).isEqualTo(testPatchDto.getFullName());
 	}
 
 	@Test
@@ -203,7 +227,11 @@ public class AccountControllerTest extends BaseWebMvcTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
 
-		verify(accountService).updatePassword(any(Long.class), any(PasswordUpdateDto.class));
+		ArgumentCaptor<PasswordUpdateDto> passwordUpdateDtoArgumentCaptor = ArgumentCaptor.forClass(PasswordUpdateDto.class);
+
+		verify(accountService).updatePassword(any(Long.class), passwordUpdateDtoArgumentCaptor.capture());
+
+		assertThat(passwordUpdateDtoArgumentCaptor.getValue().getCurrentPassword()).isEqualTo(passwordDto.getCurrentPassword());
 	}
 
 	@Test
@@ -216,6 +244,10 @@ public class AccountControllerTest extends BaseWebMvcTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
 
-		verify(accountService).updatePrivilege(any(Long.class), any(PrivilegeUpdateDto.class));
+		ArgumentCaptor<PrivilegeUpdateDto> privilegeUpdateDtoArgumentCaptor = ArgumentCaptor.forClass(PrivilegeUpdateDto.class);
+
+		verify(accountService).updatePrivilege(any(Long.class), privilegeUpdateDtoArgumentCaptor.capture());
+
+		assertThat(privilegeUpdateDtoArgumentCaptor.getValue().getPrivilege()).isEqualTo(String.valueOf(Account.Privilege.USER));
 	}
 }
