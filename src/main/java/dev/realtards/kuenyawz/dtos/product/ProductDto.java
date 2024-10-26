@@ -35,5 +35,5 @@ public class ProductDto {
 	private Integer maxQuantity;
 
 	@Schema(description = "Product variants")
-	private List<VariantPostDto> variants;
+	private List<VariantDto> variants;
 }
