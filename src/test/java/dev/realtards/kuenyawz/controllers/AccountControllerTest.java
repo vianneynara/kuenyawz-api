@@ -118,6 +118,8 @@ public class AccountControllerTest extends BaseWebMvcTest {
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.accountId").value(testAccount.getAccountId().toString()))
 			.andExpect(jsonPath("$.fullName", is(testAccount.getFullName())));
+
+		verify(accountService).getAccount(testAccount.getAccountId());
 	}
 
 	@Test
@@ -131,6 +133,8 @@ public class AccountControllerTest extends BaseWebMvcTest {
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.accountId").value(testAccount.getAccountId().toString()))
 			.andExpect(jsonPath("$.fullName", is(testAccount.getFullName())));
+
+		verify(accountService).createAccount(any(AccountRegistrationDto.class));
 	}
 
 	@Test
@@ -150,6 +154,8 @@ public class AccountControllerTest extends BaseWebMvcTest {
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.fullName", is(testPutDto.getFullName())))
 			.andExpect(jsonPath("$.email", is(testPutDto.getEmail())));
+
+		verify(accountService).updateAccount(any(Long.class), any(AccountPutDto.class));
 	}
 
 	@Test
@@ -177,6 +183,8 @@ public class AccountControllerTest extends BaseWebMvcTest {
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.fullName", is(testPatchDto.getFullName())));
+
+		verify(accountService).patchAccount(any(Long.class), any(AccountPatchDto.class));
 	}
 
 	@Test
@@ -194,6 +202,8 @@ public class AccountControllerTest extends BaseWebMvcTest {
 				.content(TestUtility.asJsonBytes(passwordDto))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
+
+		verify(accountService).updatePassword(any(Long.class), any(PasswordUpdateDto.class));
 	}
 
 	@Test
@@ -205,5 +215,7 @@ public class AccountControllerTest extends BaseWebMvcTest {
 				.content(TestUtility.asJsonBytes(Account.Privilege.USER))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
+
+		verify(accountService).updatePrivilege(any(Long.class), any(PrivilegeUpdateDto.class));
 	}
 }
