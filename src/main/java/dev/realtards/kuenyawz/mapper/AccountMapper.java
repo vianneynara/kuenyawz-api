@@ -17,5 +17,5 @@ public interface AccountMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "emailVerifiedAt", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateAccountFromPatch(AccountPatchDto dto, @MappingTarget Account account);
+    Account updateAccountFromPatch(AccountPatchDto dto, @MappingTarget Account account);
 }

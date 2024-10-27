@@ -19,5 +19,5 @@ public interface VariantMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "product", ignore = true)
 	@BeanMapping(nullValuePropertyMappingStrategy = org.mapstruct.NullValuePropertyMappingStrategy.IGNORE)
-	void updateVariantFromPatch(VariantPatchDto dto, @MappingTarget Variant variant);
+	Variant updateVariantFromPatch(VariantPatchDto dto, @MappingTarget Variant variant);
 }
