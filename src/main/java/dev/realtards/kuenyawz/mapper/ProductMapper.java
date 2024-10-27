@@ -6,6 +6,7 @@ import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
 import dev.realtards.kuenyawz.entities.Product;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
@@ -15,6 +16,10 @@ public interface ProductMapper {
 
 	ProductDto fromEntity(Product product);
 
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "variants", ignore = true)
+    @Mapping(target = "images", ignore = true)
+    @Mapping(target = "available", ignore = true)
 	@BeanMapping(nullValuePropertyMappingStrategy = org.mapstruct.NullValuePropertyMappingStrategy.IGNORE)
 	void updateProductFromPatch(ProductPatchDto dto, @MappingTarget Product product);
 }
