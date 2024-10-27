@@ -21,8 +21,11 @@ public interface VariantService {
 	VariantDto getVariant(long variantId);
 
 	@Transactional(readOnly = true)
-	VariantDto patchVariant(Long variantId, VariantPatchDto variantPatchDto);
+	List<VariantDto> getVariantsOfProductId(Long productId);
+
+	@Transactional(readOnly = true)
+	VariantDto patchVariant(Long productId, Long variantId, VariantPatchDto variantPatchDto);
 
 	@Transactional
-	void deleteVariant(Long variantId, Long productId);
+	void deleteVariant(Long productId, Long variantId);
 }

@@ -118,16 +118,28 @@ public class VariantServiceImpl implements VariantService {
 		return variantDto;
 	}
 
+	@Override
+	public List<VariantDto> getVariantsOfProductId(Long productId) {
+		List<Variant> variants = variantRepository.findAllByProduct_ProductId(productId);
+		List<VariantDto> variantDtos = variants.stream().map(variantMapper::fromEntity).toList();
+		return variantDtos;
+	}
+
 	/**
 	 * Patches the variant using Mapper.
 	 *
+	 * @param productId {@link Long}
 	 * @param variantId {@link Long}
 	 * @param variantPatchDto {@link VariantPatchDto}
 	 * @return {@link VariantDto}
 	 * @throws ResourceNotFoundException if the variant is not found
 	 */
 	@Override
-	public VariantDto patchVariant(Long variantId, VariantPatchDto variantPatchDto) {
+	public VariantDto patchVariant(Long productId, Long variantId, VariantPatchDto variantPatchDto) {
+        if (!productRepository.existsById(productId)) {
+            throw new ResourceNotFoundException("Product with ID '" + productId + "' not found");
+        }
+
 		Variant variant = variantRepository.findById(variantId)
 			.orElseThrow(() -> new ResourceNotFoundException("Variant with ID '" + variantId + "' not found"));
 
@@ -143,13 +155,13 @@ public class VariantServiceImpl implements VariantService {
 	/**
 	 * Deletes a variant from a product. Checks the variant, then deletes it.
 	 *
-	 * @param variantId {@link Long}
 	 * @param productId {@link Long}
+	 * @param variantId {@link Long}
 	 * @throws IllegalOperationException if the product only has one variant
 	 * @throws ResourceNotFoundException if the variant is not found
 	 */
 	@Override
-	public void deleteVariant(Long variantId, Long productId) {
+	public void deleteVariant(Long productId, Long variantId) {
 		long variantCount = variantRepository.countVariantsByProduct_ProductId(productId);
 		if (variantCount <= 1) {
 			throw new IllegalOperationException("Cannot delete the last variant of a product");
