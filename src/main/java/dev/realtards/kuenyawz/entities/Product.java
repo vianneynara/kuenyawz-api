@@ -42,6 +42,9 @@ public class Product extends Auditables {
 	@Column
 	private boolean isAvailable;
 
+	@Version
+	private Long version;
+
 	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	private Set<Variant> variants = new HashSet<>();

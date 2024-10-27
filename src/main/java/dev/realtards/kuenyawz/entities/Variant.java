@@ -26,6 +26,9 @@ public class Variant extends Auditables {
 	@Column
 	private String type;
 
+	@Version
+	private Long version;
+
 	@ManyToOne()
 	@JoinColumn(name = "product_id", nullable = false)
 	@JsonBackReference
