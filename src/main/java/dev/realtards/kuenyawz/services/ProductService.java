@@ -29,4 +29,6 @@ public interface ProductService {
 
 	@Transactional
 	ProductDto patchProduct(Long productId, ProductPatchDto productPatchDto);
+
+	boolean existsById(Long productId);
 }

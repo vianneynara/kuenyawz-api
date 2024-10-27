@@ -172,4 +172,15 @@ public class ProductServiceImpl implements ProductService {
 		ProductDto productDto = productMapper.fromEntity(savedProduct);
 		return productDto;
 	}
+
+	/**
+	 * Checks if a product exists by its ID.
+	 *
+	 * @param productId {@link Long}
+	 * @return {@link Boolean}
+	 */
+	@Override
+	public boolean existsById(Long productId) {
+		return productRepository.existsById(productId);
+	}
 }
