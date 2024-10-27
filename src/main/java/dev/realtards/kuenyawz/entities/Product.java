@@ -1,6 +1,5 @@
 package dev.realtards.kuenyawz.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
@@ -10,8 +9,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+//@EqualsAndHashCode(callSuper = true, exclude = {"variants", "images"})
+//@ToString(callSuper = true, exclude = {"variants", "images"})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
