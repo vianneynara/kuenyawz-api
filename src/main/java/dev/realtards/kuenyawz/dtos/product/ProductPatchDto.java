@@ -2,7 +2,16 @@ package dev.realtards.kuenyawz.dtos.product;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Schema(description = "Product patch request body")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProductPatchDto {
 
 	@Schema(description = "Product name", example = "Muffin", minLength = 2, maxLength = 128)
