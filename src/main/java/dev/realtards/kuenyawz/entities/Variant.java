@@ -1,6 +1,7 @@
 package dev.realtards.kuenyawz.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,7 +30,7 @@ public class Variant extends Auditables {
 	@Version
 	private Long version;
 
-	@ManyToOne()
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id", nullable = false)
 	@JsonBackReference
 	private Product product;

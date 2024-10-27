@@ -1,5 +1,6 @@
 package dev.realtards.kuenyawz.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
@@ -45,11 +46,11 @@ public class Product extends Auditables {
 	@Version
 	private Long version;
 
-	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	private Set<Variant> variants = new HashSet<>();
 
-	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	private Set<ProductImage> images = new HashSet<>();
 
