@@ -30,6 +30,7 @@ public class ProductPatchDto {
 	@Max(value = 200, message = "Maximum quantity must be at most 200")
 	private Integer maxQuantity;
 
+	@Schema(hidden = true)
 	@AssertTrue(message = "Minimum quantity and maximum quantity must be consistent")
 	public boolean isQuantityConsistent() {
 		return minQuantity <= maxQuantity;
