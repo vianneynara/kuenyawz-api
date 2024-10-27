@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.models;
+package dev.realtards.kuenyawz.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -23,6 +23,7 @@ public class Account extends Auditables {
 
 	@Id
 	@SnowFlakeIdValue(name = "account_id")
+	@Column(name = "account_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
 	private Long accountId;
 	@Column
 	private String password;

@@ -1,6 +1,6 @@
 package dev.realtards.kuenyawz.configurations;
 
-import dev.realtards.kuenyawz.models.Account;
+import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.repositories.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

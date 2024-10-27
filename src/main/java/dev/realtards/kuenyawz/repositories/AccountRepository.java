@@ -1,6 +1,6 @@
 package dev.realtards.kuenyawz.repositories;
 
-import dev.realtards.kuenyawz.models.Account;
+import dev.realtards.kuenyawz.entities.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

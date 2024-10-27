@@ -1,15 +1,12 @@
 package dev.realtards.kuenyawz.dtos.account;
 
-import dev.realtards.kuenyawz.models.Account;
+import dev.realtards.kuenyawz.entities.Account;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Schema(description = "Complete account update request")
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

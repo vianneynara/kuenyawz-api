@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 @UtilityClass
 public class TestUtility {
 
-	public static final String BASE_URL = "/api/v1/";
+	public static final String BASE_URL = "/api/v1";
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

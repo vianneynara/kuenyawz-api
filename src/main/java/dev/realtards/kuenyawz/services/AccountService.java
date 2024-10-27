@@ -1,7 +1,7 @@
 package dev.realtards.kuenyawz.services;
 
 import dev.realtards.kuenyawz.dtos.account.*;
-import dev.realtards.kuenyawz.models.Account;
+import dev.realtards.kuenyawz.entities.Account;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -9,13 +9,16 @@ import java.util.List;
 public interface AccountService {
 
 	@Transactional(readOnly = true)
-	List<Account> getAllAccounts();
+	List<AccountSecureDto> getAllAccounts();
 
 	@Transactional
 	Account createAccount(AccountRegistrationDto accountRegistrationDto);
 
 	@Transactional(readOnly = true)
 	Account getAccount(long accountId);
+
+	@Transactional(readOnly = true)
+	Account getAccount(String email);
 
 	@Transactional
 	Account updateAccount(Long accountId, AccountPutDto accountPutDto);

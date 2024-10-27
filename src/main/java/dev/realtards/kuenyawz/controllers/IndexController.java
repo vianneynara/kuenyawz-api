@@ -74,7 +74,7 @@ public class IndexController extends BaseController {
 		systemInfo.put("systemTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		systemInfo.put("upTime", uptimeTracker.hasBeenRunningFor());
 
-		response.put("message", "Welcome to Snack N' Bites API");
+		response.put("message", "Welcome to KuenyaWZ API");
 		response.put("status", "running");
 		response.put("system", systemInfo);
 

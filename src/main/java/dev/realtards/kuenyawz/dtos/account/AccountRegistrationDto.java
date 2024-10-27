@@ -7,8 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Schema(description = "Account registration request")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

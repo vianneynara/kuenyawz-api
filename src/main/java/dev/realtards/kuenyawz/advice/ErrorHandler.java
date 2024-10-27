@@ -46,6 +46,16 @@ public class ErrorHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
 	}
 
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage()));
+	}
+
+	@ExceptionHandler(IllegalOperationException.class)
+	public ResponseEntity<Object> handleIllegalOperationException(IllegalOperationException ex) {
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(ex.getMessage()));
+	}
+
 	// watch
 
 	@ExceptionHandler(InvalidPasswordException.class)
@@ -68,6 +78,8 @@ public class ErrorHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 			.body(new ErrorResponseWithErrors("Validation failed", errors));
 	}
+
+	// TODO: Add handlers for Spring standard exceptions
 
 	/**
 	 * Unhandled exception handler.
