@@ -29,7 +29,7 @@ public class AccountController extends BaseController {
 
 	private final AccountService accountService;
 
-	@Operation(summary = "Get all accounts",
+	@Operation(summary = "(Master) Get all accounts",
 		description = "Retrieves a list of all accounts with secure information"
 	)
 	@ApiResponse(responseCode = "200", description = "Successfully retrieved all accounts",
