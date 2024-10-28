@@ -19,9 +19,12 @@ public class ProductImage extends Auditables {
 	private Long productImageId;
 
 	@Column
-	private String relativePath;
+	private String originalName;
 
-	@ManyToOne
+	@Column
+	private Long fileSize;
+
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id", nullable = false)
 	@JsonBackReference
 	private Product product;
