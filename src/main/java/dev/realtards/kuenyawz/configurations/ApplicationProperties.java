@@ -21,6 +21,7 @@ public class ApplicationProperties {
 	// Fields
 	private String version;
 	private String repositoryUrl;
+	private String uploadDir = "uploads/product-images";
 	private Database database = new Database();
 
 	// Initializing through dotenv
