@@ -46,3 +46,11 @@ Refer to this **[Swagger Documentation](https://app.swaggerhub.com/apis-docs/Nar
 1. Clone this repository
 2. Change directory to the cloned repository
 3. Run `mvn spring-boot:run`
+
+### Running with specific profile
+
+Make sure the profile requirement is met. For example, to run with postgres profile,
+please make sure you have PostgreSQL installed and running with the provided `.ENV`.
+
+1. Add profile to environment variable: `set SPRING_PROFILES_ACTIVE=postgres`
+2. Run `mvn spring-boot:run`
