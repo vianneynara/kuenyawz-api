@@ -29,6 +29,7 @@
     <properties>
         <java.version>21</java.version>
         <org.mapstruct.version>1.6.2</org.mapstruct.version>
+        <app.profiles>postgres</app.profiles>
     </properties>
     <dependencies>
         <dependency>
@@ -116,6 +117,9 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <profiles>
+                        ${app.profiles}
+                    </profiles>
                 </configuration>
             </plugin>
             <plugin>
