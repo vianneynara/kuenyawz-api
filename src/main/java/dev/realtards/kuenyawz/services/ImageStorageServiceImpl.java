@@ -136,26 +136,29 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 		}
 	}
 
-    @Override
-    public Resource loadAsResource(String requestedPath) {
-        try {
-            Path filePath = uploadRootDir.resolve(requestedPath).normalize();
+	@Override
+	public Resource loadAsResource(final Long productId, String resourceUri) {
+		try {
+			final long resourceId = Long.parseLong(resourceUri.split("\\.")[0]);
 
-            if (!filePath.startsWith(uploadRootDir)) {
-                throw new ResourceNotFoundException("Cannot access file outside upload directory");
-            }
+			String relativePath = productImageRepository.findByProduct_ProductIdAndProductImageId(productId, resourceId)
+				.orElseThrow(() -> new ResourceNotFoundException("Resource '" + productId + "/" + resourceId + "' not found"))
+				.getRelativePath();
+			Path requestedPath = Path.of(uploadLocation.toString(), relativePath).normalize().toAbsolutePath();
+			log.warn("Requested path: {}", requestedPath);
+			Resource resource = new UrlResource(requestedPath.toUri());
 
-            Resource resource = new UrlResource(filePath.toUri());
-
-            if (!resource.exists() || !resource.isReadable()) {
-                throw new ResourceNotFoundException("File not found: " + requestedPath);
-            }
-
-            return resource;
-        } catch (MalformedURLException e) {
-            throw new ResourceNotFoundException("File not found: " + requestedPath);
-        }
-    }
+			if (resource.exists() || resource.isReadable()) {
+				log.info("Resource '{}' found, exists and readable", requestedPath);
+				return resource;
+			} else {
+				log.warn("Resource '{}' not found", requestedPath);
+				throw new ResourceNotFoundException("Resource '" + productId + "/" + resourceUri + "' not found");
+			}
+		} catch (NumberFormatException | MalformedURLException e) {
+			throw new ResourceNotFoundException("Resource '" + productId + "/" + resourceUri + "' not found");
+		}
+	}
 
     @Override
     public void delete(Long resourceId) {
