@@ -3,20 +3,23 @@ package dev.realtards.kuenyawz.services;
 import dev.realtards.kuenyawz.configurations.ApplicationProperties;
 import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;
 import dev.realtards.kuenyawz.dtos.image.ImageUploadDto;
+import dev.realtards.kuenyawz.entities.Product;
+import dev.realtards.kuenyawz.entities.ProductImage;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
+import dev.realtards.kuenyawz.repositories.ProductImageRepository;
+import dev.realtards.kuenyawz.repositories.ProductRepository;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdGenerator;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -24,9 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Comparator;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -35,146 +36,187 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class ImageStorageServiceImpl implements ImageStorageService {
 
-    private final ApplicationProperties applicationProperties;
-    private final SnowFlakeIdGenerator idGenerator;
+	private final ProductRepository productRepository;
 
-    private Path uploadRootDir;
-    private static final Set<String> ALLOWED_EXTENSIONS = Set.of("png", "jpg", "jpeg", "webp");
+	private final ApplicationProperties applicationProperties;
+	private final SnowFlakeIdGenerator idGenerator;
+	private final ProductImageRepository productImageRepository;
 
-    @Override
-    @PostConstruct
-    public void init() {
-        String productImagesDir = applicationProperties.getProductImagesDir();
+	private final String ROOT_TO_UPLOAD = "/src/main/resources/uploads";
+	private String productImagesDir = "product-images";
+	private Path uploadLocation;
+	private Set<String> acceptedExtensions;
 
-        try {
-            uploadRootDir = Paths.get(System.getProperty("user.dir"), "resources", "uploads", productImagesDir)
-                .normalize()
-                .toAbsolutePath();
+	@Override
+	@PostConstruct
+	public void init() {
+		productImagesDir = applicationProperties.getProductImagesDir();
+		try {
+			uploadLocation = Path.of(System.getProperty("user.dir"), ROOT_TO_UPLOAD, productImagesDir)
+				.normalize()
+				.toAbsolutePath();
+			log.info("Upload directory set at '{}'", uploadLocation);
+			acceptedExtensions = Set.copyOf(applicationProperties.getAcceptedImageExtensions());
+			if (!Files.exists(uploadLocation)) {
+				log.info("Creating upload directory at: {}", uploadLocation);
+				Files.createDirectories(uploadLocation);
+			}
+		} catch (IOException e) {
+			log.error("Failed to create upload directory at {}", uploadLocation, e);
+			throw new ResourceUploadException("Could not create upload directory");
+		} catch (SecurityException e) {
+			log.error("Permission denied to create upload directory at {}", uploadLocation, e);
+			throw new ResourceUploadException("Permission denied to create upload directory");
+		}
+	}
 
-            if (!Files.exists(uploadRootDir)) {
-                log.info("Creating upload directory at: {}", uploadRootDir);
-                Files.createDirectories(uploadRootDir);
-            }
-        } catch (IOException e) {
-            log.error("Failed to create upload directory at {}", uploadRootDir, e);
-            throw new RuntimeException("Could not create upload directory", e);
-        } catch (SecurityException e) {
-            log.error("Permission denied to create upload directory at {}", uploadRootDir, e);
-            throw new RuntimeException("Permission denied to create upload directory", e);
-        }
-    }
+	@Override
+	public ImageResourceDTO store(Long productId, ImageUploadDto imageUploadDto) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new ResourceNotFoundException("Product " + productId + " not found"));
+		if (product.getVariants().size() >= 3) {
+			throw new ResourceUploadException("Product " + productId + " has reached the maximum number of images");
+		}
 
-    @Override
-    public ImageResourceDTO store(ImageUploadDto imageUploadDto, Long productId) {
-        MultipartFile file = imageUploadDto.getFile();
+		final MultipartFile file = imageUploadDto.getFile();
 
-        if (file == null || file.isEmpty()) {
-            throw new ResourceUploadException("Resource uploaded is empty");
-        }
+		if (file.isEmpty()) {
+			throw new ResourceUploadException("Cannot store empty file");
+		}
 
-        // Cleaning the filename to prevent directory traversal
-        String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        String fileExtension = getFileExtension(originalFilename);
+		final String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+		final String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
 
-        if (!ALLOWED_EXTENSIONS.contains(fileExtension.toLowerCase())) {
-            throw new ResourceUploadException("Invalid file extension. Allowed extensions: " +
-                String.join(", ", ALLOWED_EXTENSIONS));
-        }
+		if (!acceptedExtensions.contains(fileExtension.toLowerCase())) {
+			throw new ResourceUploadException(String.format("Invalid file extension '%s', accepted: %s",
+				fileExtension, String.join(", ", acceptedExtensions)));
+		}
 
-        Long generatedId = idGenerator.generateId();
-        String storedFilename = generatedId + "." + fileExtension;
-        Path destinationPath = uploadRootDir.resolve(storedFilename).normalize();
+		final Long generatedId = idGenerator.generateId();
+		final String storedFilename = generatedId + "." + fileExtension;
+		final Path productDirectory = Paths.get(uploadLocation.toString(), productId.toString());
 
-        if (!destinationPath.startsWith(uploadRootDir)) {
-            throw new ResourceUploadException("Cannot store file outside upload directory");
-        }
+		if (!productDirectory.toFile().exists()) {
+			try {
+				Files.createDirectories(Paths.get(uploadLocation.toString(), productId.toString()));
+			} catch (IOException e) {
+				log.error("Failed to create directory for product {}", productId, e);
+				throw new ResourceUploadException("Could not create directory for product " + productId);
+			}
+		}
 
-        try (InputStream inputStream = file.getInputStream()) {
-            Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+		final Path destinationPath = productDirectory.resolve(storedFilename).normalize();
 
-            // Return relative path instead of absolute path
-            Path relativePath = uploadRootDir.relativize(destinationPath);
+		if (!destinationPath.startsWith(productDirectory)) {
+			throw new ResourceUploadException("Cannot store file outside product upload directory");
+		}
 
-            return ImageResourceDTO.builder()
-                .imageResourceId(generatedId)
-                .filename(storedFilename)
-                .relativeLocation(relativePath.toString())
-                .build();
+		try (InputStream inputStream = file.getInputStream()) {
+			// Copy file to the target location
+			Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
 
-        } catch (IOException e) {
-            log.error("Failed to store file {}: {}", originalFilename, e.getMessage());
-            throw new ResourceUploadException("Failed to store file " + originalFilename);
-        }
-    }
+			// Get safe relative path
+			Path relativePath = uploadLocation.relativize(destinationPath);
 
-    @Override
-    public Resource loadAsResource(String requestedPath) {
-        try {
-            Path filePath = uploadRootDir.resolve(requestedPath).normalize();
+			// Save to database
+			productImageRepository.save(ProductImage.builder()
+				.productImageId(generatedId)
+				.originalFilename(originalFilename)
+				.relativePath(relativePath.toString())
+				.fileSize(file.getSize())
+				.product(product)
+				.build());
 
-            if (!filePath.startsWith(uploadRootDir)) {
-                throw new ResourceNotFoundException("Cannot access file outside upload directory");
-            }
+			return ImageResourceDTO.builder()
+				.imageResourceId(generatedId)
+				.originalFilename(originalFilename)
+				.filename(storedFilename)
+				.relativeLocation(relativePath.toString())
+				.build();
 
-            Resource resource = new UrlResource(filePath.toUri());
+		} catch (IOException e) {
+			log.error("Failed to store file {}: {}", originalFilename, e.getMessage());
+			throw new ResourceUploadException("Failed to store file " + originalFilename);
+		}
+	}
 
-            if (!resource.exists() || !resource.isReadable()) {
-                throw new ResourceNotFoundException("File not found: " + requestedPath);
-            }
+	@Override
+	public Resource loadAsResource(final Long productId, String resourceUri) {
+		try {
+			final long resourceId = Long.parseLong(resourceUri.split("\\.")[0]);
 
-            return resource;
-        } catch (MalformedURLException e) {
-            throw new ResourceNotFoundException("File not found: " + requestedPath);
-        }
-    }
+			String relativePath = productImageRepository.findByProduct_ProductIdAndProductImageId(productId, resourceId)
+				.orElseThrow(() -> new ResourceNotFoundException("Resource '" + productId + "/" + resourceId + "' not found"))
+				.getRelativePath();
+			Path requestedPath = Path.of(uploadLocation.toString(), relativePath).normalize().toAbsolutePath();
+			log.warn("Requested path: {}", requestedPath);
+			Resource resource = new UrlResource(requestedPath.toUri());
 
-    @Override
-    public void delete(Long resourceId) {
-        try {
-            Path directory = uploadRootDir;
-            try (Stream<Path> files = Files.list(directory)) {
-                Optional<Path> fileToDelete = files
-                    .filter(file -> file.getFileName().toString().startsWith(resourceId.toString() + "."))
-                    .findFirst();
+			if (resource.exists() || resource.isReadable()) {
+				log.info("Resource '{}' found, exists and readable", requestedPath);
+				return resource;
+			} else {
+				log.warn("Resource '{}' not found", requestedPath);
+				throw new ResourceNotFoundException("Resource '" + productId + "/" + resourceUri + "' not found");
+			}
+		} catch (NumberFormatException | MalformedURLException e) {
+			throw new ResourceNotFoundException("Resource '" + productId + "/" + resourceUri + "' not found");
+		}
+	}
 
-                fileToDelete.ifPresent(path -> {
-                    try {
-                        Files.delete(path);
-                        log.info("Deleted file: {}", path);
-                    } catch (IOException e) {
-                        log.error("Error deleting file: {}", path, e);
-                        throw new ResourceUploadException("Failed to delete file");
-                    }
-                });
-            }
-        } catch (IOException e) {
-            log.error("Error listing directory contents", e);
-            throw new ResourceUploadException("Failed to access directory");
-        }
-    }
+	@Override
+	public void delete(Long productId, String resourceUri) {
+		try {
+			final long resourceId = Long.parseLong(resourceUri.split("\\.")[0]);
+			ProductImage productImage = productImageRepository.findByProduct_ProductIdAndProductImageId(productId, resourceId)
+				.orElseThrow(() -> new ResourceNotFoundException("Resource '" + productId + "/" + resourceId + "' not found"));
 
-    @Override
-    public void deleteAll() {
-        try (Stream<Path> file = Files.walk(uploadRootDir)) {
-            file.sorted(Comparator.reverseOrder())
-                .forEach(path -> {
-                    try {
-                        Files.delete(path);
-                    } catch (IOException e) {
-                        log.error("Error deleting path: {}", path, e);
-                    }
-                });
-            Files.createDirectories(uploadRootDir);
-        } catch (IOException e) {
-            log.error("Error deleting all files", e);
-            throw new ResourceUploadException("Failed to delete all files");
-        }
-    }
+			Path requestedPath = Path.of(uploadLocation.toString(), productImage.getRelativePath()).normalize().toAbsolutePath();
+			log.warn("Requested path for deletion: {}", requestedPath);
+			Files.deleteIfExists(requestedPath);
+			productImageRepository.delete(productImage);
+		} catch (NumberFormatException | IOException e) {
+			throw new ResourceNotFoundException("Resource '" + productId + "/" + resourceUri + "' not found");
+		}
+	}
 
-    private String getFileExtension(String filename) {
-        return Optional.ofNullable(filename)
-            .filter(f -> f.contains("."))
-            .map(f -> f.substring(filename.lastIndexOf(".") + 1))
-            .orElseThrow(() -> new ResourceUploadException("Invalid file format"));
-    }
+	@Override
+	public void deleteAllOfProduct(Long productId) {
+		Path productDirectory = Paths.get(uploadLocation.toString(), productId.toString());
+		try (Stream<Path> paths = Files.walk(productDirectory)) {
+			paths
+				.filter(Files::isRegularFile)
+				.map(Path::toFile)
+				.forEach(File::delete);
+			Files.deleteIfExists(productDirectory);
+		} catch (IOException e) {
+			log.error("Failed to delete product directory for product {}", productId, e);
+			throw new ResourceUploadException("Could not delete product directory for product " + productId);
+		} catch (SecurityException e) {
+			log.error("Permission denied to delete product directory for product {}", productId, e);
+			throw new ResourceUploadException("Permission denied to delete product directory for product " + productId);
+		}
+		productImageRepository.deleteAllByProduct_ProductId(productId);
+	}
+
+	@Override
+	public void deleteAll() {
+		try (Stream<Path> paths = Files.walk(uploadLocation)) {
+			paths
+				.filter(Files::isRegularFile)
+				.map(Path::toFile)
+				.forEach(File::delete);
+			Files.deleteIfExists(uploadLocation);
+
+			// Recreate the upload directory
+			Files.createDirectories(uploadLocation);
+		} catch (IOException e) {
+			log.error("Failed to delete upload directory", e);
+			throw new ResourceUploadException("Could not delete upload directory");
+		} catch (SecurityException e) {
+			log.error("Permission denied to delete upload directory", e);
+			throw new ResourceUploadException("Permission denied to delete upload directory");
+		}
+		productImageRepository.deleteAll();
+	}
 }
