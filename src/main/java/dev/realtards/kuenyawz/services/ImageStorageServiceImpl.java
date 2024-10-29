@@ -38,31 +38,33 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     private final ApplicationProperties applicationProperties;
     private final SnowFlakeIdGenerator idGenerator;
 
-    private Path uploadRootDir;
-    private static final Set<String> ALLOWED_EXTENSIONS = Set.of("png", "jpg", "jpeg", "webp");
+	private final String ROOT_TO_UPLOAD = "/src/main/resources/uploads";
+	private String productImagesDir = "product-images";
+	private Path uploadLocation;
+	private Set<String> acceptedExtensions;
 
-    @Override
-    @PostConstruct
-    public void init() {
-        String productImagesDir = applicationProperties.getProductImagesDir();
-
-        try {
-            uploadRootDir = Paths.get(System.getProperty("user.dir"), "resources", "uploads", productImagesDir)
-                .normalize()
-                .toAbsolutePath();
-
-            if (!Files.exists(uploadRootDir)) {
-                log.info("Creating upload directory at: {}", uploadRootDir);
-                Files.createDirectories(uploadRootDir);
-            }
-        } catch (IOException e) {
-            log.error("Failed to create upload directory at {}", uploadRootDir, e);
-            throw new RuntimeException("Could not create upload directory", e);
-        } catch (SecurityException e) {
-            log.error("Permission denied to create upload directory at {}", uploadRootDir, e);
-            throw new RuntimeException("Permission denied to create upload directory", e);
-        }
-    }
+	@Override
+	@PostConstruct
+	public void init() {
+		productImagesDir = applicationProperties.getProductImagesDir();
+		try {
+			uploadLocation = Path.of(System.getProperty("user.dir"), ROOT_TO_UPLOAD, productImagesDir)
+				.normalize()
+				.toAbsolutePath();
+			log.info("Upload directory set at '{}'", uploadLocation);
+			acceptedExtensions = Set.copyOf(applicationProperties.getAcceptedImageExtensions());
+			if (!Files.exists(uploadLocation)) {
+				log.info("Creating upload directory at: {}", uploadLocation);
+				Files.createDirectories(uploadLocation);
+			}
+		} catch (IOException e) {
+			log.error("Failed to create upload directory at {}", uploadLocation, e);
+			throw new ResourceUploadException("Could not create upload directory");
+		} catch (SecurityException e) {
+			log.error("Permission denied to create upload directory at {}", uploadLocation, e);
+			throw new ResourceUploadException("Permission denied to create upload directory");
+		}
+	}
 
     @Override
     public ImageResourceDTO store(ImageUploadDto imageUploadDto, Long productId) {
