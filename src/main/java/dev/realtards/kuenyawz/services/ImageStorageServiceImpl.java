@@ -3,20 +3,23 @@ package dev.realtards.kuenyawz.services;
 import dev.realtards.kuenyawz.configurations.ApplicationProperties;
 import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;
 import dev.realtards.kuenyawz.dtos.image.ImageUploadDto;
+import dev.realtards.kuenyawz.entities.Product;
+import dev.realtards.kuenyawz.entities.ProductImage;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
+import dev.realtards.kuenyawz.repositories.ProductImageRepository;
+import dev.realtards.kuenyawz.repositories.ProductRepository;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdGenerator;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -24,9 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Comparator;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -35,8 +36,11 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class ImageStorageServiceImpl implements ImageStorageService {
 
-    private final ApplicationProperties applicationProperties;
-    private final SnowFlakeIdGenerator idGenerator;
+	private final ProductRepository productRepository;
+
+	private final ApplicationProperties applicationProperties;
+	private final SnowFlakeIdGenerator idGenerator;
+	private final ProductImageRepository productImageRepository;
 
 	private final String ROOT_TO_UPLOAD = "/src/main/resources/uploads";
 	private String productImagesDir = "product-images";
