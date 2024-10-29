@@ -4,10 +4,6 @@ import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;
 import dev.realtards.kuenyawz.dtos.image.ImageUploadDto;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.nio.file.Path;
-import java.util.stream.Stream;
 
 public interface ImageStorageService {
 
@@ -24,14 +20,35 @@ public interface ImageStorageService {
 	 * @return {@link ImageResourceDTO}
 	 */
 	@Transactional
-	ImageResourceDTO store(ImageUploadDto imageUploadDto, Long productId);
+	ImageResourceDTO store(Long productId, ImageUploadDto imageUploadDto);
 
+	/**
+	 * Loads the resource as a {@link Resource} object by using product id and resource filename.
+	 * @param productId {@link Long} the product id to be associated with the file.
+	 * @param resourceUri {@link String} the resource uri.
+	 * @return {@link Resource}
+	 */
 	@Transactional(readOnly = true)
-	Resource loadAsResource(String filename);
+	Resource loadAsResource(Long productId, String resourceUri);
 
+	/**
+	 * Deletes the resource by using product id and resource filename.
+	 * @param productId {@link Long} the product id to be associated with the file.
+	 * @param resourceUri {@link String} the resource uri.
+	 */
 	@Transactional
-	void delete(Long resourceId);
+	void delete(Long productId, String resourceUri);
 
+	/**
+	 * Deletes all resources associated with the product id.
+	 * @param productId {@link Long} the product id to be associated with the file.
+	 */
+	@Transactional
+	void deleteAllOfProduct(Long productId);
+
+	/**
+	 * Deletes all resources.
+	 */
 	@Transactional
 	void deleteAll();
 }
