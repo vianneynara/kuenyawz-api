@@ -2,7 +2,7 @@ package dev.realtards.kuenyawz.advice;
 
 import dev.realtards.kuenyawz.exceptions.*;
 import dev.realtards.kuenyawz.responses.ErrorResponse;
-import dev.realtards.kuenyawz.responses.ErrorResponseWithErrors;
+import dev.realtards.kuenyawz.responses.ListedErrors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -69,14 +71,19 @@ public class ErrorHandler {
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ErrorResponseWithErrors> handleValidationErrors(MethodArgumentNotValidException ex) {
-		List<String> errors = ex.getBindingResult()
+	public ResponseEntity<Object> handleValidationErrors(MethodArgumentNotValidException ex) {
+		HashMap<String, String> errors = ex.getBindingResult()
 			.getFieldErrors()
 			.stream()
-			.map(FieldError::getDefaultMessage)
-			.collect(Collectors.toList());
+			.collect(Collectors.toMap(
+				FieldError::getField,
+				fieldError -> Objects.requireNonNull(fieldError.getDefaultMessage()),
+				(existing, replacement) -> replacement,
+				HashMap::new
+			));
+
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-			.body(new ErrorResponseWithErrors("Validation failed", errors));
+			.body(new ListedErrors<Map<String, String>>("Validation failed", errors));
 	}
 
 	// TODO: Add handlers for Spring standard exceptions
