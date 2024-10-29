@@ -2,10 +2,8 @@ package dev.realtards.kuenyawz.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException {
 
-	private static final String defaultMessage = "Resource Not Found";
-
 	public ResourceNotFoundException() {
-		super(defaultMessage);
+		super("Resource Not Found");
 	}
 
 	public ResourceNotFoundException(String message) {
