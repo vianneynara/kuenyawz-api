@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MultipartException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,14 +49,19 @@ public class ErrorHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
 	}
 
-	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage()));
-	}
-
 	@ExceptionHandler(IllegalOperationException.class)
 	public ResponseEntity<Object> handleIllegalOperationException(IllegalOperationException ex) {
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(ex.getMessage()));
+	}
+
+	@ExceptionHandler(ResourceUploadException.class)
+	public ResponseEntity<Object> handleResourceUploadException(ResourceUploadException ex) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(ex.getMessage()));
+	}
+
+	@ExceptionHandler(MultipartException.class)
+	public ResponseEntity<Object> handleMultipartException(MultipartException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
 	}
 
 	// watch
