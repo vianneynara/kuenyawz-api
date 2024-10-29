@@ -4,8 +4,11 @@ import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * This is not an explicit configuration class, but a necessary component to read
@@ -21,7 +24,11 @@ public class ApplicationProperties {
 	// Fields
 	private String version;
 	private String repositoryUrl;
-	private String uploadDir = "uploads/product-images";
+	private String productImagesDir = "product-images";
+
+	@Value("#{'${application.accepted-image-extensions}'.split(',')}")
+	private List<String> acceptedImageExtensions;
+
 	private Database database = new Database();
 
 	// Initializing through dotenv
