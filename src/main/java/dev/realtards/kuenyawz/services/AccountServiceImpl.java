@@ -49,7 +49,6 @@ public class AccountServiceImpl implements AccountService {
 			.build();
 
 		account = accountRepository.save(account);
-		log.info("CREATED: {}", account);
 
 		return account;
 	}
@@ -58,7 +57,6 @@ public class AccountServiceImpl implements AccountService {
 	public Account getAccount(long accountId) {
 		Account account = accountRepository.findById(accountId)
 			.orElseThrow(AccountNotFoundException::new);
-		log.info("RETRIEVED by ID: {}", account);
 		return account;
 	}
 
@@ -66,7 +64,6 @@ public class AccountServiceImpl implements AccountService {
 	public Account getAccount(String email) {
 		Account account = accountRepository.findByEmail(email)
 			.orElseThrow(AccountNotFoundException::new);
-		log.info("RETRIEVED by EMAIL: {}", account);
 		return account;
 	}
 
@@ -80,7 +77,6 @@ public class AccountServiceImpl implements AccountService {
 		existingAccount.setPhone(account.getPhone());
 
 		existingAccount = accountRepository.save(existingAccount);
-		log.info("UPDATED: {}", existingAccount);
 
 		return existingAccount;
 	}
@@ -92,7 +88,6 @@ public class AccountServiceImpl implements AccountService {
 		}
 
 		accountRepository.deleteById(accountId);
-		log.info("DELETED: {}", accountId);
 	}
 
 	@Override
@@ -113,7 +108,6 @@ public class AccountServiceImpl implements AccountService {
 			.ifPresent(existingAccount::setPhone);
 
 		Account savedAccount = accountRepository.save(existingAccount);
-		log.info("PATCHED: {}", existingAccount);
 
 		return savedAccount;
 	}
@@ -139,7 +133,6 @@ public class AccountServiceImpl implements AccountService {
 		existingAccount.setPassword(encodedPassword);
 
 		accountRepository.save(existingAccount);
-		log.info("PASSWORD UPDATED: {}", existingAccount);
 
 		return existingAccount;
 	}
@@ -151,7 +144,6 @@ public class AccountServiceImpl implements AccountService {
 
 		existingAccount.setPrivilege(privilegeUpdateDto.getPrivilege());
 		existingAccount = accountRepository.save(existingAccount);
-		log.info("PRIVILEGE UPDATED: {}", existingAccount);
 
 		return existingAccount;
 	}
