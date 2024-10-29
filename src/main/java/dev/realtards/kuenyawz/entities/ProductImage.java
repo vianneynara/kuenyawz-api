@@ -1,25 +1,27 @@
 package dev.realtards.kuenyawz.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductImage extends Auditables {
 
 	@Id
-	@SnowFlakeIdValue(name = "product_image_id")
+//	@SnowFlakeIdValue(name = "product_image_id")
 	@Column(name = "product_image_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
 	private Long productImageId;
 
 	@Column
-	private String originalName;
+	private String originalFilename;
+
+	@Column
+	private String relativePath;
 
 	@Column
 	private Long fileSize;

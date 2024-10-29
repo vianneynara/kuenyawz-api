@@ -63,7 +63,6 @@ public class VariantServiceImpl implements VariantService {
 		product.getVariants().add(variant);
 
 		Variant savedVariant = variantRepository.save(variant);
-		log.info("CREATED: {}", savedVariant);
 
 		// Convert and return
 		VariantDto variantDto = variantMapper.fromEntity(savedVariant);

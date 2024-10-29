@@ -3,12 +3,14 @@ package dev.realtards.kuenyawz.utils.idgenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.IdentifierGenerator;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to generate unique Snow Flake IDs.
  * Claude AI helped me create this class.
  * I honestly have no idea how this works.
  */
+@Component
 @Slf4j
 public class SnowFlakeIdGenerator implements IdentifierGenerator {
 	private static final long EPOCH = 1729468800000L; // 2024-10-21 00:00:00 UTC
@@ -51,6 +53,14 @@ public class SnowFlakeIdGenerator implements IdentifierGenerator {
 		}
 		this.workerId = workerId;
 		this.datacenterId = datacenterId;
+	}
+
+	/**
+	 * This method is used to generate the next ID without Spring Context.
+	 * @return {@code long} value of the next snowflake ID.
+	 */
+	public Long generateId() {
+		return nextId();
 	}
 
 	/**

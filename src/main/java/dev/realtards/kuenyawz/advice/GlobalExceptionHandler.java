@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @ControllerAdvice
-public class ErrorHandler {
+public class GlobalExceptionHandler {
 
 	@ExceptionHandler(AccountNotFoundException.class)
 	public ResponseEntity<Object> handleAccountNotFoundException(AccountNotFoundException ex) {
@@ -52,6 +52,11 @@ public class ErrorHandler {
 	@ExceptionHandler(IllegalOperationException.class)
 	public ResponseEntity<Object> handleIllegalOperationException(IllegalOperationException ex) {
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(ex.getMessage()));
+	}
+
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage()));
 	}
 
 	@ExceptionHandler(ResourceUploadException.class)

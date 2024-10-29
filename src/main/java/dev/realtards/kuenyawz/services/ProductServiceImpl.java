@@ -79,7 +79,6 @@ public class ProductServiceImpl implements ProductService {
 
 		// Convert and return
 		Product savedProduct = productRepository.save(product);
-		log.info("CREATED: {}", savedProduct);
 		ProductDto productDto = productMapper.fromEntity(savedProduct);
 		return productDto;
 	}
@@ -96,7 +95,6 @@ public class ProductServiceImpl implements ProductService {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
-		log.info("RETRIEVED by ID: {}", product);
 		ProductDto productDto = productMapper.fromEntity(product);
 		return productDto;
 	}
@@ -148,7 +146,6 @@ public class ProductServiceImpl implements ProductService {
 		}
 
 		productRepository.deleteById(productId);
-		log.info("DELETED: {}", productId);
 	}
 
 	/**
@@ -166,7 +163,6 @@ public class ProductServiceImpl implements ProductService {
 
 		Product updatedProduct = productMapper.updateProductFromPatch(productPatchDto, product);
 		Product savedProduct = productRepository.save(updatedProduct);
-		log.info("UPDATED: {}", savedProduct);
 
 		// Convert and return
 		ProductDto productDto = productMapper.fromEntity(savedProduct);
