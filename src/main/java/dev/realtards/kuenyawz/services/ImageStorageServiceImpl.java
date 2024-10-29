@@ -160,53 +160,59 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 		}
 	}
 
-    @Override
-    public void delete(Long resourceId) {
-        try {
-            Path directory = uploadRootDir;
-            try (Stream<Path> files = Files.list(directory)) {
-                Optional<Path> fileToDelete = files
-                    .filter(file -> file.getFileName().toString().startsWith(resourceId.toString() + "."))
-                    .findFirst();
+	@Override
+	public void delete(Long productId, String resourceUri) {
+		try {
+			final long resourceId = Long.parseLong(resourceUri.split("\\.")[0]);
+			ProductImage productImage = productImageRepository.findByProduct_ProductIdAndProductImageId(productId, resourceId)
+				.orElseThrow(() -> new ResourceNotFoundException("Resource '" + productId + "/" + resourceId + "' not found"));
 
-                fileToDelete.ifPresent(path -> {
-                    try {
-                        Files.delete(path);
-                        log.info("Deleted file: {}", path);
-                    } catch (IOException e) {
-                        log.error("Error deleting file: {}", path, e);
-                        throw new ResourceUploadException("Failed to delete file");
-                    }
-                });
-            }
-        } catch (IOException e) {
-            log.error("Error listing directory contents", e);
-            throw new ResourceUploadException("Failed to access directory");
-        }
-    }
+			Path requestedPath = Path.of(uploadLocation.toString(), productImage.getRelativePath()).normalize().toAbsolutePath();
+			log.warn("Requested path for deletion: {}", requestedPath);
+			Files.deleteIfExists(requestedPath);
+			productImageRepository.delete(productImage);
+		} catch (NumberFormatException | IOException e) {
+			throw new ResourceNotFoundException("Resource '" + productId + "/" + resourceUri + "' not found");
+		}
+	}
 
-    @Override
-    public void deleteAll() {
-        try (Stream<Path> file = Files.walk(uploadRootDir)) {
-            file.sorted(Comparator.reverseOrder())
-                .forEach(path -> {
-                    try {
-                        Files.delete(path);
-                    } catch (IOException e) {
-                        log.error("Error deleting path: {}", path, e);
-                    }
-                });
-            Files.createDirectories(uploadRootDir);
-        } catch (IOException e) {
-            log.error("Error deleting all files", e);
-            throw new ResourceUploadException("Failed to delete all files");
-        }
-    }
+	@Override
+	public void deleteAllOfProduct(Long productId) {
+		Path productDirectory = Paths.get(uploadLocation.toString(), productId.toString());
+		try (Stream<Path> paths = Files.walk(productDirectory)) {
+			paths
+				.filter(Files::isRegularFile)
+				.map(Path::toFile)
+				.forEach(File::delete);
+			Files.deleteIfExists(productDirectory);
+		} catch (IOException e) {
+			log.error("Failed to delete product directory for product {}", productId, e);
+			throw new ResourceUploadException("Could not delete product directory for product " + productId);
+		} catch (SecurityException e) {
+			log.error("Permission denied to delete product directory for product {}", productId, e);
+			throw new ResourceUploadException("Permission denied to delete product directory for product " + productId);
+		}
+		productImageRepository.deleteAllByProduct_ProductId(productId);
+	}
 
-    private String getFileExtension(String filename) {
-        return Optional.ofNullable(filename)
-            .filter(f -> f.contains("."))
-            .map(f -> f.substring(filename.lastIndexOf(".") + 1))
-            .orElseThrow(() -> new ResourceUploadException("Invalid file format"));
-    }
+	@Override
+	public void deleteAll() {
+		try (Stream<Path> paths = Files.walk(uploadLocation)) {
+			paths
+				.filter(Files::isRegularFile)
+				.map(Path::toFile)
+				.forEach(File::delete);
+			Files.deleteIfExists(uploadLocation);
+
+			// Recreate the upload directory
+			Files.createDirectories(uploadLocation);
+		} catch (IOException e) {
+			log.error("Failed to delete upload directory", e);
+			throw new ResourceUploadException("Could not delete upload directory");
+		} catch (SecurityException e) {
+			log.error("Permission denied to delete upload directory", e);
+			throw new ResourceUploadException("Permission denied to delete upload directory");
+		}
+		productImageRepository.deleteAll();
+	}
 }
