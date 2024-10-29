@@ -5,11 +5,10 @@ import dev.realtards.kuenyawz.dtos.account.PrivilegeUpdateDto;
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
 import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
-import dev.realtards.kuenyawz.exceptions.AccountExistsException;
 import dev.realtards.kuenyawz.entities.Account;
+import dev.realtards.kuenyawz.exceptions.AccountExistsException;
 import dev.realtards.kuenyawz.services.AccountService;
 import dev.realtards.kuenyawz.services.ProductService;
-import dev.realtards.kuenyawz.services.VariantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -26,7 +25,6 @@ public class DatabaseBootstrapper implements CommandLineRunner {
 
 	private final AccountService accountService;
 	private final ProductService productService;
-	private final VariantService variantService;
 
 	private final List<AccountRegistrationDto> BOOTSTRAP_ACCOUNTS = List.of(
 		AccountRegistrationDto.builder()
@@ -166,7 +164,6 @@ public class DatabaseBootstrapper implements CommandLineRunner {
 
 				if (!exists) {
 					ProductDto createdProduct = productService.createProduct(product);
-					log.info("Created product: {}", createdProduct.getName());
 				} else {
 					log.warn("Product already exists: {}", product.getName());
 				}
@@ -178,7 +175,10 @@ public class DatabaseBootstrapper implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
+		log.info("Bootstrapping database...");
 		injectAccounts();
 		injectProducts();
+
+		log.info("Database bootstrapping complete");
 	}
 }

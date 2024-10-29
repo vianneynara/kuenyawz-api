@@ -16,6 +16,9 @@ import java.util.List;
 @Builder
 public class ProductDto {
 
+	@Schema(description = "Product ID", example = "1234")
+	private Long productId;
+
 	@Schema(description = "Product name", example = "Muffin", minLength = 2, maxLength = 128)
 	private String name;
 
