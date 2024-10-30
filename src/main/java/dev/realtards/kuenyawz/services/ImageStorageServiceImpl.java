@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -74,7 +75,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 	public ImageResourceDTO store(Long productId, ImageUploadDto imageUploadDto) {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new ResourceNotFoundException("Product " + productId + " not found"));
-		if (product.getVariants().size() >= 3) {
+		if (product.getImages().size() >= 3) {
 			throw new ResourceUploadException("Product " + productId + " has reached the maximum number of images");
 		}
 
@@ -122,6 +123,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 			productImageRepository.save(ProductImage.builder()
 				.productImageId(generatedId)
 				.originalFilename(originalFilename)
+				.storedFilename(storedFilename)
 				.relativePath(relativePath.toString())
 				.fileSize(file.getSize())
 				.product(product)
@@ -218,5 +220,22 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 			throw new ResourceUploadException("Permission denied to delete upload directory");
 		}
 		productImageRepository.deleteAll();
+	}
+
+	@Override
+	public String getImageUrl(Long productId, String resourceUri) {
+		return applicationProperties.getBaseUrl() + "/api/v1/images/" + productId + "/" + resourceUri;
+	}
+
+	@Override
+	public String getImageUrl(ProductImage productImage) {
+		return getImageUrl(productImage.getProduct().getProductId(), productImage.getStoredFilename());
+	}
+
+	@Override
+	public List<String> getImageUrls(Product product) {
+		return product.getImages().stream()
+			.map(this::getImageUrl)
+			.toList();
 	}
 }

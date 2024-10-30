@@ -2,8 +2,12 @@ package dev.realtards.kuenyawz.services;
 
 import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;
 import dev.realtards.kuenyawz.dtos.image.ImageUploadDto;
+import dev.realtards.kuenyawz.entities.Product;
+import dev.realtards.kuenyawz.entities.ProductImage;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 public interface ImageStorageService {
 
@@ -51,4 +55,10 @@ public interface ImageStorageService {
 	 */
 	@Transactional
 	void deleteAll();
+
+	String getImageUrl(Long productId, String resourceUri);
+
+	String getImageUrl(ProductImage productImage);
+
+	List<String> getImageUrls(Product product);
 }
