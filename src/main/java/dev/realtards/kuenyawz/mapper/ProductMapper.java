@@ -14,6 +14,7 @@ public interface ProductMapper {
 
 	Product toEntity(ProductPostDto productPostDto);
 
+	@Mapping(target = "images", ignore = true)
 	ProductDto fromEntity(Product product);
 
     @Mapping(target = "version", ignore = true)
