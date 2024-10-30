@@ -48,6 +48,23 @@ public class ProductImageController extends BaseController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(imageResourceDTO);
 	}
 
+	@Operation(summary = "Batch upload multiple images using form-data")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "Images uploaded successfully",
+		content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+		@ApiResponse(responseCode = "400", description = "Invalid image file"),
+		@ApiResponse(responseCode = "404", description = "Product not found"),
+	})
+	@PostMapping("{productId}/batch")
+	public ResponseEntity<Object> batchUploadImage(
+		@PathVariable Long productId,
+		@Valid @ModelAttribute BatchImageUploadDto batchImageUploadDto
+	) {
+		List<ImageResourceDTO> listOfImageResourceDto = imageStorageService.batchStore(productId, batchImageUploadDto);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(new ListOfImageResourceDto(listOfImageResourceDto));
+	}
+
 	@Operation(summary = "Serve a specific image for a product")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Image served successfully",
