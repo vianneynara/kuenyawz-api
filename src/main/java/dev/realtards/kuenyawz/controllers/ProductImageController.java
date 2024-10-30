@@ -34,7 +34,7 @@ public class ProductImageController extends BaseController {
 	@Operation(summary = "Upload an image for a product using form-data")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "201", description = "Image uploaded successfully",
-			content = @Content(mediaType = "application/json",
+			content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
 				schema = @Schema(implementation = ImageResourceDTO.class))),
 		@ApiResponse(responseCode = "400", description = "Invalid image file"),
 		@ApiResponse(responseCode = "404", description = "Product not found"),
