@@ -83,16 +83,21 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
 	@Override
 	public List<ImageResourceDTO> batchStore(Long productId, BatchImageUploadDto batchImageUploadDto) {
+		if (batchImageUploadDto == null || batchImageUploadDto.getFiles().isEmpty()) {
+			throw new ResourceUploadException("Cannot store empty batch");
+		}
+
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new ResourceNotFoundException("Product " + productId + " not found"));
-		if ((product.getImages().size() + batchImageUploadDto.getImages().size()) >= 3) {
+		if ((product.getImages().size() + batchImageUploadDto.getFiles().size()) > 3) {
 			throw new ResourceUploadException("Product " + productId + " already has " + product.getImages().size()
 				+ " images, can only save " + (3 - product.getImages().size()) + " more images");
 		}
 
+		// For each MultiPartFile in the batch DTO, process the image storing
 		List<ImageResourceDTO> imageResourceDTOs = new java.util.ArrayList<>(List.of());
-		batchImageUploadDto.getImages().forEach(imageUploadDto -> {
-			ImageResourceDTO imageResourceDTO = processImageStoring(product, imageUploadDto);
+		batchImageUploadDto.getFiles().forEach(file -> {
+			ImageResourceDTO imageResourceDTO = processImageStoring(product, file);
 			imageResourceDTOs.add(imageResourceDTO);
 		});
 		return imageResourceDTOs;
