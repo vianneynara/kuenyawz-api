@@ -39,4 +39,7 @@ public class ProductDto {
 
 	@Schema(description = "Product variants")
 	private List<VariantDto> variants;
+
+	@Schema(description = "Product images URLs", example = "https://kuenyawz/api/v1/876234784758/32943584794953.jpg")
+	private List<String> images;
 }
