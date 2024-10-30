@@ -21,6 +21,9 @@ public class ProductImage extends Auditables {
 	private String originalFilename;
 
 	@Column
+	private String storedFilename;
+
+	@Column
 	private String relativePath;
 
 	@Column
