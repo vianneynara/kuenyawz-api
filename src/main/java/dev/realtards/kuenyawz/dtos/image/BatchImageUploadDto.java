@@ -1,11 +1,13 @@
 package dev.realtards.kuenyawz.dtos.image;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,7 +19,8 @@ import java.util.List;
 public class BatchImageUploadDto {
 
 	@Schema(description = "List of image files")
-	@Size(min = 1, message = "At least one image is required")
-	@Size(max = 3, message = "At most 3 images are allowed")
-	private List<ImageUploadDto> images;
+	@NotNull(message = "Image files are required")
+	@Size(min = 1, message = "At least one image file is required")
+	@Size(max = 3, message = "At most 3 images files are allowed")
+	private List<MultipartFile> files;
 }
