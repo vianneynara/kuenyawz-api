@@ -25,6 +25,7 @@ public class ApplicationProperties {
 	private String version;
 	private String repositoryUrl;
 	private String productImagesDir = "product-images";
+	private String baseUrl = "http://localhost:8081";
 
 	@Value("#{'${application.accepted-image-extensions}'.split(',')}")
 	private List<String> acceptedImageExtensions;
