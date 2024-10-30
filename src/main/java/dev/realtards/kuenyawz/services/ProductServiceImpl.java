@@ -30,11 +30,6 @@ public class ProductServiceImpl implements ProductService {
 	private final ProductMapper productMapper;
 	private final ImageStorageService imageStorageService;
 
-	/**
-	 * Master method to get all products.
-	 *
-	 * @return {@link List} of {@link ProductDto}
-	 */
 	@Override
 	public List<ProductDto> getAllProducts() {
 		return productRepository.findAll()
@@ -43,12 +38,6 @@ public class ProductServiceImpl implements ProductService {
 			.toList();
 	}
 
-	/**
-	 * Creates a new product from the DTO with the provided variants' DTOs.
-	 *
-	 * @param productPostDto {@link ProductPostDto}
-	 * @return {@link ProductDto}
-	 */
 	@Override
 	public ProductDto createProduct(ProductPostDto productPostDto) {
 		Objects.requireNonNull(productPostDto, "ProductPostDto cannot be null");
@@ -84,13 +73,6 @@ public class ProductServiceImpl implements ProductService {
 		return productDto;
 	}
 
-	/**
-	 * Retrieves a product by its ID.
-	 *
-	 * @param productId {@link Long}
-	 * @return {@link ProductDto}
-	 * @throws ResourceNotFoundException if the product is not found
-	 */
 	@Override
 	public ProductDto getProduct(long productId) {
 		Product product = productRepository.findById(productId)
@@ -100,13 +82,6 @@ public class ProductServiceImpl implements ProductService {
 		return productDto;
 	}
 
-	/**
-	 * Retrieves a product by a keyword.
-	 *
-	 * @param keyword {@link String}
-	 * @return {@link ProductDto}
-	 * @throws ResourceNotFoundException if the product is not found
-	 */
 	@Override
 	public List<ProductDto> getAllProductByKeyword(String keyword) {
 		List<Product> products = productRepository.findAllByNameLikeIgnoreCase(keyword);
@@ -115,13 +90,6 @@ public class ProductServiceImpl implements ProductService {
 		return productDtos;
 	}
 
-	/**
-	 * Retrieves all products by a category.
-	 *
-	 * @param category {@link String}
-	 * @return {@link List} of {@link ProductDto}
-	 * @throws InvalidRequestBodyValue if the category is invalid
-	 */
 	@Override
 	public List<ProductDto> getProductsByCategory(String category) {
 		try {
@@ -134,12 +102,6 @@ public class ProductServiceImpl implements ProductService {
 		}
 	}
 
-	/**
-	 * Deletes a product by its ID.
-	 *
-	 * @param productId {@link Long}
-	 * @throws ResourceNotFoundException if the product is not found
-	 */
 	@Override
 	public void deleteProduct(long productId) {
 		if (!productRepository.existsById(productId)) {
@@ -149,14 +111,7 @@ public class ProductServiceImpl implements ProductService {
 		productRepository.deleteById(productId);
 	}
 
-	/**
-	 * Patches a product by its ID.
-	 *
-	 * @param productId {@link Long}
-	 * @param productPatchDto {@link ProductPatchDto}
-	 * @return {@link ProductDto}
-	 * @throws ResourceNotFoundException if the product is not found
-	 */
+
 	@Override
 	public ProductDto patchProduct(Long productId, ProductPatchDto productPatchDto) {
 		Product product = productRepository.findById(productId)
@@ -170,18 +125,20 @@ public class ProductServiceImpl implements ProductService {
 		return productDto;
 	}
 
-	/**
-	 * Checks if a product exists by its ID.
-	 *
-	 * @param productId {@link Long}
-	 * @return {@link Boolean}
-	 */
+
 	@Override
 	public boolean existsById(Long productId) {
 		return productRepository.existsById(productId);
 	}
 
-	ProductDto convertToDto(Product product) {
+	/**
+	 * Converts a Product entity to a ProductDto using the mapper, and then sets the image URLs using
+	 * {@link ImageStorageService#getImageUrls(Product)}.
+	 *
+	 * @param product {@link Product}
+	 * @return {@link ProductDto}
+	 */
+	private ProductDto convertToDto(Product product) {
 		ProductDto productDto = productMapper.fromEntity(product);
 		productDto.setImages(imageStorageService.getImageUrls(product));
 		return productDto;

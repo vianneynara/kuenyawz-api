@@ -29,11 +29,6 @@ public class VariantServiceImpl implements VariantService {
 	private final VariantRepository variantRepository;
 	private final VariantMapper variantMapper;
 
-	/**
-	 * Master method to get all variants.
-	 *
-	 * @return {@link List} of {@link VariantDto}
-	 */
 	@Override
 	public List<VariantDto> getAllVariants() {
 		List<Variant> variants = variantRepository.findAll();
@@ -42,14 +37,6 @@ public class VariantServiceImpl implements VariantService {
 		return variantDtos;
 	}
 
-	/**
-	 * Creates a variant and connect it to an existing product.
-	 *
-	 * @param productId      {@link Long}
-	 * @param variantPostDto {@link VariantPostDto}
-	 * @return {@link Variant}
-	 * @throws ResourceNotFoundException if the product is not found
-	 */
 	@Override
 	public VariantDto createVariant(Long productId, VariantPostDto variantPostDto) {
 		Product product = productRepository.findById(productId)
@@ -69,14 +56,6 @@ public class VariantServiceImpl implements VariantService {
 		return variantDto;
 	}
 
-	/**
-	 * Creates multiple variants and connect it to an existing product.
-	 *
-	 * @param productId       {@link Long}
-	 * @param variantPostDtos {@link Iterable} of {@link VariantPostDto}
-	 * @return {@link List} of {@link VariantDto}
-	 * @throws ResourceNotFoundException if the product is not found
-	 */
 	@Override
 	public List<VariantDto> createVariants(Long productId, VariantPostDto... variantPostDtos) {
 		Product product = productRepository.findById(productId)
@@ -101,12 +80,6 @@ public class VariantServiceImpl implements VariantService {
 		return variantDtos;
 	}
 
-	/**
-	 * Gets a variant by its ID.
-	 *
-	 * @param variantId {@link Long}
-	 * @return {@link VariantDto}
-	 */
 	@Override
 	public VariantDto getVariant(long variantId) {
 		Variant variant = variantRepository.findById(variantId)
@@ -124,15 +97,6 @@ public class VariantServiceImpl implements VariantService {
 		return variantDtos;
 	}
 
-	/**
-	 * Patches the variant using Mapper.
-	 *
-	 * @param productId {@link Long}
-	 * @param variantId {@link Long}
-	 * @param variantPatchDto {@link VariantPatchDto}
-	 * @return {@link VariantDto}
-	 * @throws ResourceNotFoundException if the variant is not found
-	 */
 	@Override
 	public VariantDto patchVariant(Long productId, Long variantId, VariantPatchDto variantPatchDto) {
         if (!productRepository.existsById(productId)) {
@@ -151,14 +115,6 @@ public class VariantServiceImpl implements VariantService {
 		return variantDto;
 	}
 
-	/**
-	 * Deletes a variant from a product. Checks the variant, then deletes it.
-	 *
-	 * @param productId {@link Long}
-	 * @param variantId {@link Long}
-	 * @throws IllegalOperationException if the product only has one variant
-	 * @throws ResourceNotFoundException if the variant is not found
-	 */
 	@Override
 	public void deleteVariant(Long productId, Long variantId) {
 		long variantCount = variantRepository.countVariantsByProduct_ProductId(productId);
