@@ -28,6 +28,7 @@ public class ProductServiceImpl implements ProductService {
 
 	private final ProductRepository productRepository;
 	private final ProductMapper productMapper;
+	private final ImageStorageService imageStorageService;
 
 	/**
 	 * Master method to get all products.
@@ -38,7 +39,7 @@ public class ProductServiceImpl implements ProductService {
 	public List<ProductDto> getAllProducts() {
 		return productRepository.findAll()
 			.stream()
-			.map(productMapper::fromEntity)
+			.map(this::convertToDto)
 			.toList();
 	}
 
@@ -95,7 +96,7 @@ public class ProductServiceImpl implements ProductService {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
-		ProductDto productDto = productMapper.fromEntity(product);
+		ProductDto productDto = this.convertToDto(product);
 		return productDto;
 	}
 
@@ -178,5 +179,11 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public boolean existsById(Long productId) {
 		return productRepository.existsById(productId);
+	}
+
+	ProductDto convertToDto(Product product) {
+		ProductDto productDto = productMapper.fromEntity(product);
+		productDto.setImages(imageStorageService.getImageUrls(product));
+		return productDto;
 	}
 }
