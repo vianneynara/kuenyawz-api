@@ -1,6 +1,7 @@
 package dev.realtards.kuenyawz.services;
 
 import dev.realtards.kuenyawz.configurations.ApplicationProperties;
+import dev.realtards.kuenyawz.dtos.image.BatchImageUploadDto;
 import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;
 import dev.realtards.kuenyawz.dtos.image.ImageUploadDto;
 import dev.realtards.kuenyawz.entities.Product;
@@ -81,6 +82,23 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
 		ImageResourceDTO imageResourceDTO = processImageStoring(product, imageUploadDto);
 		return imageResourceDTO;
+	}
+
+	@Override
+	public List<ImageResourceDTO> batchStore(Long productId, BatchImageUploadDto batchImageUploadDto) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new ResourceNotFoundException("Product " + productId + " not found"));
+		if ((product.getImages().size() + batchImageUploadDto.getImages().size()) >= 3) {
+			throw new ResourceUploadException("Product " + productId + " already has " + product.getImages().size()
+				+ " images, can only save " + (3 - product.getImages().size()) + " more images");
+		}
+
+		List<ImageResourceDTO> imageResourceDTOs = new java.util.ArrayList<>(List.of());
+		batchImageUploadDto.getImages().forEach(imageUploadDto -> {
+			ImageResourceDTO imageResourceDTO = processImageStoring(product, imageUploadDto);
+			imageResourceDTOs.add(imageResourceDTO);
+		});
+		return imageResourceDTOs;
 	}
 
 	@Override

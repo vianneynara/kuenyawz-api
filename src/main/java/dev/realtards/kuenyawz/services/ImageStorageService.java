@@ -1,9 +1,11 @@
 package dev.realtards.kuenyawz.services;
 
+import dev.realtards.kuenyawz.dtos.image.BatchImageUploadDto;
 import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;
 import dev.realtards.kuenyawz.dtos.image.ImageUploadDto;
 import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.ProductImage;
+import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,16 @@ public interface ImageStorageService {
 	 */
 	@Transactional
 	ImageResourceDTO store(Long productId, ImageUploadDto imageUploadDto);
+
+	/**
+	 * Prepares the storing mechanism with the files and the product id.
+	 *
+	 * @param productId {@link Long} the product id to be associated with the file.
+	 * @param batchImageUploadDto {@link BatchImageUploadDto}
+	 * @return {@link List<ImageResourceDTO>}
+	 */
+	@Transactional
+	List<ImageResourceDTO> batchStore(Long productId, BatchImageUploadDto batchImageUploadDto);
 
 	/**
 	 * Loads the resource as a {@link Resource} object by using product id and resource filename.
