@@ -14,6 +14,7 @@ public class ProductImage extends Auditables {
 
 	@Id
 //	@SnowFlakeIdValue(name = "product_image_id")
+	// This is defined by the builder when saving, making it consistent with the filename id
 	@Column(name = "product_image_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
 	private Long productImageId;
 
