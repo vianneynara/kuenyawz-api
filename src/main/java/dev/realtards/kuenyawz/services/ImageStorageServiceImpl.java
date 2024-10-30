@@ -24,10 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -151,8 +148,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 				.forEach(File::delete);
 			Files.deleteIfExists(productDirectory);
 		} catch (IOException e) {
-			log.error("Failed to delete product directory for product {}", productId, e);
-			throw new ResourceUploadException("Could not delete product directory for product " + productId);
+			log.warn("Failed to delete product directory for product {}", productId, e);
 		} catch (SecurityException e) {
 			log.error("Permission denied to delete product directory for product {}", productId, e);
 			throw new ResourceUploadException("Permission denied to delete product directory for product " + productId);
