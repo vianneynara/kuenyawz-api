@@ -196,6 +196,24 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
 	// Helper / extracted methods
 
+	/**
+	 * Process image storing using multipart file to be converted to {@link ImageUploadDto}.
+	 *
+	 * @param product {@link Product}
+	 * @param file {@link MultipartFile}
+	 * @return {@link ImageResourceDTO}
+	 */
+	private ImageResourceDTO processImageStoring(Product product, MultipartFile file) {
+		return processImageStoring(product, ImageUploadDto.builder().file(file).build());
+	}
+
+	/**
+	 * {@link ImageUploadDto} storing procedure.
+	 *
+	 * @param product {@link Product}
+	 * @param imageUploadDto {@link }
+	 * @return {@link ImageResourceDTO}
+	 */
 	private ImageResourceDTO processImageStoring(Product product, ImageUploadDto imageUploadDto) {
 		final MultipartFile file = imageUploadDto.getFile();
 
