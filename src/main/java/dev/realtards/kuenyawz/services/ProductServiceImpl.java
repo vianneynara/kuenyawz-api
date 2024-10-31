@@ -7,6 +7,7 @@ import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
 import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
+import dev.realtards.kuenyawz.exceptions.ResourceExistsException;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
@@ -43,11 +44,11 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public ProductDto createProduct(ProductPostDto productPostDto) {
 		if (productPostDto == null)
-			throw new ResourceUploadException("ProductPostDto cannot be null");
+			throw new InvalidRequestBodyValue("ProductPostDto cannot be null");
 		if (productPostDto.getVariants() == null || productPostDto.getVariants().isEmpty())
-			throw new ResourceUploadException("Variants must not be empty");
+			throw new InvalidRequestBodyValue("Variants must not be empty");
 		if (productRepository.existsByNameIgnoreCase(productPostDto.getName()))
-			throw new ResourceUploadException("Product with name '" + productPostDto.getName() + "' exists");
+			throw new ResourceExistsException("Product with name '" + productPostDto.getName() + "' exists");
 
 		Product product = Product.builder()
 			.name(productPostDto.getName())
@@ -127,7 +128,7 @@ public class ProductServiceImpl implements ProductService {
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
 		if (productRepository.existsByNameIgnoreCase(productPatchDto.getName()))
-			throw new ResourceUploadException("Product with name '" + productPatchDto.getName() + "' exists");
+			throw new ResourceExistsException("Product with name '" + productPatchDto.getName() + "' exists");
 
 		Product updatedProduct = productMapper.updateProductFromPatch(productPatchDto, product);
 		Product savedProduct = productRepository.save(updatedProduct);
