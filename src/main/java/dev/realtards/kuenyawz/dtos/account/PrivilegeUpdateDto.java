@@ -1,6 +1,7 @@
 package dev.realtards.kuenyawz.dtos.account;
 
 import dev.realtards.kuenyawz.entities.Account;
+import dev.realtards.kuenyawz.utils.stringtrimmer.CleanString;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -16,6 +17,7 @@ public class PrivilegeUpdateDto {
 	@Schema(description = "New privilege level to set",	example = "user")
 	@NotBlank(message = "Privilege is required")
 	@Pattern(regexp = "^(admin|user)$", message = "Privilege must be either 'admin' or 'user'")
+	@CleanString
 	private String privilege;
 
 	public Account.Privilege getPrivilege() {
