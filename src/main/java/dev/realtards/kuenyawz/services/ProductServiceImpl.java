@@ -10,6 +10,7 @@ import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
+import dev.realtards.kuenyawz.repositories.ProductImageRepository;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class ProductServiceImpl implements ProductService {
 	private final ProductRepository productRepository;
 	private final ProductMapper productMapper;
 	private final ImageStorageService imageStorageService;
+	private final ProductImageRepository productImageRepository;
 
 	@Override
 	public List<ProductDto> getAllProducts() {
@@ -109,6 +111,13 @@ public class ProductServiceImpl implements ProductService {
 		}
 
 		productRepository.deleteById(productId);
+	}
+
+	@Override
+	public void deleteAllProducts() {
+		productRepository.deleteAll();
+
+		productImageRepository.deleteAll();
 	}
 
 

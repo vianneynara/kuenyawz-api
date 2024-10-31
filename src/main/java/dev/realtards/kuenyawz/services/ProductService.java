@@ -69,6 +69,12 @@ public interface ProductService {
 	void deleteProduct(long productId);
 
 	/**
+	 * Deletes all products in the database and all the images related to it.
+	 */
+	@Transactional
+	void deleteAllProducts();
+
+	/**
 	 * Patches a product by its ID.
 	 *
 	 * @param productId {@link Long}

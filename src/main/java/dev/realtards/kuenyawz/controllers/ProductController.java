@@ -124,6 +124,16 @@ public class ProductController extends BaseController {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
+	@Operation(summary = "(Master) Deletes all products in the database")
+	@ApiResponses({
+		@ApiResponse(responseCode = "204", description = "All products deleted successfully")
+	})
+	@DeleteMapping("/all")
+	public ResponseEntity<Object> deleteAllProducts() {
+		productService.deleteAllProducts();
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
 	@Operation(summary = "Patch a product by ID")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Product patched successfully",
