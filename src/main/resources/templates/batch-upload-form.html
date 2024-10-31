@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Batch Image Upload</title>
+</head>
+<body>
+<h1>Batch Image Upload</h1>
+<label for="productId">Product ID:</label>
+<select id="productId" name="productId" required></select>
+<button onclick="refreshProductOptions()">Refresh</button>
+<br><br>
+<label for="file">Files to upload:</label>
+<input type="file" id="file" name="file" multiple required>
+<br><br>
+<button onclick="uploadImages()">Upload Images</button>
+<br><br>
+<div id="responses"></div>
+
+<script>
+    function refreshProductOptions() {
+        fetchProductIds();
+    }
+
+    function fetchProductIds() {
+        fetch('http://localhost:8081/api/v1/product/all')
+            .then(response => response.json())
+            .then(data => {
+                const productSelect = document.getElementById('productId');
+                productSelect.innerHTML = '<option value="">Select a product</option>';
+
+                data.products.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product.productId;
+                    option.text = `(${product.productId}) ${product.name} - ${product.images.length} images`;
+                    productSelect.add(option);
+                });
+            })
+            .catch(error => {
+                alert('Error fetching product IDs: ' + error);
+            });
+    }
+
+    function uploadImages() {
+        const productId = document.getElementById('productId').value;
+        const fileInput = document.getElementById('file');
+        const formData = new FormData();
+
+        for (const file of fileInput.files) {
+            formData.append('files', file);
+        }
+
+        const responseDiv = document.getElementById('responses');
+        responseDiv.innerHTML = '';
+
+        fetch(`http://localhost:8081/api/v1/images/${productId}/batch`, {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                responseDiv.innerHTML = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                responseDiv.innerHTML = 'Error uploading images: ' + error;
+            });
+    }
+
+    fetchProductIds();
+</script>
+</body>
+</html>
