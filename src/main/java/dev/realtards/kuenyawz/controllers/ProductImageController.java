@@ -128,9 +128,4 @@ public class ProductImageController extends BaseController {
 		imageStorageService.deleteAll();
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
-
-	@GetMapping("/batch-upload-form")
-	public String batchUploadForm() {
-		return "batch-upload-form";
-	}
 }
