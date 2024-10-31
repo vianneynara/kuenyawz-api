@@ -36,6 +36,9 @@ public class ProductServiceImplTest {
 	@InjectMocks
 	private ProductServiceImpl productService;
 
+	@Mock
+	private ImageStorageService imageStorageService;
+
 	@Spy
 	private ProductMapper productMapper;
 

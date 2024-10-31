@@ -1,6 +1,7 @@
 package dev.realtards.kuenyawz.services;
 
 import dev.realtards.kuenyawz.configurations.ApplicationProperties;
+import dev.realtards.kuenyawz.dtos.image.BatchImageUploadDto;
 import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;
 import dev.realtards.kuenyawz.dtos.image.ImageUploadDto;
 import dev.realtards.kuenyawz.entities.Product;
@@ -23,10 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -79,67 +77,30 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 			throw new ResourceUploadException("Product " + productId + " has reached the maximum number of images");
 		}
 
-		final MultipartFile file = imageUploadDto.getFile();
+		ImageResourceDTO imageResourceDTO = processImageStoring(product, imageUploadDto);
+		return imageResourceDTO;
+	}
 
-		if (file.isEmpty()) {
-			throw new ResourceUploadException("Cannot store empty file");
+	@Override
+	public List<ImageResourceDTO> batchStore(Long productId, BatchImageUploadDto batchImageUploadDto) {
+		if (batchImageUploadDto == null || batchImageUploadDto.getFiles().isEmpty()) {
+			throw new ResourceUploadException("Cannot store empty batch");
 		}
 
-		final String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-		final String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-
-		if (!acceptedExtensions.contains(fileExtension.toLowerCase())) {
-			throw new ResourceUploadException(String.format("Invalid file extension '%s', accepted: %s",
-				fileExtension, String.join(", ", acceptedExtensions)));
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new ResourceNotFoundException("Product " + productId + " not found"));
+		if ((product.getImages().size() + batchImageUploadDto.getFiles().size()) > 3) {
+			throw new ResourceUploadException("Product " + productId + " already has " + product.getImages().size()
+				+ " images, can only save " + (3 - product.getImages().size()) + " more images");
 		}
 
-		final Long generatedId = idGenerator.generateId();
-		final String storedFilename = generatedId + "." + fileExtension;
-		final Path productDirectory = Paths.get(uploadLocation.toString(), productId.toString());
-
-		if (!productDirectory.toFile().exists()) {
-			try {
-				Files.createDirectories(Paths.get(uploadLocation.toString(), productId.toString()));
-			} catch (IOException e) {
-				log.error("Failed to create directory for product {}", productId, e);
-				throw new ResourceUploadException("Could not create directory for product " + productId);
-			}
-		}
-
-		final Path destinationPath = productDirectory.resolve(storedFilename).normalize();
-
-		if (!destinationPath.startsWith(productDirectory)) {
-			throw new ResourceUploadException("Cannot store file outside product upload directory");
-		}
-
-		try (InputStream inputStream = file.getInputStream()) {
-			// Copy file to the target location
-			Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-
-			// Get safe relative path
-			Path relativePath = uploadLocation.relativize(destinationPath);
-
-			// Save to database
-			productImageRepository.save(ProductImage.builder()
-				.productImageId(generatedId)
-				.originalFilename(originalFilename)
-				.storedFilename(storedFilename)
-				.relativePath(relativePath.toString())
-				.fileSize(file.getSize())
-				.product(product)
-				.build());
-
-			return ImageResourceDTO.builder()
-				.imageResourceId(generatedId)
-				.originalFilename(originalFilename)
-				.filename(storedFilename)
-				.relativeLocation(relativePath.toString())
-				.build();
-
-		} catch (IOException e) {
-			log.error("Failed to store file {}: {}", originalFilename, e.getMessage());
-			throw new ResourceUploadException("Failed to store file " + originalFilename);
-		}
+		// For each MultiPartFile in the batch DTO, process the image storing
+		List<ImageResourceDTO> imageResourceDTOs = new java.util.ArrayList<>(List.of());
+		batchImageUploadDto.getFiles().forEach(file -> {
+			ImageResourceDTO imageResourceDTO = processImageStoring(product, file);
+			imageResourceDTOs.add(imageResourceDTO);
+		});
+		return imageResourceDTOs;
 	}
 
 	@Override
@@ -192,8 +153,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 				.forEach(File::delete);
 			Files.deleteIfExists(productDirectory);
 		} catch (IOException e) {
-			log.error("Failed to delete product directory for product {}", productId, e);
-			throw new ResourceUploadException("Could not delete product directory for product " + productId);
+			log.warn("Failed to delete product directory for product {}", productId, e);
 		} catch (SecurityException e) {
 			log.error("Permission denied to delete product directory for product {}", productId, e);
 			throw new ResourceUploadException("Permission denied to delete product directory for product " + productId);
@@ -237,5 +197,89 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 		return product.getImages().stream()
 			.map(this::getImageUrl)
 			.toList();
+	}
+
+	// Helper / extracted methods
+
+	/**
+	 * Process image storing using multipart file to be converted to {@link ImageUploadDto}.
+	 *
+	 * @param product {@link Product}
+	 * @param file {@link MultipartFile}
+	 * @return {@link ImageResourceDTO}
+	 */
+	private ImageResourceDTO processImageStoring(Product product, MultipartFile file) {
+		return processImageStoring(product, ImageUploadDto.builder().file(file).build());
+	}
+
+	/**
+	 * {@link ImageUploadDto} storing procedure.
+	 *
+	 * @param product {@link Product}
+	 * @param imageUploadDto {@link }
+	 * @return {@link ImageResourceDTO}
+	 */
+	private ImageResourceDTO processImageStoring(Product product, ImageUploadDto imageUploadDto) {
+		final MultipartFile file = imageUploadDto.getFile();
+
+		if (file.isEmpty()) {
+			throw new ResourceUploadException("Cannot store empty file");
+		}
+
+		final String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+		final String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+
+		if (!acceptedExtensions.contains(fileExtension.toLowerCase())) {
+			throw new ResourceUploadException(String.format("Invalid file extension '%s', accepted: %s",
+				fileExtension, String.join(", ", acceptedExtensions)));
+		}
+
+		final Long generatedId = idGenerator.generateId();
+		final String storedFilename = generatedId + "." + fileExtension;
+		final Path productDirectory = Paths.get(uploadLocation.toString(), product.getProductId().toString());
+
+		if (!productDirectory.toFile().exists()) {
+			try {
+				Files.createDirectories(Paths.get(uploadLocation.toString(), product.getProductId().toString()));
+			} catch (IOException e) {
+				log.error("Failed to create directory for product {}", product.getProductId(), e);
+				throw new ResourceUploadException("Could not create directory for product " + product.getProductId());
+			}
+		}
+
+		final Path destinationPath = productDirectory.resolve(storedFilename).normalize();
+
+		if (!destinationPath.startsWith(productDirectory)) {
+			throw new ResourceUploadException("Cannot store file outside product upload directory");
+		}
+
+		try (InputStream inputStream = file.getInputStream()) {
+			// Copy file to the target location
+			Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+
+			// Get safe relative path
+			Path relativePath = uploadLocation.relativize(destinationPath);
+
+			// Save to database
+			productImageRepository.save(ProductImage.builder()
+				.productImageId(generatedId)
+				.originalFilename(originalFilename)
+				.storedFilename(storedFilename)
+				.relativePath(relativePath.toString())
+				.fileSize(file.getSize())
+				.product(product)
+				.build());
+
+			return ImageResourceDTO.builder()
+				.imageResourceId(generatedId)
+				.originalFilename(originalFilename)
+				.filename(storedFilename)
+				.relativeLocation(relativePath.toString())
+				.build();
+
+		} catch (IOException e) {
+			log.error("Failed to store file {}: {}", originalFilename, e.getMessage());
+			throw new ResourceUploadException("Failed to store file " + originalFilename);
+		}
 	}
 }

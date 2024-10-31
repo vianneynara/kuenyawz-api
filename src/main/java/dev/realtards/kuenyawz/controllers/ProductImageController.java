@@ -1,7 +1,9 @@
 package dev.realtards.kuenyawz.controllers;
 
+import dev.realtards.kuenyawz.dtos.image.BatchImageUploadDto;
 import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;
 import dev.realtards.kuenyawz.dtos.image.ImageUploadDto;
+import dev.realtards.kuenyawz.dtos.image.ListOfImageResourceDto;
 import dev.realtards.kuenyawz.services.ImageStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 
 @Tag(name = "Product Images Relay Endpoints")
 @Controller
@@ -34,7 +38,7 @@ public class ProductImageController extends BaseController {
 	@Operation(summary = "Upload an image for a product using form-data")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "201", description = "Image uploaded successfully",
-			content = @Content(mediaType = "application/json",
+			content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
 				schema = @Schema(implementation = ImageResourceDTO.class))),
 		@ApiResponse(responseCode = "400", description = "Invalid image file"),
 		@ApiResponse(responseCode = "404", description = "Product not found"),
@@ -46,6 +50,23 @@ public class ProductImageController extends BaseController {
 	) {
 		ImageResourceDTO imageResourceDTO = imageStorageService.store(productId, imageUploadDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(imageResourceDTO);
+	}
+
+	@Operation(summary = "Batch upload multiple images using form-data")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "Images uploaded successfully",
+		content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+		@ApiResponse(responseCode = "400", description = "Invalid image file"),
+		@ApiResponse(responseCode = "404", description = "Product not found"),
+	})
+	@PostMapping("{productId}/batch")
+	public ResponseEntity<Object> batchUploadImage(
+		@PathVariable Long productId,
+		@Valid @ModelAttribute BatchImageUploadDto batchImageUploadDto
+	) {
+		List<ImageResourceDTO> listOfImageResourceDto = imageStorageService.batchStore(productId, batchImageUploadDto);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(new ListOfImageResourceDto(listOfImageResourceDto));
 	}
 
 	@Operation(summary = "Serve a specific image for a product")
@@ -106,5 +127,10 @@ public class ProductImageController extends BaseController {
 	public ResponseEntity<Object> deleteAllImages() {
 		imageStorageService.deleteAll();
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@GetMapping("/batch-upload-form")
+	public String batchUploadForm() {
+		return "batch-upload-form";
 	}
 }
