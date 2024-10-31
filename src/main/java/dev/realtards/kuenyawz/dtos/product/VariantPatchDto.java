@@ -1,5 +1,6 @@
 package dev.realtards.kuenyawz.dtos.product;
 
+import dev.realtards.kuenyawz.utils.stringtrimmer.CleanString;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Size;
@@ -23,5 +24,6 @@ public class VariantPatchDto {
 
 	@Schema(description = "Variant type", example = "chocolate")
 	@Size(min = 2, max = 50, message = "Type must be between 2 and 50 characters")
+	@CleanString
 	private String type;
 }

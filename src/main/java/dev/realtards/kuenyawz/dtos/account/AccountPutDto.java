@@ -1,6 +1,7 @@
 package dev.realtards.kuenyawz.dtos.account;
 
 import dev.realtards.kuenyawz.entities.Account;
+import dev.realtards.kuenyawz.utils.stringtrimmer.CleanString;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -15,11 +16,13 @@ public class AccountPutDto {
     @Schema(description = "User's full name", example = "Emilia Narwandaru", minLength = 2, maxLength = 128)
 	@NotBlank(message = "Full name is required")
 	@Size(min = 2, max = 128, message = "Full name must be between 2 and 128 characters")
+	@CleanString
 	private String fullName;
 
     @Schema(description = "User's email address", example = "emilia.narwandaru@example.com")
 	@NotBlank(message = "Email is required")
 	@Email(message = "Email format is invalid")
+	@CleanString
 	private String email;
 
     @Schema(description = "User's phone number", example = "+92345678909", pattern = "^\\+?[1-9][0-9]{7,14}$")
