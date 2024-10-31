@@ -29,13 +29,13 @@ public class Account extends Auditables {
 	private String password;
 	@Column
 	private String fullName;
-	@Column
+	@Column(unique = true)
 	private String googleId;
-	@Column
+	@Column(unique = true)
 	private String email;
 	@Column
 	private LocalDateTime emailVerifiedAt;
-	@Column
+	@Column(unique = true)
 	private String phone;
 	@Column
 	private Privilege privilege;

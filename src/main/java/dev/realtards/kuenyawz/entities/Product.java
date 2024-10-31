@@ -25,7 +25,7 @@ public class Product extends Auditables {
 	@Column(name = "product_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
 	private Long productId;
 
-	@Column
+	@Column(unique = true)
 	private String name;
 
 	@Column

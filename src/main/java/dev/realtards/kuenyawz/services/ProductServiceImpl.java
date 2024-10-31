@@ -8,6 +8,7 @@ import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
+import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -40,12 +40,12 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public ProductDto createProduct(ProductPostDto productPostDto) {
-		Objects.requireNonNull(productPostDto, "ProductPostDto cannot be null");
-		Objects.requireNonNull(productPostDto.getVariants(), "Variants cannot be null");
-
-		if (productPostDto.getVariants().isEmpty()) {
-			throw new IllegalArgumentException("Product must have at least one variant");
-		}
+		if (productPostDto == null)
+			throw new ResourceUploadException("ProductPostDto cannot be null");
+		if (productPostDto.getVariants() == null || productPostDto.getVariants().isEmpty())
+			throw new ResourceUploadException("Variants must not be empty");
+		if (productRepository.existsByNameIgnoreCase(productPostDto.getName()))
+			throw new ResourceUploadException("Product with name '" + productPostDto.getName() + "' exists");
 
 		Product product = Product.builder()
 			.name(productPostDto.getName())
@@ -116,6 +116,9 @@ public class ProductServiceImpl implements ProductService {
 	public ProductDto patchProduct(Long productId, ProductPatchDto productPatchDto) {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
+
+		if (productRepository.existsByNameIgnoreCase(productPatchDto.getName()))
+			throw new ResourceUploadException("Product with name '" + productPatchDto.getName() + "' exists");
 
 		Product updatedProduct = productMapper.updateProductFromPatch(productPatchDto, product);
 		Product savedProduct = productRepository.save(updatedProduct);
