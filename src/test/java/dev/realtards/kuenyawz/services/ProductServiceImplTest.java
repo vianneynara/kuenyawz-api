@@ -134,7 +134,7 @@ public class ProductServiceImplTest {
 	void createProduct_WithNullProductPostDto_ShouldThrowResourceUploadException() {
 		// Act & Assert
 		assertThatThrownBy(() -> productService.createProduct(null))
-			.isInstanceOf(ResourceUploadException.class)
+			.isInstanceOf(InvalidRequestBodyValue.class)
 			.hasMessage("ProductPostDto cannot be null");
 	}
 
@@ -145,7 +145,7 @@ public class ProductServiceImplTest {
 
 		// Act & Assert
 		assertThatThrownBy(() -> productService.createProduct(productPostDto))
-			.isInstanceOf(ResourceUploadException.class)
+			.isInstanceOf(InvalidRequestBodyValue.class)
 			.hasMessage("Variants must not be empty");
 	}
 
@@ -156,7 +156,7 @@ public class ProductServiceImplTest {
 
 		// Act & Assert
 		assertThatThrownBy(() -> productService.createProduct(productPostDto))
-			.isInstanceOf(ResourceUploadException.class)
+			.isInstanceOf(InvalidRequestBodyValue.class)
 			.hasMessage("Variants must not be empty");
 	}
 
