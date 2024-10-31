@@ -3,9 +3,12 @@ package dev.realtards.kuenyawz.advice;
 import dev.realtards.kuenyawz.exceptions.*;
 import dev.realtards.kuenyawz.responses.ErrorResponse;
 import dev.realtards.kuenyawz.responses.ListedErrors;
+import jakarta.transaction.TransactionalException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -84,6 +87,39 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(PasswordMismatchException.class)
 	public ResponseEntity<Object> handlePasswordMismatchException(PasswordMismatchException ex) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
+	}
+
+	@ExceptionHandler(TransactionSystemException.class)
+	public ResponseEntity<Object> handleTransactionSystemException(TransactionSystemException ex) {
+		Throwable cause = ex.getCause();
+		if (cause instanceof TransactionalException) {
+			cause = cause.getCause();
+		}
+
+		if (cause instanceof ConstraintViolationException) {
+			return handleConstraintViolationException((ConstraintViolationException) cause);
+		}
+
+		if (cause instanceof InvalidCredentialsException) {
+			return handleIncorrectCredentialsException((InvalidCredentialsException) cause);
+		}
+
+		return handleGenericException(ex);
+	}
+
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+		HashMap<String, String> errors = ex.getConstraintViolations()
+			.stream()
+			.collect(Collectors.toMap(
+				violation -> violation.getPropertyPath().toString(),
+				violation -> Objects.requireNonNull(violation.getMessage()),
+				(existing, replacement) -> replacement,
+				HashMap::new
+			));
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			.body(new ListedErrors<Map<String, String>>("Validation failed", errors));
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
