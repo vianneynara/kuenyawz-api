@@ -8,6 +8,7 @@ import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
+import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -130,22 +131,22 @@ public class ProductServiceImplTest {
 	}
 
 	@Test
-	void createProduct_WithNullProductPostDto_ShouldThrowNullPointerException() {
+	void createProduct_WithNullProductPostDto_ShouldThrowResourceUploadException() {
 		// Act & Assert
 		assertThatThrownBy(() -> productService.createProduct(null))
-			.isInstanceOf(NullPointerException.class)
+			.isInstanceOf(ResourceUploadException.class)
 			.hasMessage("ProductPostDto cannot be null");
 	}
 
 	@Test
-	void createProduct_WithNullVariants_ShouldThrowNullPointerException() {
+	void createProduct_WithNullVariants_ShouldThrowResourceUploadException() {
 		// Arrange
 		productPostDto.setVariants(null);
 
 		// Act & Assert
 		assertThatThrownBy(() -> productService.createProduct(productPostDto))
-			.isInstanceOf(NullPointerException.class)
-			.hasMessage("Variants cannot be null");
+			.isInstanceOf(ResourceUploadException.class)
+			.hasMessage("Variants must not be empty");
 	}
 
 	@Test
@@ -155,8 +156,8 @@ public class ProductServiceImplTest {
 
 		// Act & Assert
 		assertThatThrownBy(() -> productService.createProduct(productPostDto))
-			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessage("Product must have at least one variant");
+			.isInstanceOf(ResourceUploadException.class)
+			.hasMessage("Variants must not be empty");
 	}
 
 	@Test

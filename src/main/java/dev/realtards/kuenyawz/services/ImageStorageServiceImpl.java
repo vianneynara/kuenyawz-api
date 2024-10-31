@@ -163,14 +163,13 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
 	@Override
 	public void deleteAll() {
-		try (Stream<Path> paths = Files.walk(uploadLocation)) {
-			paths
-				.filter(Files::isRegularFile)
-				.map(Path::toFile)
-				.forEach(File::delete);
+		try (Stream<Path> directories = Files.walk(uploadLocation)) {
+			try (Stream<Path> paths = directories.filter(Files::isDirectory)) {
+				paths
+					.map(Path::toFile)
+					.forEach(File::delete);
+			}
 			Files.deleteIfExists(uploadLocation);
-
-			// Recreate the upload directory
 			Files.createDirectories(uploadLocation);
 		} catch (IOException e) {
 			log.error("Failed to delete upload directory", e);
