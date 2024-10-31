@@ -31,7 +31,6 @@ public class ProductServiceImpl implements ProductService {
 	private final ProductRepository productRepository;
 	private final ProductMapper productMapper;
 	private final ImageStorageService imageStorageService;
-	private final ProductImageRepository productImageRepository;
 
 	@Override
 	public List<ProductDto> getAllProducts() {
