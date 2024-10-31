@@ -117,7 +117,7 @@ public class ProductServiceImpl implements ProductService {
 	public void deleteAllProducts() {
 		productRepository.deleteAll();
 
-		productImageRepository.deleteAll();
+		imageStorageService.deleteAll();
 	}
 
 
