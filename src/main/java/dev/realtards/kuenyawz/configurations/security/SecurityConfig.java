@@ -1,60 +1,45 @@
 package dev.realtards.kuenyawz.configurations.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-	// TODO: Change this in production
-
-	/**
-	 * Configures the security filter chain
-	 *
-	 * @param hs {@link HttpSecurity} object
-	 * @return {@link SecurityFilterChain} object
-	 * @throws Exception any exception that occurs during configuration
-	 */
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity hs) throws Exception {
-//		hs
-//			// disabling CSRF for h2-console and API endpoints
-//			.csrf(csrfConfig -> csrfConfig
-//				.ignoringRequestMatchers("/h2-console/**")
-//				.ignoringRequestMatchers("/api/v1/**")
-//			)
-//			// authorize h2-console and API endpoints
-//			.authorizeHttpRequests(authRequest -> authRequest
-//				.requestMatchers("/h2-console/**").permitAll()
-//				.requestMatchers("/api/v1/**").permitAll()
-//				.anyRequest().authenticated()
-//			)
-//			// basic authentication for all other requests
-//			.httpBasic(Customizer.withDefaults())
-//			// prepare session management for JWT, that is stateless
-//			.sessionManagement(session -> session
-//				.sessionCreationPolicy(SessionCreationPolicy.STATELESS
-//				)
-//			);
-		hs
-			.csrf(AbstractHttpConfigurer::disable)
+	public SecurityFilterChain securityFilterChain(HttpSecurity httpSec) throws Exception {
+		httpSec
+			.csrf(csrf -> csrf.ignoringRequestMatchers(
+				requestMatcher -> requestMatcher.getServletPath().startsWith("/h2-console")
+			))
 			.authorizeHttpRequests(auth -> auth
-				.anyRequest().permitAll()
+				.requestMatchers("/h2-console/**").permitAll()
+				.anyRequest().authenticated()
 			)
-			// enable frame options for h2-console
 			.headers(headers -> headers
-				.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable())
-			);
-		return hs.build();
+				.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+			)
+			.httpBasic(Customizer.withDefaults());
+
+		return httpSec.build();
 	}
 
 	@Bean
@@ -64,6 +49,11 @@ public class SecurityConfig {
 		provider.setPasswordEncoder(passwordEncoder());
 		return provider;
 	}
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
