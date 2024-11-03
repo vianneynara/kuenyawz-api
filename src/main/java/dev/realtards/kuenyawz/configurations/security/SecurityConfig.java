@@ -1,9 +1,7 @@
 package dev.realtards.kuenyawz.configurations.security;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -12,12 +10,8 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -31,7 +25,13 @@ public class SecurityConfig {
 				requestMatcher -> requestMatcher.getServletPath().startsWith("/h2-console")
 			))
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/h2-console/**").permitAll()
+				.requestMatchers(
+					"/h2-console/**",				// H2 Console
+                    "/api/v1/auth/**",          	// Auth endpoints
+                    "/api/v1/pub/**",				// Public endpoints
+                    "/swagger-ui/**",				// Swagger UI
+                    "/v3/api-docs/**"           	// OpenAPI docs
+				).permitAll()
 				.anyRequest().authenticated()
 			)
 			.headers(headers -> headers
