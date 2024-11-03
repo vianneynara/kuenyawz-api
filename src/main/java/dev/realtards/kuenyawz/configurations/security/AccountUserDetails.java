@@ -21,7 +21,7 @@ public class AccountUserDetails implements UserDetails {
 		this.email = account.getEmail();
 		this.password = account.getPassword();
 		this.authorities = Collections.singletonList(
-			new SimpleGrantedAuthority("ROLE_" + account.getPrivilege().name())
+			new SimpleGrantedAuthority(account.getPrivilege().name())
 		);
 	}
 
