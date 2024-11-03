@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class DatabaseConfiguration {
+public class DatabaseConfig {
 
 	private final ApplicationProperties applicationProperties;
 
