@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.configurations;
+package dev.realtards.kuenyawz.configurations.properties;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.configurations;
+package dev.realtards.kuenyawz.configurations.security;
 
 import dev.realtards.kuenyawz.entities.Account;
 import lombok.Getter;

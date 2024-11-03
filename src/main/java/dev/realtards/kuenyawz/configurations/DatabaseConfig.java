@@ -1,5 +1,6 @@
 package dev.realtards.kuenyawz.configurations;
 
+import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.jdbc.DataSourceBuilder;
