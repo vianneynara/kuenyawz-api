@@ -31,6 +31,7 @@ public class ApplicationProperties {
 	private List<String> acceptedImageExtensions;
 
 	private Database database = new Database();
+    private Security security = new Security();
 
 	// Initializing through dotenv
 	@Autowired
@@ -41,6 +42,9 @@ public class ApplicationProperties {
         this.database.url = dotenv.get("DB_URL");
         this.database.username = dotenv.get("DB_USERNAME");
         this.database.password = dotenv.get("DB_PASSWORD");
+
+        this.security.username = dotenv.get("SECURITY_USERNAME");
+        this.security.password = dotenv.get("SECURITY_PASSWORD");
 	}
 
 	@Getter
@@ -50,4 +54,11 @@ public class ApplicationProperties {
 		private String username;
 		private String password;
 	}
+
+    @Getter
+    @Setter
+    public static class Security {
+        private String username;
+        private String password;
+    }
 }
