@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -103,6 +104,11 @@ public class GlobalExceptionHandler {
 	}
 
 	// TODO: Add handlers for Spring standard exceptions
+
+	@ExceptionHandler(NoResourceFoundException.class)
+	public ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Resource or endpoint might not exist"));
+	}
 
 	/**
 	 * Unhandled exception handler.
