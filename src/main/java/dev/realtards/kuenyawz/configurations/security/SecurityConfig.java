@@ -25,13 +25,12 @@ public class SecurityConfig {
 				requestMatcher -> requestMatcher.getServletPath().startsWith("/h2-console")
 			))
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers(
-					"/h2-console/**",				// H2 Console
-                    "/api/v1/auth/**",          	// Auth endpoints
-                    "/api/v1/pub/**",				// Public endpoints
-                    "/swagger-ui/**",				// Swagger UI
-                    "/v3/api-docs/**"           	// OpenAPI docs
-				).permitAll()
+				.requestMatchers("/h2-console/**").hasRole("ADMIN")
+				.requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+				.requestMatchers("/api/v1/sim/**").hasRole("ADMIN")
+				.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").hasRole("ADMIN")
+				.requestMatchers("/api/v1/**").hasAnyRole("ADMIN", "USER")
+				.requestMatchers("/api/v1/auth/**").permitAll()
 				.anyRequest().authenticated()
 			)
 			.headers(headers -> headers
