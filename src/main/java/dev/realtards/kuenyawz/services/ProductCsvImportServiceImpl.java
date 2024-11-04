@@ -4,10 +4,12 @@ import dev.realtards.kuenyawz.dtos.product.ProductCsvPostDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
 import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
+import dev.realtards.kuenyawz.exceptions.ResourceExistsException;
 import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
@@ -60,13 +62,23 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 	}
 
 	@Override
-	public ProductPostDto parseLineToProductDto(String line) {
-		String[] values = line.split(",");
+	public ProductPostDto parseLineToProductDto(String line, String separator) {
+		if (separator == null || separator.isEmpty()) {
+			separator = ";";
+		}
+
+		String[] values = line.split(separator);
+
+		if ((values.length == 0) || values[0].isEmpty() || values[1].isEmpty() || values[2].isEmpty() || values[3].isEmpty() || values[4].isEmpty() || values[5].isEmpty()) {
+			log.warn("Skipping product with empty required fields");
+			return null;
+		}
 
 		List<VariantPostDto> variants = new ArrayList<>();
 
 		for (int i = 0; i < CSV_VARIANT_COLUMNS_COUNT; i += 2) {
 			int currIdx = CSV_VARIANT_STARTS_AT + (i * 2);
+
 			if ((currIdx + 1 < values.length) && !values[currIdx].isEmpty() && !values[currIdx + 1].isEmpty()) {
 				VariantPostDto variant = VariantPostDto.builder()
 					.type(values[currIdx])
