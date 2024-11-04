@@ -39,14 +39,15 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 			String line = br.readLine();
 
 			while ((line = br.readLine()) != null) {
-				ProductPostDto productDto = parseLineToProductDto(line);
-				if (!productDto.getVariants().isEmpty()) {
-					try {
-						productService.createProduct(productDto);
-					} catch (InvalidRequestBodyValue | ResourceUploadException e) {
-						log.warn("Error importing product: " + e.getMessage());
-					}
-				}
+                try {
+                    ProductPostDto productDto = parseLineToProductDto(line, null);
+                    if (productDto != null && !productDto.getVariants().isEmpty()) {
+                        productService.createProduct(productDto);
+                    }
+                } catch (InvalidRequestBodyValue | ResourceExistsException e) {
+                    // Log the error and skip the current line
+                    log.warn("Error importing product: " + e.getMessage());
+                }
 			}
 		} catch (IOException e) {
 			throw new ResourceUploadException("Error reading the file");
