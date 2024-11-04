@@ -21,5 +21,5 @@ public interface ProductCsvImportService {
 	 * @param line {@link String} data row of the CSV file
 	 * @return {@link ProductPostDto} parsed data to ProductPostDto
 	 */
-	ProductPostDto parseLineToProductDto(String line);
+	ProductPostDto parseLineToProductDto(String line, String separator);
 }
