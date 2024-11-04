@@ -76,7 +76,7 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 
 		List<VariantPostDto> variants = new ArrayList<>();
 
-		for (int i = 0; i < CSV_VARIANT_COLUMNS_COUNT; i += 2) {
+		for (int i = 0; i < CSV_VARIANT_COLUMNS_COUNT; i++) {
 			int currIdx = CSV_VARIANT_STARTS_AT + (i * 2);
 
 			if ((currIdx + 1 < values.length) && !values[currIdx].isEmpty() && !values[currIdx + 1].isEmpty()) {
