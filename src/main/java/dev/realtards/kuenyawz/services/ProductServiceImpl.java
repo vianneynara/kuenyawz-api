@@ -9,7 +9,6 @@ import dev.realtards.kuenyawz.entities.Variant;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.realtards.kuenyawz.exceptions.ResourceExistsException;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
-import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
 import dev.realtards.kuenyawz.repositories.ProductImageRepository;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
