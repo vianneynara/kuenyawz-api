@@ -99,4 +99,9 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 			.build();
 		return dto;
 	}
+
+	@ExceptionHandler({NumberFormatException.class})
+	public void handleNumberFormatException(NumberFormatException e) {
+		throw new InvalidRequestBodyValue("Parsing failed, please check the values and separator of the file");
+	}
 }
