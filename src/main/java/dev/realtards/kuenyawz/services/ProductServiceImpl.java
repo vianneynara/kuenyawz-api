@@ -3,7 +3,6 @@ package dev.realtards.kuenyawz.services;
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPatchDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
-import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
 import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
@@ -16,9 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Primary
@@ -40,32 +39,9 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public ProductDto createProduct(ProductPostDto productPostDto) {
-		if (productPostDto == null)
-			throw new InvalidRequestBodyValue("ProductPostDto cannot be null");
-		if (productPostDto.getVariants() == null || productPostDto.getVariants().isEmpty())
-			throw new InvalidRequestBodyValue("Variants must not be empty");
-		if (productRepository.existsByNameIgnoreCase(productPostDto.getName()))
-			throw new ResourceExistsException("Product with name '" + productPostDto.getName() + "' exists");
+		validateProductPostDto(productPostDto);
 
-		Product product = Product.builder()
-			.name(productPostDto.getName())
-			.tagline(productPostDto.getTagline())
-			.description(productPostDto.getDescription())
-			.category(Product.Category.fromString(productPostDto.getCategory()))
-			.minQuantity(productPostDto.getMinQuantity())
-			.maxQuantity(productPostDto.getMaxQuantity())
-			.build();
-
-		Set<Variant> variants = new HashSet<>();
-		for (VariantPostDto dto : productPostDto.getVariants()) {
-			Variant variant = Variant.builder()
-				.price(dto.getPrice())
-				.type(dto.getType())
-				.product(product)
-				.build();
-			variants.add(variant);
-		}
-		product.setVariants(variants);
+		Product product = buildProductFromDto(productPostDto);
 
 		// Convert and return
 		Product savedProduct = productRepository.save(product);
@@ -103,19 +79,45 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public void deleteProduct(long productId) {
-		if (!productRepository.existsById(productId)) {
-			throw new ResourceNotFoundException("Product with ID '" + productId + "' not found");
-		}
-
+	public void hardDeleteProduct(Long productId) {
 		productRepository.deleteById(productId);
 	}
 
 	@Override
-	public void deleteAllProducts() {
+	public void hardDeleteAllProducts() {
 		productRepository.deleteAll();
+	}
 
-		imageStorageService.deleteAll();
+	@Override
+	public void softDeleteProduct(Long productId) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
+
+		product.setDeleted(true);
+		productRepository.save(product);
+	}
+
+	@Override
+	public void softDeleteAllProducts() {
+        List<Product> products = productRepository.findAll();
+        products.forEach(product -> {
+            product.setDeleted(true);
+            productRepository.save(product);
+        });
+	}
+
+	@Override
+	public void restoreSoftDeletedProduct(Long productId) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
+
+		List<Product> nameDupeProducts = productRepository.findAllByNameLikeIgnoreCase(product.getName());
+		if (!nameDupeProducts.isEmpty()) {
+			throw new ResourceExistsException("Product with name '" + product.getName() + "' exists");
+		}
+
+		product.setDeleted(false);
+		productRepository.save(product);
 	}
 
 	@Override
@@ -152,4 +154,39 @@ public class ProductServiceImpl implements ProductService {
 		productDto.setImages(imageStorageService.getImageUrls(product));
 		return productDto;
 	}
+
+    private void validateProductPostDto(ProductPostDto productPostDto) {
+        if (productPostDto == null) {
+            throw new InvalidRequestBodyValue("ProductPostDto cannot be null");
+        }
+        if (productPostDto.getVariants() == null || productPostDto.getVariants().isEmpty()) {
+            throw new InvalidRequestBodyValue("Variants must not be empty");
+        }
+        if (productRepository.existsByNameIgnoreCase(productPostDto.getName())) {
+            throw new ResourceExistsException("Product with name '" + productPostDto.getName() + "' exists");
+        }
+    }
+
+    private Product buildProductFromDto(ProductPostDto productPostDto) {
+        Product product = Product.builder()
+            .name(productPostDto.getName())
+            .tagline(productPostDto.getTagline())
+            .description(productPostDto.getDescription())
+            .category(Product.Category.fromString(productPostDto.getCategory()))
+            .minQuantity(productPostDto.getMinQuantity())
+            .maxQuantity(productPostDto.getMaxQuantity())
+            .deleted(false)
+            .build();
+
+        Set<Variant> variants = productPostDto.getVariants().stream()
+            .map(dto -> Variant.builder()
+                .price(dto.getPrice())
+                .type(dto.getType())
+                .product(product)
+                .build())
+            .collect(Collectors.toSet());
+
+        product.setVariants(variants);
+        return product;
+    }
 }
