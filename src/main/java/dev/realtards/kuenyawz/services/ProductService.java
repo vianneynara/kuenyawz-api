@@ -73,6 +73,8 @@ public interface ProductService {
 	 */
 	@Transactional
 	void deleteAllProducts();
+	void hardDeleteAllProducts();
+
 
 	/**
 	 * Patches a product by its ID.
