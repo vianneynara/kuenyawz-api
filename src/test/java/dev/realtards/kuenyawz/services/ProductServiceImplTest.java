@@ -8,7 +8,6 @@ import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
-import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -234,12 +233,12 @@ public class ProductServiceImplTest {
 	}
 
 	@Test
-	void deleteProduct_WithExistingId_ShouldDeleteProduct() {
+	void deleteProduct_WithExistingId_ShouldSoftHardDeleteProduct() {
 		// Arrange
 		when(productRepository.existsById(1L)).thenReturn(true);
 
 		// Act
-		productService.deleteProduct(1L);
+		productService.softDeleteProduct(1L);
 
 		// Assert
 		verify(productRepository).existsById(1L);
@@ -247,12 +246,12 @@ public class ProductServiceImplTest {
 	}
 
 	@Test
-	void deleteProduct_WithNonExistingId_ShouldThrowResourceNotFoundException() {
+	void softHardDeleteProduct_WithNonExistingId_ShouldThrowResourceNotFoundException() {
 		// Arrange
 		when(productRepository.existsById(1L)).thenReturn(false);
 
 		// Act & Assert
-		assertThatThrownBy(() -> productService.deleteProduct(1L))
+		assertThatThrownBy(() -> productService.softDeleteProduct(1L))
 			.isInstanceOf(ResourceNotFoundException.class)
 			.hasMessage("Product with ID '1' not found");
 	}
