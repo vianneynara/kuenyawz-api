@@ -47,11 +47,11 @@ public class Account extends Auditables {
 	 */
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	public enum Privilege {
-		@JsonProperty("admin")
-		ADMIN("admin"),
+		@JsonProperty("ADMIN")
+		ADMIN("USER"),
 
-		@JsonProperty("user")
-		USER("user");
+		@JsonProperty("USER")
+		USER("USER");
 
 		private final String privilege;
 
