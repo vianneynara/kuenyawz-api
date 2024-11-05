@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
  * make it available for the application. This uses the dotenv-java library.
  */
 @Configuration
-public class DotenvConfiguration {
+public class DotenvConfig {
 
 	@Bean
 	public Dotenv dotenv() {
