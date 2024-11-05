@@ -233,12 +233,12 @@ public class ProductServiceImplTest {
 	}
 
 	@Test
-	void deleteProduct_WithExistingId_ShouldSoftHardDeleteProduct() {
+	void hardDeleteProduct_WithExistingId_ShouldHardDeleteProduct() {
 		// Arrange
 		when(productRepository.existsById(1L)).thenReturn(true);
 
 		// Act
-		productService.softDeleteProduct(1L);
+		productService.hardDeleteProduct(1L);
 
 		// Assert
 		verify(productRepository).existsById(1L);
@@ -246,9 +246,35 @@ public class ProductServiceImplTest {
 	}
 
 	@Test
-	void softHardDeleteProduct_WithNonExistingId_ShouldThrowResourceNotFoundException() {
+	void hardDeleteProduct_WithNonExistingId_ShouldThrowResourceNotFoundException() {
 		// Arrange
 		when(productRepository.existsById(1L)).thenReturn(false);
+
+		// Act & Assert
+		assertThatThrownBy(() -> productService.hardDeleteProduct(1L))
+			.isInstanceOf(ResourceNotFoundException.class)
+			.hasMessage("Product with ID '1' not found");
+	}
+
+	@Test
+	void softDeleteProduct_WithExistingId_ShouldSoftDeleteProduct() {
+		// Arrange
+		when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+		when(productRepository.save(product)).thenReturn(product);
+
+		// Act
+		productService.softDeleteProduct(1L);
+
+		// Assert
+		verify(productRepository).findById(1L);
+		verify(productRepository).save(product);
+		assertThat(product.isDeleted()).isTrue();
+	}
+
+	@Test
+	void softDeleteProduct_WithNonExistingId_ShouldThrowResourceNotFoundException() {
+		// Arrange
+		when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
 		// Act & Assert
 		assertThatThrownBy(() -> productService.softDeleteProduct(1L))
