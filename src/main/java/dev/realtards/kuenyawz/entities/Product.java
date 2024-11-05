@@ -27,7 +27,6 @@ public class Product extends Auditables {
 	private Long productId;
 
 	@Column
-	@NaturalId
 	private String name;
 
 	@Column
