@@ -74,6 +74,27 @@ public interface ProductService {
 	@Transactional
 	void hardDeleteAllProducts();
 
+	/**
+	 * Soft deletes a product by its ID.
+	 *
+	 * @param productId {@link Long}
+	 */
+	@Transactional
+	void softDeleteProduct(Long productId);
+
+	/**
+	 * Soft deletes all products in the database.
+	 */
+	@Transactional
+	void softDeleteAllProducts();
+
+	/**
+	 * Restores a soft-deleted product by its ID. It will not restore if exists a non soft-deleted product 
+	 * with the same name.
+	 *
+	 * @param productId {@link Long}
+	 */
+	void restoreSoftDeletedProduct(Long productId);
 
 	/**
 	 * Patches a product by its ID.
