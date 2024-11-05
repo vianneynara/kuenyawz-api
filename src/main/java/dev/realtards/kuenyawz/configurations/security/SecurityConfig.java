@@ -30,9 +30,9 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSec) throws Exception {
 		httpSec
-			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/v1/**"))
+			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**"))
 			.authorizeHttpRequests(auth -> auth
-					.requestMatchers("/api/v1/**").hasRole("ADMIN")
+					.requestMatchers("/api/**").hasRole("ADMIN")
 					.anyRequest().permitAll()
 			)
 			.headers(headers -> headers
@@ -66,7 +66,7 @@ public class SecurityConfig {
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return (web) -> web.ignoring()
 			.requestMatchers(
-				"/v3/api-docs/**",
+				"/api/docs/v3/**",
 				"/swagger-ui/**",
 				"/swagger-ui.html"
 			);
