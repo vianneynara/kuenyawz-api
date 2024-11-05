@@ -21,16 +21,16 @@ public class OpenAPIConfig {
 						.type(SecurityScheme.Type.HTTP)
 						.scheme("basic")))
 			.info(new Info()
-				.title("WZ Snack And Bites API")
+				.title("KuenyaWZ API")
 				.version("1.0.0")
-				.description("Private API to serve the WZ Snack And Bites website")
+				.description("Private API to serve KuenyaWZ website")
 				.contact(new Contact()
 					.name("Nara")
 					.email("vianneynara.github@outlook.com")
 					.url("https://github.com/vianneynara"))
 				.license(new License()
 					.name("MIT")
-					.url("https://github.com/vianneynara/wz-snack-n-bites-api/blob/main/LICENSE"))
+					.url("https://github.com/vianneynara/kuenyawz-api/blob/main/LICENSE"))
 			);
 	}
 }
