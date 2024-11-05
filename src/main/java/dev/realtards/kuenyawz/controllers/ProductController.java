@@ -249,6 +249,20 @@ public class ProductController extends BaseController {
 		return ResponseEntity.status(HttpStatus.OK).body(variantDto);
 	}
 
+	@Operation(summary = "Delete a variant by ID")
+	@ApiResponses({
+		@ApiResponse(responseCode = "204", description = "Variant deleted successfully"),
+		@ApiResponse(responseCode = "404", description = "Variant not found")
+	})
+	@DeleteMapping("{productId}/variant/{variantId}")
+	public ResponseEntity<Object> deleteVariant(
+		@PathVariable Long productId,
+		@PathVariable Long variantId
+	) {
+		variantService.deleteVariant(productId, variantId);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
 	@Operation(summary = "Import products from CSV file")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Products imported successfully"),
