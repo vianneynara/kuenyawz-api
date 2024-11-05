@@ -22,7 +22,7 @@ import java.util.List;
 
 @Tag(name = "Account Routes", description = "Endpoints for managing user accounts")
 @RestController
-@RequestMapping("/account")
+@RequestMapping("/accounts")
 @RequiredArgsConstructor
 @Validated
 public class AccountController extends BaseController {

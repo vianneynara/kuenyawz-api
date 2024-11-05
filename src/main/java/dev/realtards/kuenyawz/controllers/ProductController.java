@@ -22,7 +22,7 @@ import java.util.List;
 
 @Tag(name = "Product Routes", description = "Endpoints for managing products and its variants")
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/products")
 @RequiredArgsConstructor
 @Validated
 public class ProductController extends BaseController {
@@ -182,7 +182,7 @@ public class ProductController extends BaseController {
 		@ApiResponse(responseCode = "404", description = "Product not found"),
 		@ApiResponse(responseCode = "400", description = "Invalid request body")
 	})
-	@PostMapping("{productId}/variant")
+	@PostMapping("{productId}/variants")
 	public ResponseEntity<Object> createVariant(
 		@PathVariable Long productId,
 		@Valid @RequestBody VariantPostDto variantPostDto
@@ -201,7 +201,7 @@ public class ProductController extends BaseController {
 		@ApiResponse(responseCode = "404", description = "Product not found"),
 		@ApiResponse(responseCode = "400", description = "Invalid request body")
 	})
-	@PostMapping("{productId}/variants")
+	@PostMapping("{productId}/variants/batch")
 	public ResponseEntity<Object> createVariants(
 		@PathVariable Long productId,
 		@Valid @RequestBody List<VariantPostDto> variantPostDtos
@@ -239,7 +239,7 @@ public class ProductController extends BaseController {
 		),
 		@ApiResponse(responseCode = "404", description = "Variant not found")
 	})
-	@PatchMapping("{productId}/variant/{variantId}")
+	@PatchMapping("{productId}/variants/{variantId}")
 	public ResponseEntity<Object> patchVariant(
 		@PathVariable Long productId,
 		@PathVariable Long variantId,
@@ -254,7 +254,7 @@ public class ProductController extends BaseController {
 		@ApiResponse(responseCode = "204", description = "Variant deleted successfully"),
 		@ApiResponse(responseCode = "404", description = "Variant not found")
 	})
-	@DeleteMapping("{productId}/variant/{variantId}")
+	@DeleteMapping("{productId}/variants/{variantId}")
 	public ResponseEntity<Object> deleteVariant(
 		@PathVariable Long productId,
 		@PathVariable Long variantId

@@ -22,7 +22,7 @@
     }
 
     function fetchProductIds() {
-        fetch('http://localhost:8081/api/v1/product/all')
+        fetch('http://localhost:8081/api/product/all')
             .then(response => response.json())
             .then(data => {
                 const productSelect = document.getElementById('productId');
@@ -52,7 +52,7 @@
         const responseDiv = document.getElementById('responses');
         responseDiv.innerHTML = '';
 
-        fetch(`http://localhost:8081/api/v1/images/${productId}/batch`, {
+        fetch(`http://localhost:8081/api/images/${productId}/batch`, {
             method: 'POST',
             body: formData
         })
