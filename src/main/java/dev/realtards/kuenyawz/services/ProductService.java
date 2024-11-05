@@ -72,7 +72,6 @@ public interface ProductService {
 	 * Deletes all products in the database and all the images related to it.
 	 */
 	@Transactional
-	void deleteAllProducts();
 	void hardDeleteAllProducts();
 
 
