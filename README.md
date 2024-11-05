@@ -39,7 +39,7 @@ Refer to this **[Swagger Documentation](https://app.swaggerhub.com/apis-docs/Nar
 
 - Database: H2 in memory
 - Port: 8081
-- Base URL: `http://localhost:8081/api/v1`
+- Base URL: `http://localhost:8081/api`
 
 ## Installing and running application
 
