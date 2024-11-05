@@ -201,7 +201,7 @@ public class ProductController extends BaseController {
 		@ApiResponse(responseCode = "404", description = "Product not found"),
 		@ApiResponse(responseCode = "400", description = "Invalid request body")
 	})
-	@PostMapping("{productId}/variants")
+	@PostMapping("{productId}/variants/batch")
 	public ResponseEntity<Object> createVariants(
 		@PathVariable Long productId,
 		@Valid @RequestBody List<VariantPostDto> variantPostDtos
