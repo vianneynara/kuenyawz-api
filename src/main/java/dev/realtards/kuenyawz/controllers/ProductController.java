@@ -119,10 +119,10 @@ public class ProductController extends BaseController {
 		@ApiResponse(responseCode = "404", description = "Product not found")
 	})
 	@DeleteMapping("{productId}")
-	public ResponseEntity<Object> deleteProduct(
+	public ResponseEntity<Object> softDeleteAllProducts(
 		@PathVariable Long productId
 	) {
-		productService.deleteProduct(productId);
+		productService.softDeleteProduct(productId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
@@ -131,8 +131,8 @@ public class ProductController extends BaseController {
 		@ApiResponse(responseCode = "204", description = "All products deleted successfully")
 	})
 	@DeleteMapping("/all")
-	public ResponseEntity<Object> deleteAllProducts() {
-		productService.deleteAllProducts();
+	public ResponseEntity<Object> softDeleteAllProducts() {
+		productService.softDeleteAllProducts();
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
@@ -274,5 +274,21 @@ public class ProductController extends BaseController {
 	) {
 		productCsvImportService.importProductsFromDto(file);
 		return ResponseEntity.status(HttpStatus.OK).build();
+	}
+
+	// Non Exposed Endpoints
+
+	@DeleteMapping("{productId}/permanent")
+	public ResponseEntity<Object> hardDeleteProduct(
+		@PathVariable Long productId
+	) {
+		productService.hardDeleteProduct(productId);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	@DeleteMapping("all/permanent")
+	public ResponseEntity<Object> hardDeleteAllProducts() {
+		productService.hardDeleteAllProducts();
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 }

@@ -3,7 +3,6 @@ package dev.realtards.kuenyawz.services;
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPatchDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
-import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,13 +65,35 @@ public interface ProductService {
 	 * @throws ResourceNotFoundException if the product is not found
 	 */
 	@Transactional
-	void deleteProduct(long productId);
+	void hardDeleteProduct(Long productId);
 
 	/**
 	 * Deletes all products in the database and all the images related to it.
 	 */
 	@Transactional
-	void deleteAllProducts();
+	void hardDeleteAllProducts();
+
+	/**
+	 * Soft deletes a product by its ID.
+	 *
+	 * @param productId {@link Long}
+	 */
+	@Transactional
+	void softDeleteProduct(Long productId);
+
+	/**
+	 * Soft deletes all products in the database.
+	 */
+	@Transactional
+	void softDeleteAllProducts();
+
+	/**
+	 * Restores a soft-deleted product by its ID. It will not restore if exists a non soft-deleted product 
+	 * with the same name.
+	 *
+	 * @param productId {@link Long}
+	 */
+	void restoreSoftDeletedProduct(Long productId);
 
 	/**
 	 * Patches a product by its ID.

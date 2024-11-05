@@ -4,17 +4,18 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@SQLRestriction("deleted = false")
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-//@EqualsAndHashCode(callSuper = true, exclude = {"variants", "images"})
-//@ToString(callSuper = true, exclude = {"variants", "images"})
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,7 +26,7 @@ public class Product extends Auditables {
 	@Column(name = "product_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
 	private Long productId;
 
-	@Column(unique = true)
+	@Column
 	private String name;
 
 	@Column
@@ -45,6 +46,9 @@ public class Product extends Auditables {
 
 	@Column
 	private boolean isAvailable;
+
+	@Column(name = "deleted", nullable = false)
+	private boolean deleted = false;
 
 	@Version
 	private Long version;

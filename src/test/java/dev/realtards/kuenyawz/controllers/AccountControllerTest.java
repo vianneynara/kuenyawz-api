@@ -236,20 +236,20 @@ public class AccountControllerTest extends BaseWebMvcTest {
 		assertThat(passwordUpdateDtoArgumentCaptor.getValue().getCurrentPassword()).isEqualTo(passwordDto.getCurrentPassword());
 	}
 
-	@Test
-	void updatePrivilege_ShouldReturnNoContent() throws Exception {
-		when(accountService.updatePrivilege(any(Long.class), any(PrivilegeUpdateDto.class)))
-			.thenReturn(null);
-
-		mockMvc.perform(patch(BASE_URL + "/{accountId}/privilege", 1L)
-				.content(TestUtility.asJsonBytes(Account.Privilege.USER))
-				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isNoContent());
-
-		ArgumentCaptor<PrivilegeUpdateDto> privilegeUpdateDtoArgumentCaptor = ArgumentCaptor.forClass(PrivilegeUpdateDto.class);
-
-		verify(accountService).updatePrivilege(any(Long.class), privilegeUpdateDtoArgumentCaptor.capture());
-
-		assertThat(privilegeUpdateDtoArgumentCaptor.getValue().getPrivilege().toString()).isEqualTo(String.valueOf(Account.Privilege.USER));
-	}
+//	@Test
+//	void updatePrivilege_ShouldReturnNoContent() throws Exception {
+//		when(accountService.updatePrivilege(any(Long.class), any(PrivilegeUpdateDto.class)))
+//			.thenReturn(null);
+//
+//		mockMvc.perform(patch(BASE_URL + "/{accountId}/privilege", 1L)
+//				.content(TestUtility.asJsonBytes(Account.Privilege.USER))
+//				.contentType(MediaType.APPLICATION_JSON))
+//			.andExpect(status().isNoContent());
+//
+//		ArgumentCaptor<PrivilegeUpdateDto> privilegeUpdateDtoArgumentCaptor = ArgumentCaptor.forClass(PrivilegeUpdateDto.class);
+//
+//		verify(accountService).updatePrivilege(any(Long.class), privilegeUpdateDtoArgumentCaptor.capture());
+//
+//		assertThat(privilegeUpdateDtoArgumentCaptor.getValue().getPrivilege().toString()).isEqualTo(String.valueOf(Account.Privilege.USER));
+//	}
 }

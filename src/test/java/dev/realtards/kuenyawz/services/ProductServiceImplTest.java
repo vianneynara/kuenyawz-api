@@ -8,7 +8,6 @@ import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
-import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -234,12 +233,12 @@ public class ProductServiceImplTest {
 	}
 
 	@Test
-	void deleteProduct_WithExistingId_ShouldDeleteProduct() {
+	void hardDeleteProduct_WithExistingId_ShouldHardDeleteProduct() {
 		// Arrange
 		when(productRepository.existsById(1L)).thenReturn(true);
 
 		// Act
-		productService.deleteProduct(1L);
+		productService.hardDeleteProduct(1L);
 
 		// Assert
 		verify(productRepository).existsById(1L);
@@ -247,12 +246,38 @@ public class ProductServiceImplTest {
 	}
 
 	@Test
-	void deleteProduct_WithNonExistingId_ShouldThrowResourceNotFoundException() {
+	void hardDeleteProduct_WithNonExistingId_ShouldThrowResourceNotFoundException() {
 		// Arrange
 		when(productRepository.existsById(1L)).thenReturn(false);
 
 		// Act & Assert
-		assertThatThrownBy(() -> productService.deleteProduct(1L))
+		assertThatThrownBy(() -> productService.hardDeleteProduct(1L))
+			.isInstanceOf(ResourceNotFoundException.class)
+			.hasMessage("Product with ID '1' not found");
+	}
+
+	@Test
+	void softDeleteProduct_WithExistingId_ShouldSoftDeleteProduct() {
+		// Arrange
+		when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+		when(productRepository.save(product)).thenReturn(product);
+
+		// Act
+		productService.softDeleteProduct(1L);
+
+		// Assert
+		verify(productRepository).findById(1L);
+		verify(productRepository).save(product);
+		assertThat(product.isDeleted()).isTrue();
+	}
+
+	@Test
+	void softDeleteProduct_WithNonExistingId_ShouldThrowResourceNotFoundException() {
+		// Arrange
+		when(productRepository.findById(1L)).thenReturn(Optional.empty());
+
+		// Act & Assert
+		assertThatThrownBy(() -> productService.softDeleteProduct(1L))
 			.isInstanceOf(ResourceNotFoundException.class)
 			.hasMessage("Product with ID '1' not found");
 	}

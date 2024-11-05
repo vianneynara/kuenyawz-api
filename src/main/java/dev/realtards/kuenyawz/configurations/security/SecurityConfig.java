@@ -3,7 +3,6 @@ package dev.realtards.kuenyawz.configurations.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,14 +30,9 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSec) throws Exception {
 		httpSec
-			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/v1/**"))
 			.authorizeHttpRequests(auth -> auth
-//				.requestMatchers("/h2-console/**").hasRole("ADMIN")
 					.requestMatchers("/api/v1/**").hasRole("ADMIN")
-//				.requestMatchers("/api/v1/sim/**").hasRole("ADMIN")
-//				.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").hasRole("ADMIN")
-//				.requestMatchers("/api/v1/**").hasAnyRole("ADMIN", "USER")
-//				.requestMatchers("/api/v1/auth/**").permitAll()
 					.anyRequest().permitAll()
 			)
 			.headers(headers -> headers
