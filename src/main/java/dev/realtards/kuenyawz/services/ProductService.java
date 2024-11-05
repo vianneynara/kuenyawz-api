@@ -3,7 +3,6 @@ package dev.realtards.kuenyawz.services;
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPatchDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
-import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
