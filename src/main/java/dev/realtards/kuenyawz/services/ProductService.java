@@ -66,7 +66,7 @@ public interface ProductService {
 	 * @throws ResourceNotFoundException if the product is not found
 	 */
 	@Transactional
-	void deleteProduct(long productId);
+	void hardDeleteProduct(Long productId);
 
 	/**
 	 * Deletes all products in the database and all the images related to it.
