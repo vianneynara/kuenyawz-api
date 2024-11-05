@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,8 @@ public class AccountController extends BaseController {
 	private final AccountService accountService;
 
 	@Operation(summary = "(Master) Get all accounts",
-		description = "Retrieves a list of all accounts with secure information"
+		description = "Retrieves a list of all accounts with secure information",
+		security = @SecurityRequirement(name = "basicAuth")
 	)
 	@ApiResponse(responseCode = "200", description = "Successfully retrieved all accounts",
 		content = @Content(
