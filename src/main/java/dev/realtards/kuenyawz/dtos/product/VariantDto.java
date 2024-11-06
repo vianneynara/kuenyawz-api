@@ -23,4 +23,10 @@ public class VariantDto {
 
 	@Schema(description = "Variant type", example = "chocolate")
 	private String type;
+
+	@Schema(description = "Minimum quantity of variant that can be ordered", example = "1")
+	private Integer minQuantity;
+
+	@Schema(description = "Maximum quantity of variant that can be ordered", example = "10")
+	private Integer maxQuantity;
 }
