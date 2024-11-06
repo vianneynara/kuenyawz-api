@@ -35,8 +35,6 @@ class VariantRepositoryTest {
             .tagline("Delicious muffin")
             .description("A test muffin description")
             .category(Product.Category.CAKE)
-            .minQuantity(1)
-            .maxQuantity(10)
             .isAvailable(true)
             .build();
         
@@ -48,12 +46,16 @@ class VariantRepositoryTest {
             .price(new BigDecimal("29.99"))
             .type("Regular")
             .product(product)
+            .minQuantity(1)
+            .maxQuantity(10)
             .build();
 
         variant2 = Variant.builder()
             .price(new BigDecimal("39.99"))
             .type("(Addon) Extra Almonds")
             .product(product)
+            .minQuantity(1)
+            .maxQuantity(10)
             .build();
 
         // Save variants
