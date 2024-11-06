@@ -39,12 +39,6 @@ public class Product extends Auditables {
 	private Category category;
 
 	@Column
-	private Integer minQuantity;
-
-	@Column
-	private Integer maxQuantity;
-
-	@Column
 	private boolean isAvailable;
 
 	@Column(name = "deleted", nullable = false)
