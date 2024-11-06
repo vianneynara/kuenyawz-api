@@ -177,17 +177,26 @@ public class ProductServiceImpl implements ProductService {
             .tagline(productPostDto.getTagline())
             .description(productPostDto.getDescription())
             .category(Product.Category.fromString(productPostDto.getCategory()))
-            .minQuantity(productPostDto.getMinQuantity())
-            .maxQuantity(productPostDto.getMaxQuantity())
             .deleted(false)
             .build();
 
         Set<Variant> variants = productPostDto.getVariants().stream()
-            .map(dto -> Variant.builder()
-                .price(dto.getPrice())
-                .type(dto.getType())
-                .product(product)
-                .build())
+            .map(dto -> {
+				Variant variant = Variant.builder()
+					.price(dto.getPrice())
+					.type(dto.getType())
+					.product(product)
+					.build();
+
+				if (dto.isQuantityConsistent()) {
+					variant.setMinQuantity(dto.getMinQuantity());
+					variant.setMaxQuantity(dto.getMaxQuantity());
+				} else {
+					throw new InvalidRequestBodyValue("Minimum quantity and maximum quantity must be consistent");
+				}
+
+				return variant;
+			})
             .collect(Collectors.toSet());
 
         product.setVariants(variants);
