@@ -105,8 +105,6 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 					} else {
 						log.warn("Skipping variant with inconsistent quantity: " + variantPostDto.getType());
 					}
-
-					variants.add(variantPostDto);
 				}
 			}
 		} catch (IndexOutOfBoundsException e) {
