@@ -1,5 +1,6 @@
 package dev.realtards.kuenyawz.services;
 
+import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
 import dev.realtards.kuenyawz.dtos.product.ProductCsvPostDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
 import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
@@ -26,9 +27,10 @@ import java.util.Objects;
 public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 
 	private final int CSV_VARIANT_COLUMNS_COUNT = 3;
-	private final int CSV_VARIANT_STARTS_AT = 6;
+	private final int CSV_VARIANT_STARTS_AT = 4;
 
 	private final ProductService productService;
+	private final ApplicationProperties applicationProperties;
 
 	@Override
 	public void importProductsFromCsv(MultipartFile file) {
@@ -41,15 +43,15 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 			String line = br.readLine();
 
 			while ((line = br.readLine()) != null) {
-                try {
-                    ProductPostDto productDto = parseLineToProductDto(line, null);
-                    if (productDto != null && !productDto.getVariants().isEmpty()) {
-                        productService.createProduct(productDto);
-                    }
-                } catch (InvalidRequestBodyValue | ResourceExistsException e) {
-                    // Log the error and skip the current line
-                    log.warn("Error importing product: " + e.getMessage());
-                }
+				try {
+					ProductPostDto productDto = parseLineToProductDto(line, null);
+					if (productDto != null && !productDto.getVariants().isEmpty()) {
+						productService.createProduct(productDto);
+					}
+				} catch (InvalidRequestBodyValue | ResourceExistsException e) {
+					// Log the error and skip the current line
+					log.warn("Error importing product: " + e.getMessage());
+				}
 			}
 		} catch (IOException e) {
 			throw new ResourceUploadException("Error reading the file");
@@ -76,16 +78,40 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 
 		List<VariantPostDto> variants = new ArrayList<>();
 
-		for (int i = 0; i < CSV_VARIANT_COLUMNS_COUNT; i++) {
-			int currIdx = CSV_VARIANT_STARTS_AT + (i * 2);
+		try {
+			for (int i = 0; i < CSV_VARIANT_COLUMNS_COUNT; i++) {
+				int currIdx = CSV_VARIANT_STARTS_AT + (i * 3);
 
-			if ((currIdx + 1 < values.length) && !values[currIdx].isEmpty() && !values[currIdx + 1].isEmpty()) {
-				VariantPostDto variant = VariantPostDto.builder()
-					.type(values[currIdx])
-					.price(new BigDecimal(values[currIdx + 1]))
-					.build();
-				variants.add(variant);
+				if ((currIdx + 1 < values.length) && !values[currIdx].isEmpty() && !values[currIdx + 1].isEmpty()) {
+					VariantPostDto variantPostDto = VariantPostDto.builder()
+						.type(values[currIdx])
+						.price(new BigDecimal(values[currIdx + 1]))
+						.maxQuantity(applicationProperties.getMaxVariantQuantity())
+						.build();
+
+					try {
+						// Check for min quantity in the row
+						if (values[currIdx + 2] != null && !values[currIdx + 2].isEmpty()) {
+							variantPostDto.setMinQuantity(Integer.parseInt(values[currIdx + 2]));
+						}
+					} catch (IndexOutOfBoundsException e) {
+						// When the min quantity is not defined, use default value.
+						variantPostDto.setMinQuantity(1);
+					}
+
+					// Check consistency, max quantity should be defined manually, uses default value.
+					if (variantPostDto.isQuantityConsistent()) {
+						variants.add(variantPostDto);
+					} else {
+						log.warn("Skipping variant with inconsistent quantity: " + variantPostDto.getType());
+					}
+
+					variants.add(variantPostDto);
+				}
 			}
+		} catch (IndexOutOfBoundsException e) {
+			log.warn("Skipping product with incomplete variant data");
+			return null;
 		}
 
 		ProductPostDto dto = ProductPostDto.builder()
@@ -93,8 +119,6 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 			.tagline(values[1])
 			.description(values[2])
 			.category(values[3])
-			.minQuantity(Integer.valueOf(values[4]))
-			.maxQuantity(Integer.valueOf(values[5]))
 			.variants(variants)
 			.build();
 		return dto;
