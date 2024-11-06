@@ -32,7 +32,7 @@ public class SecurityConfig {
 		httpSec
 			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**"))
 			.authorizeHttpRequests(auth -> auth
-					.requestMatchers("/api/**").hasRole("ADMIN")
+//					.requestMatchers("/api/**").hasRole("ADMIN")
 					.anyRequest().permitAll()
 			)
 			.headers(headers -> headers
