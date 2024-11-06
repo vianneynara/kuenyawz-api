@@ -39,10 +39,9 @@ public class VariantPatchDto {
 	@Schema(hidden = true)
 	@AssertTrue(message = "Minimum quantity and maximum quantity must be consistent")
 	public boolean isQuantityConsistent() {
-		if (!(minQuantity == null) && !(maxQuantity == null)) {
-			return minQuantity <= maxQuantity;
-		} else {
+		if (minQuantity == null || maxQuantity == null) {
 			return true;
 		}
+		return minQuantity <= maxQuantity;
 	}
 }
