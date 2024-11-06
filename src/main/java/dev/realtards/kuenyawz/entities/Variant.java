@@ -28,6 +28,12 @@ public class Variant extends Auditables {
 	@Column
 	private String type;
 
+	@Column
+	private Integer minQuantity;
+
+	@Column
+	private Integer maxQuantity;
+
 	@Version
 	private Long version;
 
@@ -41,7 +47,9 @@ public class Variant extends Auditables {
 		return "Variant{" +
 			"variantId=" + variantId +
 			", price=" + price +
-			", type='" + type + '\'' +
+			", type='" + type + "'" +
+			", minQuantity=" + minQuantity +
+			", maxQuantity=" + maxQuantity +
 			", version=" + version +
 			", productId=" + (product != null ? product.getProductId() : null) +
 			'}';

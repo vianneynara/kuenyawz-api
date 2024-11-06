@@ -65,8 +65,6 @@ public class ProductServiceImplTest {
 			.tagline("Test Tagline")
 			.description("Test Description")
 			.category(Product.Category.CAKE)
-			.minQuantity(1)
-			.maxQuantity(10)
 			.variants(variants)
 			.build();
 
@@ -75,14 +73,14 @@ public class ProductServiceImplTest {
 			.tagline("Test Tagline")
 			.description("Test Description")
 			.category(Product.Category.fromString("cake"))
-			.minQuantity(1)
-			.maxQuantity(10)
 			.build();
 
 		variantPostDtos = List.of(
 			VariantPostDto.builder()
 				.price(new BigDecimal("10.00"))
 				.type("chocolate")
+				.minQuantity(1)
+				.maxQuantity(10)
 				.build()
 		);
 
@@ -91,8 +89,6 @@ public class ProductServiceImplTest {
 			.tagline("Test Tagline")
 			.description("Test Description")
 			.category("cake")
-			.minQuantity(1)
-			.maxQuantity(10)
 			.variants(variantPostDtos)
 			.build();
 	}

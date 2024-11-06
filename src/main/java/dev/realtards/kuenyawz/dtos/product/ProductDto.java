@@ -31,12 +31,6 @@ public class ProductDto {
 	@Schema(description = "Product category", example = "cake")
 	private Product.Category category;
 
-	@Schema(description = "Minimum quantity of product that can be ordered", example = "1")
-	private Integer minQuantity;
-
-	@Schema(description = "Maximum quantity of product that can be ordered", example = "10")
-	private Integer maxQuantity;
-
 	@Schema(description = "Product variants")
 	private List<VariantDto> variants;
 

@@ -22,7 +22,7 @@
     }
 
     function fetchProductIds() {
-        fetch('http://localhost:8081/api/product/all')
+        fetch('http://localhost:8081/api/products/all')
             .then(response => response.json())
             .then(data => {
                 const productSelect = document.getElementById('productId');
