@@ -76,9 +76,28 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 			return null;
 		}
 
-		List<VariantPostDto> variants = new ArrayList<>();
+		List<VariantPostDto> variants = parseVariantsFromValues(values);
 
+		ProductPostDto dto = ProductPostDto.builder()
+			.name(values[0])
+			.tagline(values[1])
+			.description(values[2])
+			.category(values[3])
+			.variants(variants)
+			.build();
+		return dto;
+	}
+
+	@ExceptionHandler({NumberFormatException.class})
+	public void handleNumberFormatException(NumberFormatException e) {
+		throw new InvalidRequestBodyValue("Parsing failed, please check the values and separator of the file");
+	}
+
+	// Helper methods to iterate over the variants of a line
+
+	private List<VariantPostDto> parseVariantsFromValues(String[] values) {
 		try {
+			List<VariantPostDto> variants = new ArrayList<>();
 			for (int i = 0; i < CSV_VARIANT_COLUMNS_COUNT; i++) {
 				int currIdx = CSV_VARIANT_STARTS_AT + (i * 3);
 
@@ -107,23 +126,10 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 					}
 				}
 			}
+			return variants;
 		} catch (IndexOutOfBoundsException e) {
 			log.warn("Skipping product with incomplete variant data");
 			return null;
 		}
-
-		ProductPostDto dto = ProductPostDto.builder()
-			.name(values[0])
-			.tagline(values[1])
-			.description(values[2])
-			.category(values[3])
-			.variants(variants)
-			.build();
-		return dto;
-	}
-
-	@ExceptionHandler({NumberFormatException.class})
-	public void handleNumberFormatException(NumberFormatException e) {
-		throw new InvalidRequestBodyValue("Parsing failed, please check the values and separator of the file");
 	}
 }
