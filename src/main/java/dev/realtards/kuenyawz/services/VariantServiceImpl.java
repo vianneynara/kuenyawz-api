@@ -6,6 +6,7 @@ import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
 import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
 import dev.realtards.kuenyawz.exceptions.IllegalOperationException;
+import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.mapper.VariantMapper;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
@@ -47,6 +48,14 @@ public class VariantServiceImpl implements VariantService {
 			.type(variantPostDto.getType())
 			.product(product)
 			.build();
+
+		if (variantPostDto.isQuantityConsistent()) {
+			variant.setMinQuantity(variantPostDto.getMinQuantity());
+			variant.setMaxQuantity(variantPostDto.getMaxQuantity());
+		} else {
+			throw new InvalidRequestBodyValue("Minimum quantity and maximum quantity must be consistent");
+		}
+
 		product.getVariants().add(variant);
 
 		Variant savedVariant = variantRepository.save(variant);
@@ -68,6 +77,14 @@ public class VariantServiceImpl implements VariantService {
 				.type(dto.getType())
 				.product(product)
 				.build();
+
+			if (dto.isQuantityConsistent()) {
+				variant.setMinQuantity(dto.getMinQuantity());
+				variant.setMaxQuantity(dto.getMaxQuantity());
+			} else {
+				throw new InvalidRequestBodyValue("Minimum quantity and maximum quantity must be consistent");
+			}
+
 			variants.add(variant);
 		}
 		product.getVariants().addAll(variants);
@@ -99,12 +116,14 @@ public class VariantServiceImpl implements VariantService {
 
 	@Override
 	public VariantDto patchVariant(Long productId, Long variantId, VariantPatchDto variantPatchDto) {
-        if (!productRepository.existsById(productId)) {
-            throw new ResourceNotFoundException("Product with ID '" + productId + "' not found");
-        }
+		if (!productRepository.existsById(productId)) {
+			throw new ResourceNotFoundException("Product with ID '" + productId + "' not found");
+		}
 
 		Variant variant = variantRepository.findById(variantId)
 			.orElseThrow(() -> new ResourceNotFoundException("Variant with ID '" + variantId + "' not found"));
+
+		checkQuantityConsistency(variant, variantPatchDto);
 
 		Variant updatedVariant = variantMapper.updateVariantFromPatch(variantPatchDto, variant);
 		Variant savedVariant = variantRepository.save(updatedVariant);
@@ -127,5 +146,20 @@ public class VariantServiceImpl implements VariantService {
 			throw new ResourceNotFoundException("Variant with ID '" + variantId + "' not found in Product with ID '" + productId + "'");
 		}
 		log.info("DELETED: {}", variantId);
+	}
+
+	private void checkQuantityConsistency(Variant variant, VariantPatchDto variantPatchDto) {
+		Integer minQuantity = variantPatchDto.getMinQuantity();
+		Integer maxQuantity = variantPatchDto.getMaxQuantity();
+
+		/*  */ if (minQuantity != null && maxQuantity != null && minQuantity > maxQuantity) {
+			throw new InvalidRequestBodyValue("Minimum quantity must be less than or equal to maximum quantity");
+		} else if (minQuantity == null && maxQuantity != null && maxQuantity < variant.getMinQuantity()) {
+			throw new InvalidRequestBodyValue("Maximum quantity must be greater than or equal to minimum quantity");
+		} else if (minQuantity != null && maxQuantity == null && minQuantity > variant.getMaxQuantity()) {
+			throw new InvalidRequestBodyValue("Minimum quantity must be less than or equal to maximum quantity");
+		} else if (minQuantity == null && maxQuantity == null && variant.getMinQuantity() > variant.getMaxQuantity()) {
+			throw new InvalidRequestBodyValue("Minimum quantity must be less than or equal to maximum quantity");
+		}
 	}
 }
