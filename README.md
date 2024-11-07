@@ -10,8 +10,9 @@ This project is to be implemented for our **[KuenyaWZ](https://github.com/vianne
 
 - [ ] Entities - Controllers - Services - Repositories
     - [x] Account
-    - [ ] Product
-    - [ ] Variant (subset of Product)
+    - [x] Product
+    - [x] Variant (subset of Product)
+    - [x] Product Images
     - [ ] Order
     - [ ] Order Item (subset of Order)
     - [ ] Transaction
