@@ -33,7 +33,7 @@ public class ProductController extends BaseController {
 
 	// PRODUCT ENDPOINTS
 
-	@Operation(summary = "(Master) Get all products", description = "Retrieves a list of all products with their variants")
+	@Operation(summary = "Get all products", description = "Retrieves a list of all products with their variants")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Successfully retrieved all products",
 			content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -42,7 +42,7 @@ public class ProductController extends BaseController {
 		),
 		@ApiResponse(responseCode = "403", description = "Forbidden")
 	})
-	@GetMapping("/all")
+	@GetMapping
 	public ResponseEntity<Object> getAllProducts() {
 		List<ProductDto> productDtos = productService.getAllProducts();
 		return ResponseEntity.status(HttpStatus.OK).body(new ListOfProductDto(productDtos));
