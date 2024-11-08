@@ -17,7 +17,7 @@ public interface ProductService {
 	 * @return {@link List} of {@link ProductDto}
 	 */
 	@Transactional(readOnly = true)
-	List<ProductDto> getAllProducts();
+	List<ProductDto> getAllProducts(String category);
 
 	/**
 	 * Creates a new product from the DTO with the provided variants' DTOs.
@@ -55,7 +55,7 @@ public interface ProductService {
 	 * @return {@link List} of {@link ProductDto}
 	 * @throws InvalidRequestBodyValue if the category is invalid
 	 */
-	@Transactional(readOnly = true)
+//	@Transactional(readOnly = true)
 	List<ProductDto> getProductsByCategory(String category);
 
 	/**

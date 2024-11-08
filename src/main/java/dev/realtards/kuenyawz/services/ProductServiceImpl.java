@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -30,11 +31,15 @@ public class ProductServiceImpl implements ProductService {
 	private final ImageStorageService imageStorageService;
 
 	@Override
-	public List<ProductDto> getAllProducts() {
-		return productRepository.findAll()
-			.stream()
-			.map(this::convertToDto)
-			.toList();
+	public List<ProductDto> getAllProducts(String category) {
+		if (StringUtils.hasText(category)) {
+			return getProductsByCategory(category);
+		} else {
+			return productRepository.findAll()
+				.stream()
+				.map(this::convertToDto)
+				.toList();
+		}
 	}
 
 	@Override
@@ -68,9 +73,11 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public List<ProductDto> getProductsByCategory(String category) {
+		category = category.trim().toUpperCase();
 		try {
 			Product.Category categoryEnum = Product.Category.fromString(category);
 			List<Product> products = productRepository.findAllByCategoryIs(categoryEnum);
+
 			List<ProductDto> productDtos = products.stream().map(productMapper::fromEntity).toList();
 			return productDtos;
 		} catch (IllegalArgumentException e) {
@@ -103,11 +110,11 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public void softDeleteAllProducts() {
-        List<Product> products = productRepository.findAll();
-        products.forEach(product -> {
-            product.setDeleted(true);
-            productRepository.save(product);
-        });
+		List<Product> products = productRepository.findAll();
+		products.forEach(product -> {
+			product.setDeleted(true);
+			productRepository.save(product);
+		});
 	}
 
 	@Override
@@ -159,29 +166,29 @@ public class ProductServiceImpl implements ProductService {
 		return productDto;
 	}
 
-    private void validateProductPostDto(ProductPostDto productPostDto) {
-        if (productPostDto == null) {
-            throw new InvalidRequestBodyValue("ProductPostDto cannot be null");
-        }
-        if (productPostDto.getVariants() == null || productPostDto.getVariants().isEmpty()) {
-            throw new InvalidRequestBodyValue("Variants must not be empty");
-        }
-        if (productRepository.existsByNameIgnoreCase(productPostDto.getName())) {
-            throw new ResourceExistsException("Product with name '" + productPostDto.getName() + "' exists");
-        }
-    }
+	private void validateProductPostDto(ProductPostDto productPostDto) {
+		if (productPostDto == null) {
+			throw new InvalidRequestBodyValue("ProductPostDto cannot be null");
+		}
+		if (productPostDto.getVariants() == null || productPostDto.getVariants().isEmpty()) {
+			throw new InvalidRequestBodyValue("Variants must not be empty");
+		}
+		if (productRepository.existsByNameIgnoreCase(productPostDto.getName())) {
+			throw new ResourceExistsException("Product with name '" + productPostDto.getName() + "' exists");
+		}
+	}
 
-    private Product buildProductFromDto(ProductPostDto productPostDto) {
-        Product product = Product.builder()
-            .name(productPostDto.getName())
-            .tagline(productPostDto.getTagline())
-            .description(productPostDto.getDescription())
-            .category(Product.Category.fromString(productPostDto.getCategory()))
-            .deleted(false)
-            .build();
+	private Product buildProductFromDto(ProductPostDto productPostDto) {
+		Product product = Product.builder()
+			.name(productPostDto.getName())
+			.tagline(productPostDto.getTagline())
+			.description(productPostDto.getDescription())
+			.category(Product.Category.fromString(productPostDto.getCategory()))
+			.deleted(false)
+			.build();
 
-        Set<Variant> variants = productPostDto.getVariants().stream()
-            .map(dto -> {
+		Set<Variant> variants = productPostDto.getVariants().stream()
+			.map(dto -> {
 				Variant variant = Variant.builder()
 					.price(dto.getPrice())
 					.type(dto.getType())
@@ -197,9 +204,9 @@ public class ProductServiceImpl implements ProductService {
 
 				return variant;
 			})
-            .collect(Collectors.toSet());
+			.collect(Collectors.toSet());
 
-        product.setVariants(variants);
-        return product;
-    }
+		product.setVariants(variants);
+		return product;
+	}
 }
