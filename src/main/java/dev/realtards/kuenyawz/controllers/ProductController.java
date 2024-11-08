@@ -43,8 +43,10 @@ public class ProductController extends BaseController {
 		@ApiResponse(responseCode = "403", description = "Forbidden")
 	})
 	@GetMapping
-	public ResponseEntity<Object> getAllProducts() {
-		List<ProductDto> productDtos = productService.getAllProducts();
+	public ResponseEntity<Object> getAllProducts(
+		@RequestParam(required = false) String category
+	) {
+		List<ProductDto> productDtos = productService.getAllProducts(category);
 		return ResponseEntity.status(HttpStatus.OK).body(new ListOfProductDto(productDtos));
 	}
 
