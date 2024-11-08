@@ -12,7 +12,8 @@ import dev.realtards.kuenyawz.services.ProductCsvImportService;
 import dev.realtards.kuenyawz.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
@@ -28,7 +29,7 @@ import java.util.ListIterator;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class DatabaseBootstrapper implements CommandLineRunner {
+public class DatabaseBootstrapper implements ApplicationListener<ApplicationReadyEvent> {
 
 	private final AccountService accountService;
 	private final ProductService productService;
@@ -153,7 +154,7 @@ public class DatabaseBootstrapper implements CommandLineRunner {
 			.build()
 	);
 
-	private void injectAccounts() {
+	public void injectAccounts() {
 		final ListIterator<AccountRegistrationDto> iterator = BOOTSTRAP_ACCOUNTS.listIterator();
 
 		while (iterator.hasNext()) {
@@ -169,6 +170,8 @@ public class DatabaseBootstrapper implements CommandLineRunner {
 				iterator.next();
 			}
 		}
+
+		log.info("Injected {} accounts", accountService.getAllAccounts().size());
 	}
 
 	private void injectProducts() {
@@ -191,9 +194,11 @@ public class DatabaseBootstrapper implements CommandLineRunner {
 				log.error("Failed to create product: {}", product.getName(), e);
 			}
 		}
+
+		log.info("Injected {} products", productService.getAllProducts(null).size());
 	}
 
-	private void injectProductsFromCSV() {
+	public void injectProductsFromCSV() {
 		try {
 			ClassPathResource resource = new ClassPathResource(PATH_TO_PRODUCT_SEEDER);
 			File file = resource.getFile();
@@ -210,14 +215,15 @@ public class DatabaseBootstrapper implements CommandLineRunner {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+
+		log.info("Injected {} products", productService.getAllProducts(null).size());
 	}
 
 	@Override
-	public void run(String... args) {
+	public void onApplicationEvent(ApplicationReadyEvent event) {
 		log.info("Bootstrapping database...");
 		injectAccounts();
 		injectProductsFromCSV();
-
 		log.info("Database bootstrapping complete");
 	}
 }
