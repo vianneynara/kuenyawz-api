@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,11 +37,12 @@ public class ProductCsvServiceImpl implements ProductCsvService {
 	@Override
 	public List<ProductCsvRecord> csvToProductCsvRecord(File file) {
 		try {
-			List<ProductCsvRecord> productCsvRecords = new CsvToBeanBuilder<ProductCsvRecord>(new FileReader(file))
+			List<ProductCsvRecord> productCsvRecords = new CsvToBeanBuilder<ProductCsvRecord>(
+				new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))
 				.withType(ProductCsvRecord.class)
 				.withSeparator(';')
-				.build()
-				.parse();
+				.withIgnoreLeadingWhiteSpace(true)
+				.build().parse();
 			return productCsvRecords;
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
