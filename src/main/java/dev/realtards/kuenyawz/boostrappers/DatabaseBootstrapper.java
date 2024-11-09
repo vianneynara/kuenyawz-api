@@ -2,7 +2,6 @@ package dev.realtards.kuenyawz.boostrappers;
 
 import dev.realtards.kuenyawz.dtos.account.AccountRegistrationDto;
 import dev.realtards.kuenyawz.dtos.account.PrivilegeUpdateDto;
-import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
 import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
 import dev.realtards.kuenyawz.entities.Account;
@@ -10,18 +9,13 @@ import dev.realtards.kuenyawz.exceptions.AccountExistsException;
 import dev.realtards.kuenyawz.services.AccountService;
 import dev.realtards.kuenyawz.services.ProductCsvImportService;
 import dev.realtards.kuenyawz.services.ProductService;
+import dev.realtards.kuenyawz.utils.parser.CSVParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.ListIterator;
@@ -35,7 +29,7 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 	private final ProductService productService;
 	private final ProductCsvImportService productCsvImportService;
 
-	private final String PATH_TO_PRODUCT_SEEDER = "seeders/ProductsSeeder.csv";
+	private static final String PATH_TO_PRODUCT_SEEDER = "seeders/ProductsSeeder.csv";
 
 	private final List<AccountRegistrationDto> BOOTSTRAP_ACCOUNTS = List.of(
 		AccountRegistrationDto.builder()
@@ -153,6 +147,7 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 			))
 			.build()
 	);
+	private final CSVParser cSVParser;
 
 	public void injectAccounts() {
 		final ListIterator<AccountRegistrationDto> iterator = BOOTSTRAP_ACCOUNTS.listIterator();
@@ -171,52 +166,13 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 			}
 		}
 
-		log.info("Injected {} accounts", accountService.getAllAccounts().size());
-	}
-
-	private void injectProducts() {
-		final ListIterator<ProductPostDto> iterator = BOOTSTRAP_PRODUCTS.listIterator();
-
-		while (iterator.hasNext()) {
-			ProductPostDto product = iterator.next();
-			try {
-				// Check if product already exists by searching for exact name
-				List<ProductDto> existingProducts = productService.getAllProductByKeyword(product.getName());
-				boolean exists = existingProducts.stream()
-					.anyMatch(p -> p.getName().equals(product.getName()));
-
-				if (!exists) {
-					ProductDto createdProduct = productService.createProduct(product);
-				} else {
-					log.warn("Product already exists: {}", product.getName());
-				}
-			} catch (Exception e) {
-				log.error("Failed to create product: {}", product.getName(), e);
-			}
-		}
-
-		log.info("Injected {} products", productService.getAllProducts(null).size());
+		log.info("Database has {} accounts", accountService.getAllAccounts().size());
 	}
 
 	public void injectProductsFromCSV() {
-		try {
-			ClassPathResource resource = new ClassPathResource(PATH_TO_PRODUCT_SEEDER);
-			File file = resource.getFile();
+		CSVParser parser = new CSVParser(productService, productCsvImportService);
 
-			try (FileInputStream fis = new FileInputStream(file)) {
-				MultipartFile multipartFile = new MockMultipartFile(
-					"file",
-					file.getName(),
-					"text/csv",
-					fis
-				);
-				productCsvImportService.importProductsFromCsv(multipartFile);
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		log.info("Injected {} products", productService.getAllProducts(null).size());
+		parser.saveProductsFromCsv(PATH_TO_PRODUCT_SEEDER);
 	}
 
 	@Override
