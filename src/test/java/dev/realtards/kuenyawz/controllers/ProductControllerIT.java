@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -101,7 +100,7 @@ class ProductControllerIT {
 
 		List<ProductDto> productDtos = List.of(productDto);
 
-		when(productService.getAllProducts()).thenReturn(productDtos);
+		when(productService.getAllProducts(null)).thenReturn(productDtos);
 
 		// Act
 		MvcResult result = mockMvc.perform(get("/api/products"))
