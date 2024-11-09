@@ -1,7 +1,6 @@
 package dev.realtards.kuenyawz.services;
 
 import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
-import dev.realtards.kuenyawz.dtos.product.ProductCsvPostDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
 import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
@@ -24,7 +23,7 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ProductCsvImportServiceImpl implements ProductCsvImportService {
+public class ProductCsvServiceImpl implements ProductCsvService {
 
 	private final int CSV_VARIANT_COLUMNS_COUNT = 3;
 	private final int CSV_VARIANT_STARTS_AT = 4;
@@ -33,7 +32,7 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 	private final ApplicationProperties applicationProperties;
 
 	@Override
-	public void importProductsFromCsv(MultipartFile file) {
+	public void importProductsFromFile(MultipartFile file) {
 		if (!Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf(".") + 1).equals("csv")) {
 			throw new InvalidRequestBodyValue("Must be a valid CSV file");
 		}
@@ -56,11 +55,6 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 		} catch (IOException e) {
 			throw new ResourceUploadException("Error reading the file");
 		}
-	}
-
-	@Override
-	public void importProductsFromDto(ProductCsvPostDto productCsvPostDto) {
-		importProductsFromCsv(productCsvPostDto.getFile());
 	}
 
 	@Override
