@@ -29,7 +29,7 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 	private final ProductService productService;
 	private final ProductCsvService productCsvService;
 
-	private static final String PATH_TO_PRODUCT_SEEDER = "seeders/ProductsSeeder.csv";
+	private static final String PATH_TO_PRODUCT_SEEDER = "seeders/Products.csv";
 
 	private final List<AccountRegistrationDto> BOOTSTRAP_ACCOUNTS = List.of(
 		AccountRegistrationDto.builder()
