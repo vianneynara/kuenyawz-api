@@ -44,9 +44,9 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 
 			while ((line = br.readLine()) != null) {
 				try {
-					ProductPostDto productDto = parseLineToProductDto(line, null);
-					if (productDto != null && !productDto.getVariants().isEmpty()) {
-						productService.createProduct(productDto);
+					ProductPostDto productPostDto = parseLineToProductPostDto(line, null);
+					if (productPostDto != null && !productPostDto.getVariants().isEmpty()) {
+						productService.createProduct(productPostDto);
 					}
 				} catch (InvalidRequestBodyValue | ResourceExistsException e) {
 					// Log the error and skip the current line
@@ -64,7 +64,7 @@ public class ProductCsvImportServiceImpl implements ProductCsvImportService {
 	}
 
 	@Override
-	public ProductPostDto parseLineToProductDto(String line, String separator) {
+	public ProductPostDto parseLineToProductPostDto(String line, String separator) {
 		if (separator == null || separator.isEmpty()) {
 			separator = ";";
 		}
