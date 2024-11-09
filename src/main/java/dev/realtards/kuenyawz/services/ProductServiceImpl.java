@@ -65,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public List<ProductDto> getAllProductByKeyword(String keyword) {
-		List<Product> products = productRepository.findAllByNameLikeIgnoreCase(keyword);
+		List<Product> products = productRepository.findAllByNameLikeIgnoreCase("%" + keyword + "%");
 
 		List<ProductDto> productDtos = products.stream().map(productMapper::fromEntity).toList();
 		return productDtos;
