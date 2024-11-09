@@ -1,20 +1,21 @@
 package dev.realtards.kuenyawz.services;
 
+import com.opencsv.bean.CsvToBeanBuilder;
 import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
+import dev.realtards.kuenyawz.dtos.csv.ProductCsvRecord;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
 import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.realtards.kuenyawz.exceptions.ResourceExistsException;
 import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@NoArgsConstructor(force = true)
 @Slf4j
 public class ProductCsvServiceImpl implements ProductCsvService {
 
@@ -32,7 +34,21 @@ public class ProductCsvServiceImpl implements ProductCsvService {
 	private final ApplicationProperties applicationProperties;
 
 	@Override
-	public void importProductsFromFile(MultipartFile file) {
+	public List<ProductCsvRecord> csvToProductCsvRecord(File file) {
+		try {
+			List<ProductCsvRecord> productCsvRecords = new CsvToBeanBuilder<ProductCsvRecord>(new FileReader(file))
+				.withType(ProductCsvRecord.class)
+				.withSeparator(';')
+				.build()
+				.parse();
+			return productCsvRecords;
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public void importProductsFromMultiPartFile(MultipartFile file) {
 		if (!Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf(".") + 1).equals("csv")) {
 			throw new InvalidRequestBodyValue("Must be a valid CSV file");
 		}
