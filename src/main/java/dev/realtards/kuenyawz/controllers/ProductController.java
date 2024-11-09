@@ -1,7 +1,7 @@
 package dev.realtards.kuenyawz.controllers;
 
 import dev.realtards.kuenyawz.dtos.product.*;
-import dev.realtards.kuenyawz.services.ProductCsvImportService;
+import dev.realtards.kuenyawz.services.ProductCsvService;
 import dev.realtards.kuenyawz.services.ProductService;
 import dev.realtards.kuenyawz.services.VariantService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,7 +29,7 @@ public class ProductController extends BaseController {
 
 	private final ProductService productService;
 	private final VariantService variantService;
-	private final ProductCsvImportService productCsvImportService;
+	private final ProductCsvService productCsvService;
 
 	// PRODUCT ENDPOINTS
 
@@ -272,9 +272,9 @@ public class ProductController extends BaseController {
 	})
 	@PostMapping("/import")
 	public ResponseEntity<Object> importProductsFromCsv(
-		@Valid @ModelAttribute ProductCsvPostDto file
+		@Valid @ModelAttribute ProductCsvPostDto productCsvPostDto
 	) {
-		productCsvImportService.importProductsFromDto(file);
+		productCsvService.importProductsFromFile(productCsvPostDto.getFile());
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 

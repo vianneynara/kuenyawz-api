@@ -7,7 +7,7 @@ import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
 import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.exceptions.AccountExistsException;
 import dev.realtards.kuenyawz.services.AccountService;
-import dev.realtards.kuenyawz.services.ProductCsvImportService;
+import dev.realtards.kuenyawz.services.ProductCsvService;
 import dev.realtards.kuenyawz.services.ProductService;
 import dev.realtards.kuenyawz.utils.parser.CSVParser;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 
 	private final AccountService accountService;
 	private final ProductService productService;
-	private final ProductCsvImportService productCsvImportService;
+	private final ProductCsvService productCsvService;
 
 	private static final String PATH_TO_PRODUCT_SEEDER = "seeders/ProductsSeeder.csv";
 
@@ -170,7 +170,7 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 	}
 
 	public void injectProductsFromCSV() {
-		CSVParser parser = new CSVParser(productService, productCsvImportService);
+		CSVParser parser = new CSVParser(productService, productCsvService);
 
 		parser.saveProductsFromCsv(PATH_TO_PRODUCT_SEEDER);
 	}
