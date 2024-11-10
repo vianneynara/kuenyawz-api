@@ -30,17 +30,33 @@ public class ProductServiceImpl implements ProductService {
 	private final ProductMapper productMapper;
 	private final ImageStorageService imageStorageService;
 
-	@Override
-	public List<ProductDto> getAllProducts(String category) {
-		if (StringUtils.hasText(category)) {
-			return getProductsByCategory(category);
-		} else {
-			return productRepository.findAll()
-				.stream()
-				.map(this::convertToDto)
-				.toList();
+    @Override
+    public List<ProductDto> getAllProducts(String category, String keyword) {
+        List<Product> products = findProducts(category, keyword);
+        return products.stream()
+                      .map(productMapper::fromEntity)
+                      .toList();
+    }
+
+    private List<Product> findProducts(String category, String keyword) {
+        boolean hasCategory = StringUtils.hasText(category);
+        boolean hasKeyword = StringUtils.hasText(keyword);
+
+        if (!hasCategory && !hasKeyword) {
+            return productRepository.findAll();
+        }
+
+        String processedKeyword = hasKeyword ? "%" + keyword.trim() + "%" : null;
+
+        if (hasCategory) {
+            Product.Category categoryEnum = parseCategoryOrThrow(category);
+            return hasKeyword
+                ? productRepository.findAllByCategoryIsAndNameLikeIgnoreCase(categoryEnum, processedKeyword)
+                : productRepository.findAllByCategory(categoryEnum);
+        } else {
+			return productRepository.findAllByNameLikeIgnoreCase(processedKeyword);
 		}
-	}
+    }
 
 	@Override
 	public ProductDto createProduct(ProductPostDto productPostDto) {
@@ -64,31 +80,9 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<ProductDto> getAllProductByKeyword(String keyword) {
-		List<Product> products = productRepository.findAllByNameLikeIgnoreCase("%" + keyword + "%");
-
-		List<ProductDto> productDtos = products.stream().map(productMapper::fromEntity).toList();
-		return productDtos;
-	}
-
-	@Override
-	public List<ProductDto> getProductsByCategory(String category) {
-		category = category.trim().toUpperCase();
-		try {
-			Product.Category categoryEnum = Product.Category.fromString(category);
-			List<Product> products = productRepository.findAllByCategoryIs(categoryEnum);
-
-			List<ProductDto> productDtos = products.stream().map(productMapper::fromEntity).toList();
-			return productDtos;
-		} catch (IllegalArgumentException e) {
-			throw new InvalidRequestBodyValue("Invalid category: " + category);
-		}
-	}
-
-	@Override
 	public void hardDeleteProduct(Long productId) {
-        Product product = productRepository.findByIdUnfiltered(productId)
-            .orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
+		Product product = productRepository.findByIdUnfiltered(productId)
+			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
 		productRepository.updateProductDeletedStatusToFalse(productId);
 		productRepository.deleteProductPermanently(product.getProductId());
@@ -213,5 +207,16 @@ public class ProductServiceImpl implements ProductService {
 
 		product.setVariants(variants);
 		return product;
+	}
+
+	// Get all products methods
+
+	private Product.Category parseCategoryOrThrow(String category) {
+		category = category.trim().toUpperCase();
+		try {
+			return Product.Category.fromString(category);
+		} catch (IllegalArgumentException e) {
+			throw new InvalidRequestBodyValue("Invalid category: " + category);
+		}
 	}
 }
