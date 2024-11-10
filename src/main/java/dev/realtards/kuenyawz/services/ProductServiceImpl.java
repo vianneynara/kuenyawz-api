@@ -87,16 +87,17 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public void hardDeleteProduct(Long productId) {
-		if (!productRepository.existsById(productId)) {
-			throw new ResourceNotFoundException("Product with ID '" + productId + "' not found");
-		}
+        Product product = productRepository.findByIdUnfiltered(productId)
+            .orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
-		productRepository.deleteById(productId);
+		productRepository.updateProductDeletedStatusToFalse(productId);
+		productRepository.deleteProductPermanently(product.getProductId());
 	}
 
 	@Override
 	public void hardDeleteAllProducts() {
-		productRepository.deleteAll();
+		productRepository.updateAllDeletedStatusToFalse();
+		productRepository.deleteAllProductsPermanently();
 	}
 
 	@Override
@@ -151,6 +152,10 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public boolean existsById(Long productId) {
 		return productRepository.existsById(productId);
+	}
+
+	public boolean existsIncludingDeleted(Long productId) {
+		return productRepository.findByIdUnfiltered(productId).isPresent();
 	}
 
 	/**

@@ -274,7 +274,7 @@ public class ProductController extends BaseController {
 	public ResponseEntity<Object> importProductsFromCsv(
 		@Valid @ModelAttribute ProductCsvPostDto productCsvPostDto
 	) {
-		productCsvService.importProductsFromFile(productCsvPostDto.getFile());
+		productCsvService.saveProductFromMultipartFile(productCsvPostDto.getFile());
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
