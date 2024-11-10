@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +25,6 @@ import java.util.Objects;
 public class ProductCsvServiceImpl implements ProductCsvService {
 
     private final ProductService productService;
-    private final ApplicationProperties applicationProperties;
 
     @Override
     public void saveProductFromMultipartFile(MultipartFile file) {
@@ -114,7 +112,7 @@ public class ProductCsvServiceImpl implements ProductCsvService {
         log.info("Import completed - Success: {}, Skipped: {}, Errors: {}",
                 successCount, skipCount, errorCount);
         log.info("Total products in database: {}",
-                productService.getAllProducts(null).size());
+                productService.getAllProducts(null, null).size());
     }
 
     private List<VariantPostDto> fromRecord(ProductCsvRecord record) {
