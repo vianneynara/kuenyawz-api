@@ -10,6 +10,7 @@ import dev.realtards.kuenyawz.services.ProductCsvService;
 import dev.realtards.kuenyawz.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.ClassPathResource;
@@ -23,7 +24,7 @@ import java.util.ListIterator;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class DatabaseBootstrapper implements ApplicationListener<ApplicationReadyEvent> {
+public class DatabaseBootstrapper implements ApplicationListener<ApplicationReadyEvent>, CommandLineRunner {
 
 	private final AccountService accountService;
 	private final ProductCsvService productCsvService;
@@ -97,6 +98,15 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent event) {
+		start();
+	}
+
+	@Override
+	public void run(String... args) throws Exception {
+		start();
+	}
+
+	private void start() {
 		log.info("Bootstrapping database...");
 		injectAccounts();
 		injectProducts();
