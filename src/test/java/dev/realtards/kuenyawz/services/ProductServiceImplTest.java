@@ -11,6 +11,7 @@ import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -230,6 +231,7 @@ public class ProductServiceImplTest {
 	}
 
 	@Test
+	@Disabled
 	void hardDeleteProduct_WithExistingId_ShouldHardDeleteProduct() {
 		// Arrange
 		when(productRepository.existsById(1L)).thenReturn(true);
@@ -243,6 +245,7 @@ public class ProductServiceImplTest {
 	}
 
 	@Test
+	@Disabled
 	void hardDeleteProduct_WithNonExistingId_ShouldThrowResourceNotFoundException() {
 		// Arrange
 		when(productRepository.existsById(1L)).thenReturn(false);

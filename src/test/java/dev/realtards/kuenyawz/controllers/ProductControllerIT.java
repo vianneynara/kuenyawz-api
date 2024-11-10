@@ -5,6 +5,7 @@ import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
 import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
 import dev.realtards.kuenyawz.entities.Product;
+import dev.realtards.kuenyawz.repositories.ProductRepository;
 import dev.realtards.kuenyawz.services.ProductService;
 import dev.realtards.kuenyawz.services.VariantService;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,36 +29,39 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 class ProductControllerIT {
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
 
-	@Autowired
 	private MockMvc mockMvc;
 
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	@Mock
+	@Autowired
 	private ProductService productService;
 
-	@Mock
-	private VariantService variantService;
+	@Autowired
+	private ProductRepository productRepository;
 
 	@BeforeEach
 	void setup() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+//		productRepository.deleteAll();
+//		productRepository.flush();
 	}
 
 	@Test
 	void testCreateProduct() throws Exception {
 		// Arrange
 		ProductPostDto productPostDto = ProductPostDto.builder()
-			.name("Test Product")
+			.name("Test Product1")
 			.tagline("Test Tagline")
 			.description("Test Description")
 			.category("cake")
@@ -79,35 +83,34 @@ class ProductControllerIT {
 		MvcResult result = mockMvc.perform(post("/api/products")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(productPostDto)))
-			.andExpect(MockMvcResultMatchers.status().isCreated())
-			.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Test Product"))
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.name").value("Test Product1"))
 			.andReturn();
 
 		// Assert
-		assertThat(result.getResponse().getContentAsString()).contains("Test Product");
+		assertThat(result.getResponse().getContentAsString()).contains("Test Product1");
 	}
 
-	@Test
-	void testGetAllProducts() throws Exception {
-		// Arrange
-		ProductDto productDto = ProductDto.builder()
-			.productId(1L)
-			.name("Test Product")
-			.tagline("Test Tagline")
-			.description("Test Description")
-			.category(Product.Category.CAKE)
-			.build();
 
-		List<ProductDto> productDtos = List.of(productDto);
+    @Test
+    void testGetAllProducts() throws Exception {
+        // Arrange
+        Product product = Product.builder()
+            .name("Test Product2")
+            .tagline("Test Tagline")
+            .description("Test Description")
+            .category(Product.Category.CAKE)
+            .build();
 
-		when(productService.getAllProducts(null)).thenReturn(productDtos);
+        productRepository.save(product);
 
-		// Act
-		MvcResult result = mockMvc.perform(get("/api/products"))
-			.andExpect(MockMvcResultMatchers.status().isOk())
+        // Act & Assert
+        MvcResult result = mockMvc.perform(get("/api/products"))
+            .andExpect(status().isOk())
 			.andReturn();
+//            .andDo(print()); // This helps with debugging
 
 		// Assert
-		assertThat(result.getResponse().getContentAsString()).contains("Test Product");
+		assertThat(result.getResponse().getContentAsString()).contains("Test Product2");
 	}
 }

@@ -1,12 +1,15 @@
 package dev.realtards.kuenyawz.repositories;
 
 import dev.realtards.kuenyawz.entities.Product;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
@@ -14,17 +17,35 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	List<Product> findAllByCategoryIs(Product.Category category);
 
-    boolean existsByNameIgnoreCase(String name);
+	boolean existsByNameIgnoreCase(String name);
 
-    /**
-     * This is not used, but is good to document for future reference.
-     */
-    @Modifying
-    @Query("UPDATE Product p SET " +
-        "p.deleted = true, " +
-        "p.version = (p.version + 1) " +
-        "WHERE p.productId = :productId AND p.version = :version")
-    int softDeleteById(@Param("productId") Long id, @Param("version") Long version);
+	@Query("SELECT p FROM Product p WHERE p.productId = :productId")
+	@SQLRestriction("")
+	Optional<Product> findByIdUnfiltered(@Param("productId") Long id);
 
-    List<Product> findAllByDeletedTrue();
+	@Query("SELECT p FROM Product p")
+	@SQLRestriction("")
+	List<Product> findAllUnfiltered();
+
+	@Modifying
+	@Transactional
+	@Query("DELETE FROM Product p WHERE p.productId = :productId AND p.deleted IN (true, false)")
+	void deleteProductPermanently(@Param("productId") Long id);
+
+	@Modifying
+	@Transactional
+	@Query("DELETE FROM Product p WHERE p.deleted IN (true, false)")
+	void deleteAllProductsPermanently();
+
+	@Modifying
+	@Transactional
+	@SQLRestriction("")
+	@Query("UPDATE Product p SET p.deleted = true WHERE p.productId = :productId AND p.deleted = false")
+	void updateProductDeletedStatusToFalse(@Param("productId") Long id);
+
+	@Modifying
+	@Transactional
+	@Query("UPDATE Product p SET p.deleted = true WHERE p.deleted = false")
+	@SQLRestriction("")
+	void updateAllDeletedStatusToFalse();
 }

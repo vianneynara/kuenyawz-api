@@ -1,17 +1,22 @@
 package dev.realtards.kuenyawz.repositories;
 
+import dev.realtards.kuenyawz.boostrappers.DatabaseBootstrapper;
+import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
 import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
-import dev.realtards.kuenyawz.services.ProductCsvImportServiceImpl;
+import dev.realtards.kuenyawz.services.AccountService;
+import dev.realtards.kuenyawz.services.ProductCsvServiceImpl;
 import dev.realtards.kuenyawz.services.ProductService;
-import dev.realtards.kuenyawz.utils.parser.CSVParser;
+import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
@@ -19,25 +24,37 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-@DataJpaTest
+@SpringBootTest
+@Import({DatabaseBootstrapper.class})
 public class ProductRepositoryTest {
 
 	@Autowired
-	private ProductRepository productRepository;
+	ProductRepository productRepository;
 
-	@MockBean
-	private ProductService productService;
+	@Autowired
+	ProductService productService;
 
-	@MockBean
-	private ProductCsvImportServiceImpl productCsvImportService;
+	@Autowired
+	AccountService accountService;
+
+	@Autowired
+	ProductCsvServiceImpl productCsvImportService;
+
+	@Autowired
+	ApplicationProperties applicationProperties;
 
 	@BeforeEach
 	void setUp() {
+		productCsvImportService = new ProductCsvServiceImpl(productService, applicationProperties);
+
 		productRepository.deleteAll();
 		productRepository.flush();
 
-		CSVParser csvParser = new CSVParser(productService, productCsvImportService);
-		csvParser.saveProductsFromCsv("seeders/ProductsSeeder.csv");
+		try {
+			productCsvImportService.saveProductFromFile(new ClassPathResource("seeders/Products.csv").getFile());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Test
@@ -60,17 +77,21 @@ public class ProductRepositoryTest {
 	@Test
 	void testSaveProduct() {
 		Product product = Product.builder()
+			.productId((new SnowFlakeIdGenerator()).generateId())
 			.name("Test Product")
 			.tagline("Test Tagline")
 			.description("Test Description")
 			.category(Product.Category.CAKE)
-			.variants(Set.of(
-				Variant.builder()
-					.type("Test Variant")
-					.price(BigDecimal.valueOf(1000.0))
-					.build()
-			))
+			.version(0L)
 			.build();
+
+		Variant variant = Variant.builder()
+			.type("Test Variant")
+			.price(BigDecimal.valueOf(1000.0))
+			.product(product)
+			.build();
+
+		product.setVariants(Set.of(variant));
 
 		Product savedProduct = productRepository.save(product);
 
@@ -80,5 +101,4 @@ public class ProductRepositoryTest {
 		assertThat(savedProduct.getTagline()).isEqualTo(product.getTagline());
 		assertThat(savedProduct.getCategory()).isEqualTo(product.getCategory());
 	}
-
 }
