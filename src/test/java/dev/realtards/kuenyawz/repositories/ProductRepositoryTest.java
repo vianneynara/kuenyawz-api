@@ -8,16 +8,15 @@ import dev.realtards.kuenyawz.services.AccountService;
 import dev.realtards.kuenyawz.services.ProductCsvServiceImpl;
 import dev.realtards.kuenyawz.services.ProductService;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdGenerator;
-import dev.realtards.kuenyawz.utils.parser.CSVParser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
@@ -39,9 +38,6 @@ public class ProductRepositoryTest {
 	AccountService accountService;
 
 	@Autowired
-	CSVParser csvParser;
-
-	@Autowired
 	ProductCsvServiceImpl productCsvImportService;
 
 	@Autowired
@@ -54,8 +50,11 @@ public class ProductRepositoryTest {
 		productRepository.deleteAll();
 		productRepository.flush();
 
-		CSVParser csvParser = new CSVParser(productService, productCsvImportService);
-		csvParser.saveProductsFromCsv("seeders/Products.csv");
+		try {
+			productCsvImportService.saveProductFromFile(new ClassPathResource("seeders/Products.csv").getFile());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Test

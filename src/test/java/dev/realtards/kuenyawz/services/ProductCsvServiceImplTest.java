@@ -1,7 +1,11 @@
 package dev.realtards.kuenyawz.services;
 
 import dev.realtards.kuenyawz.dtos.csv.ProductCsvRecord;
+import dev.realtards.kuenyawz.repositories.ProductRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
@@ -10,18 +14,29 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
 class ProductCsvServiceImplTest {
 
-	ProductCsvService productCsvService = new ProductCsvServiceImpl();
+	@Autowired
+	ProductCsvService productCsvService;
+
+	@Autowired
+	ProductRepository productRepository;
+
+	@BeforeEach
+	void setUp() {
+		productRepository.deleteAll();
+		productRepository.flush();
+	}
 
 	@Test
 	void testCsvToProductCsvRecord() throws FileNotFoundException {
 		File file = ResourceUtils.getFile("classpath:seeders/Products.csv");
 
 		// Act
-		List<ProductCsvRecord> productCsvRecords = productCsvService.csvToProductCsvRecord(file);
+		productCsvService.saveProductFromFile(file);
 
 		// Assertions
-		assertThat(productCsvRecords.size()).isGreaterThan(0);
+		assertThat(productRepository.count()).isGreaterThan(0);
 	}
 }

@@ -8,12 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
@@ -35,7 +33,7 @@ class DatabaseBootstrapperTest {
 
 	@BeforeEach
 	void setUp() {
-		databaseBootstrapper = new DatabaseBootstrapper(accountService, productService, productCsvService, productRepository);
+		databaseBootstrapper = new DatabaseBootstrapper(accountService, productCsvService, productRepository);
 	}
 
 	@Test
