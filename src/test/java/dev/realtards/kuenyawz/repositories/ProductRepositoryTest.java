@@ -45,7 +45,7 @@ public class ProductRepositoryTest {
 
 	@BeforeEach
 	void setUp() {
-		productCsvImportService = new ProductCsvServiceImpl(productService, applicationProperties);
+		productCsvImportService = new ProductCsvServiceImpl(productService);
 
 		productRepository.deleteAll();
 		productRepository.flush();
