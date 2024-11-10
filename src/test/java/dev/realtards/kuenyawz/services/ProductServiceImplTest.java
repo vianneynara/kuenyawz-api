@@ -104,7 +104,7 @@ public class ProductServiceImplTest {
 		when(productMapper.fromEntity(product)).thenReturn(productDto);
 
 		// Act
-		List<ProductDto> result = productService.getAllProducts(null);
+		List<ProductDto> result = productService.getAllProducts(null, null);
 
 		// Assert
 		assertThat(result).isEqualTo(expectedDtos);
@@ -193,7 +193,7 @@ public class ProductServiceImplTest {
 		when(productMapper.fromEntity(product)).thenReturn(productDto);
 
 		// Act
-		List<ProductDto> result = productService.getAllProductByKeyword(keyword);
+		List<ProductDto> result = productService.getAllProducts(null, keyword);
 
 		// Assert
 		assertThat(result).isEqualTo(expectedDtos);
@@ -207,15 +207,15 @@ public class ProductServiceImplTest {
 		Product.Category category = Product.Category.CAKE;
 		List<Product> products = List.of(product);
 		List<ProductDto> expectedDtos = List.of(productDto);
-		when(productRepository.findAllByCategoryIs(category)).thenReturn(products);
+		when(productRepository.findAllByCategory(category)).thenReturn(products);
 		when(productMapper.fromEntity(product)).thenReturn(productDto);
 
 		// Act
-		List<ProductDto> result = productService.getProductsByCategory(category.toString());
+		List<ProductDto> result = productService.getAllProducts(category.toString(), null);
 
 		// Assert
 		assertThat(result).isEqualTo(expectedDtos);
-		verify(productRepository).findAllByCategoryIs(Product.Category.CAKE);
+		verify(productRepository).findAllByCategory(Product.Category.CAKE);
 		verify(productMapper).fromEntity(product);
 	}
 
@@ -225,7 +225,7 @@ public class ProductServiceImplTest {
 		String invalidCategory = "invalid";
 
 		// Act & Assert
-		assertThatThrownBy(() -> productService.getProductsByCategory(invalidCategory))
+		assertThatThrownBy(() -> productService.getAllProducts(invalidCategory, null))
 			.isInstanceOf(InvalidRequestBodyValue.class)
 			.hasMessage("Invalid category: INVALID");
 	}
