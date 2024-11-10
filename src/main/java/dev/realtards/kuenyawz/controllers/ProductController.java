@@ -1,7 +1,7 @@
 package dev.realtards.kuenyawz.controllers;
 
 import dev.realtards.kuenyawz.dtos.product.*;
-import dev.realtards.kuenyawz.services.ProductCsvImportService;
+import dev.realtards.kuenyawz.services.ProductCsvService;
 import dev.realtards.kuenyawz.services.ProductService;
 import dev.realtards.kuenyawz.services.VariantService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,11 +29,11 @@ public class ProductController extends BaseController {
 
 	private final ProductService productService;
 	private final VariantService variantService;
-	private final ProductCsvImportService productCsvImportService;
+	private final ProductCsvService productCsvService;
 
 	// PRODUCT ENDPOINTS
 
-	@Operation(summary = "(Master) Get all products", description = "Retrieves a list of all products with their variants")
+	@Operation(summary = "Get all products", description = "Retrieves a list of all products with their variants")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Successfully retrieved all products",
 			content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -42,9 +42,11 @@ public class ProductController extends BaseController {
 		),
 		@ApiResponse(responseCode = "403", description = "Forbidden")
 	})
-	@GetMapping("/all")
-	public ResponseEntity<Object> getAllProducts() {
-		List<ProductDto> productDtos = productService.getAllProducts();
+	@GetMapping
+	public ResponseEntity<Object> getAllProducts(
+		@RequestParam(required = false) String category
+	) {
+		List<ProductDto> productDtos = productService.getAllProducts(category);
 		return ResponseEntity.status(HttpStatus.OK).body(new ListOfProductDto(productDtos));
 	}
 
@@ -270,9 +272,9 @@ public class ProductController extends BaseController {
 	})
 	@PostMapping("/import")
 	public ResponseEntity<Object> importProductsFromCsv(
-		@Valid @ModelAttribute ProductCsvPostDto file
+		@Valid @ModelAttribute ProductCsvPostDto productCsvPostDto
 	) {
-		productCsvImportService.importProductsFromDto(file);
+		productCsvService.saveProductFromMultipartFile(productCsvPostDto.getFile());
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
