@@ -6,13 +6,11 @@ import dev.realtards.kuenyawz.dtos.csv.ProductCsvRecord;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
 import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
-import dev.realtards.kuenyawz.exceptions.ResourceExistsException;
 import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -24,124 +22,123 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-@NoArgsConstructor(force = true)
 @Slf4j
 public class ProductCsvServiceImpl implements ProductCsvService {
 
-	private final int CSV_VARIANT_COLUMNS_COUNT = 3;
-	private final int CSV_VARIANT_STARTS_AT = 4;
+    private final ProductService productService;
+    private final ApplicationProperties applicationProperties;
 
-	private final ProductService productService;
-	private final ApplicationProperties applicationProperties;
+    @Override
+    public void saveProductFromMultipartFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new InvalidRequestBodyValue("File cannot be empty");
+        }
 
-	@Override
-	public List<ProductCsvRecord> csvToProductCsvRecord(File file) {
-		try {
-			List<ProductCsvRecord> productCsvRecords = new CsvToBeanBuilder<ProductCsvRecord>(
-				new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))
-				.withType(ProductCsvRecord.class)
-				.withSeparator(';')
-				.withIgnoreLeadingWhiteSpace(true)
-				.build().parse();
-			return productCsvRecords;
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
+        String filename = file.getOriginalFilename();
+        if (filename == null || !filename.toLowerCase().endsWith(".csv")) {
+            throw new InvalidRequestBodyValue("Must be a valid CSV file");
+        }
 
-	@Override
-	public void importProductsFromMultiPartFile(MultipartFile file) {
-		if (!Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf(".") + 1).equals("csv")) {
-			throw new InvalidRequestBodyValue("Must be a valid CSV file");
-		}
+        try {
+            List<ProductCsvRecord> records = csvToProductCsvRecord(file.getInputStream());
+            processProductRecords(records);
+        } catch (IOException e) {
+            log.error("Error processing CSV file: {}", e.getMessage());
+            throw new ResourceUploadException("Error reading file: " + e.getMessage());
+        }
+    }
 
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-			// Skip the header on row 1
-			String line = br.readLine();
+    @Override
+    public void saveProductFromFile(String path) {
+        try {
+            File file = ResourceUtils.getFile(path);
+            List<ProductCsvRecord> records = csvToProductCsvRecord(new FileInputStream(file));
+            processProductRecords(records);
+        } catch (FileNotFoundException e) {
+            log.error("File not found: {}", e.getMessage());
+            throw new ResourceUploadException("File not found: " + e.getMessage());
+        }
+    }
 
-			while ((line = br.readLine()) != null) {
-				try {
-					ProductPostDto productPostDto = parseLineToProductPostDto(line, null);
-					if (productPostDto != null && !productPostDto.getVariants().isEmpty()) {
-						productService.createProduct(productPostDto);
-					}
-				} catch (InvalidRequestBodyValue | ResourceExistsException e) {
-					// Log the error and skip the current line
-					log.warn("Error importing product: " + e.getMessage());
-				}
-			}
-		} catch (IOException e) {
-			throw new ResourceUploadException("Error reading the file");
-		}
-	}
+    @Override
+    public void saveProductFromFile(File file) {
+        try {
+            List<ProductCsvRecord> records = csvToProductCsvRecord(new FileInputStream(file));
+            processProductRecords(records);
+        } catch (FileNotFoundException e) {
+            log.error("File not found: {}", e.getMessage());
+            throw new ResourceUploadException("File not found: " + e.getMessage());
+        }
+    }
 
-	@Override
-	public ProductPostDto parseLineToProductPostDto(String line, String separator) {
-		if (separator == null || separator.isEmpty()) {
-			separator = ";";
-		}
+    private List<ProductCsvRecord> csvToProductCsvRecord(InputStream inputStream) {
+        return new CsvToBeanBuilder<ProductCsvRecord>(
+                new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+                .withType(ProductCsvRecord.class)
+                .withSeparator(';')
+                .withIgnoreLeadingWhiteSpace(true)
+                .build()
+                .parse();
+    }
 
-		String[] values = line.split(separator);
+    private void processProductRecords(List<ProductCsvRecord> records) {
+        int successCount = 0;
+        int skipCount = 0;
+        int errorCount = 0;
 
-		if ((values.length == 0) || values[0].isEmpty() || values[1].isEmpty() || values[2].isEmpty() || values[3].isEmpty() || values[4].isEmpty() || values[5].isEmpty()) {
-			log.warn("Skipping product with empty required fields");
-			return null;
-		}
+        for (ProductCsvRecord record : records) {
+            try {
+                List<VariantPostDto> variants = fromRecord(record);
+                if (variants.isEmpty()) {
+                    log.warn("Skipping product with no variants: {}", record.getName());
+                    skipCount++;
+                    continue;
+                }
 
-		List<VariantPostDto> variants = parseVariantsFromValues(values);
+                ProductPostDto productPostDto = ProductPostDto.builder()
+                        .name(record.getName())
+                        .tagline(record.getTagline())
+                        .description(record.getDescription())
+                        .category(record.getCategory())
+                        .variants(variants)
+                        .build();
 
-		ProductPostDto dto = ProductPostDto.builder()
-			.name(values[0])
-			.tagline(values[1])
-			.description(values[2])
-			.category(values[3])
-			.variants(variants)
-			.build();
-		return dto;
-	}
+                productService.createProduct(productPostDto);
+                successCount++;
+            } catch (Exception e) {
+                log.warn("Error importing product {}: {}", record.getName(), e.getMessage());
+                errorCount++;
+            }
+        }
 
-	@ExceptionHandler({NumberFormatException.class})
-	public void handleNumberFormatException(NumberFormatException e) {
-		throw new InvalidRequestBodyValue("Parsing failed, please check the values and separator of the file");
-	}
+        log.info("Import completed - Success: {}, Skipped: {}, Errors: {}",
+                successCount, skipCount, errorCount);
+        log.info("Total products in database: {}",
+                productService.getAllProducts(null).size());
+    }
 
-	// Helper methods to iterate over the variants of a line
+    private List<VariantPostDto> fromRecord(ProductCsvRecord record) {
+        List<VariantPostDto> variants = new ArrayList<>();
 
-	private List<VariantPostDto> parseVariantsFromValues(String[] values) {
-		try {
-			List<VariantPostDto> variants = new ArrayList<>();
-			for (int i = 0; i < CSV_VARIANT_COLUMNS_COUNT; i++) {
-				int currIdx = CSV_VARIANT_STARTS_AT + (i * 3);
+        addVariantIfValid(variants, record.getVariant1_type(), record.getVariant1_price(),
+                record.getVariant1_minQuantity());
+        addVariantIfValid(variants, record.getVariant2_type(), record.getVariant2_price(),
+                record.getVariant2_minQuantity());
+        addVariantIfValid(variants, record.getVariant3_type(), record.getVariant3_price(),
+                record.getVariant3_minQuantity());
 
-				if ((currIdx + 1 < values.length) && !values[currIdx].isEmpty() && !values[currIdx + 1].isEmpty()) {
-					VariantPostDto variantPostDto = VariantPostDto.builder()
-						.type(values[currIdx])
-						.price(new BigDecimal(values[currIdx + 1]))
-						.maxQuantity(applicationProperties.getMaxVariantQuantity())
-						.build();
+        return variants;
+    }
 
-					try {
-						// Check for min quantity in the row
-						if (values[currIdx + 2] != null && !values[currIdx + 2].isEmpty()) {
-							variantPostDto.setMinQuantity(Integer.parseInt(values[currIdx + 2]));
-						}
-					} catch (IndexOutOfBoundsException e) {
-						// When the min quantity is not defined, use default value.
-						variantPostDto.setMinQuantity(1);
-					}
-
-					// Check consistency, max quantity should be defined manually, uses default value.
-					if (variantPostDto.isQuantityConsistent()) {
-						variants.add(variantPostDto);
-					} else {
-						log.warn("Skipping variant with inconsistent quantity: " + variantPostDto.getType());
-					}
-				}
-			}
-			return variants;
-		} catch (IndexOutOfBoundsException e) {
-			log.warn("Skipping product with incomplete variant data");
-			return null;
-		}
-	}
+    private void addVariantIfValid(List<VariantPostDto> variants, String type,
+            Float price, Integer minQuantity) {
+        if (type != null && price != null) {
+            variants.add(VariantPostDto.builder()
+                    .type(type)
+                    .price(BigDecimal.valueOf(price))
+                    .minQuantity(minQuantity != null ? minQuantity : 1)
+                    .maxQuantity(250)
+                    .build());
+        }
+    }
 }
