@@ -18,6 +18,7 @@ public interface ProductService {
 	 * @param keyword {@link String} optional keyword filter
 	 * @return {@link List} of {@link ProductDto}
 	 */
+	@Transactional(readOnly = true)
 	List<ProductDto> getAllProducts(String category, String keyword);
 
 	/**
@@ -36,6 +37,7 @@ public interface ProductService {
 	 * @return {@link ProductDto}
 	 * @throws ResourceNotFoundException if the product is not found
 	 */
+	@Transactional(readOnly = true)
 	ProductDto getProduct(long productId);
 
 
@@ -74,6 +76,7 @@ public interface ProductService {
 	 *
 	 * @param productId {@link Long}
 	 */
+	@Transactional(readOnly = true)
 	void restoreSoftDeletedProduct(Long productId);
 
 	/**
@@ -93,5 +96,6 @@ public interface ProductService {
 	 * @param productId {@link Long}
 	 * @return {@link Boolean}
 	 */
+	@Transactional(readOnly = true)
 	boolean existsById(Long productId);
 }
