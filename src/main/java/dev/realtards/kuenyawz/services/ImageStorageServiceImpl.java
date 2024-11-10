@@ -193,6 +193,9 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
 	@Override
 	public List<String> getImageUrls(Product product) {
+		if (product.getImages() == null) {
+			return List.of();
+		}
 		return product.getImages().stream()
 			.map(this::getImageUrl)
 			.toList();
