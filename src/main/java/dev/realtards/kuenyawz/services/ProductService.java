@@ -14,10 +14,11 @@ public interface ProductService {
 	/**
 	 * Master method to get all products.
 	 *
+	 * @param category {@link String} optional category filter
+	 * @param keyword {@link String} optional keyword filter
 	 * @return {@link List} of {@link ProductDto}
 	 */
-	@Transactional(readOnly = true)
-	List<ProductDto> getAllProducts(String category);
+	List<ProductDto> getAllProducts(String category, String keyword);
 
 	/**
 	 * Creates a new product from the DTO with the provided variants' DTOs.
@@ -35,28 +36,8 @@ public interface ProductService {
 	 * @return {@link ProductDto}
 	 * @throws ResourceNotFoundException if the product is not found
 	 */
-	@Transactional(readOnly = true)
 	ProductDto getProduct(long productId);
 
-	/**
-	 * Retrieves a product by a keyword.
-	 *
-	 * @param keyword {@link String}
-	 * @return {@link ProductDto}
-	 * @throws ResourceNotFoundException if the product is not found
-	 */
-	@Transactional(readOnly = true)
-	List<ProductDto> getAllProductByKeyword(String keyword);
-
-	/**
-	 * Retrieves all products by a category.
-	 *
-	 * @param category {@link String}
-	 * @return {@link List} of {@link ProductDto}
-	 * @throws InvalidRequestBodyValue if the category is invalid
-	 */
-//	@Transactional(readOnly = true)
-	List<ProductDto> getProductsByCategory(String category);
 
 	/**
 	 * Deletes a product by its ID.
