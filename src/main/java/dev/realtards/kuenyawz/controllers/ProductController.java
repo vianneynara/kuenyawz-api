@@ -44,9 +44,10 @@ public class ProductController extends BaseController {
 	})
 	@GetMapping
 	public ResponseEntity<Object> getAllProducts(
-		@RequestParam(required = false) String category
+		@RequestParam(required = false) String category,
+		@RequestParam(required = false) String keyword
 	) {
-		List<ProductDto> productDtos = productService.getAllProducts(category);
+		List<ProductDto> productDtos = productService.getAllProducts(category, keyword);
 		return ResponseEntity.status(HttpStatus.OK).body(new ListOfProductDto(productDtos));
 	}
 
@@ -90,11 +91,11 @@ public class ProductController extends BaseController {
 			schema = @Schema(implementation = ListOfProductDto.class)
 		)
 	)
-	@GetMapping("/search/{keyword}")
+	@GetMapping("/keyword/{keyword}")
 	public ResponseEntity<Object> searchProducts(
 		@PathVariable String keyword
 	) {
-		List<ProductDto> productDtos = productService.getAllProductByKeyword(keyword);
+		List<ProductDto> productDtos = productService.getAllProducts(null, keyword);
 		return ResponseEntity.status(HttpStatus.OK).body(new ListOfProductDto(productDtos));
 	}
 
@@ -111,7 +112,7 @@ public class ProductController extends BaseController {
 	public ResponseEntity<Object> getProductsByCategory(
 		@PathVariable String category
 	) {
-		List<ProductDto> productDtos = productService.getProductsByCategory(category);
+		List<ProductDto> productDtos = productService.getAllProducts(category, null);
 		return ResponseEntity.status(HttpStatus.OK).body(new ListOfProductDto(productDtos));
 	}
 
