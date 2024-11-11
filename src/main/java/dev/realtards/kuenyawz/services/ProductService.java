@@ -3,7 +3,6 @@ package dev.realtards.kuenyawz.services;
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPatchDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
-import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,11 +14,13 @@ public interface ProductService {
 	 * Master method to get all products.
 	 *
 	 * @param category {@link String} optional category filter
-	 * @param keyword {@link String} optional keyword filter
+	 * @param keyword  {@link String} optional keyword filter
+	 * @param page {@link Integer} optional page number
+	 * @param pageSize {@link Integer} optional page size
 	 * @return {@link List} of {@link ProductDto}
 	 */
 	@Transactional(readOnly = true)
-	List<ProductDto> getAllProducts(String category, String keyword);
+	List<ProductDto> getAllProducts(String category, String keyword, Integer page, Integer pageSize);
 
 	/**
 	 * Creates a new product from the DTO with the provided variants' DTOs.

@@ -31,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
 	private final ImageStorageService imageStorageService;
 
     @Override
-    public List<ProductDto> getAllProducts(String category, String keyword) {
+    public List<ProductDto> getAllProducts(String category, String keyword, Integer page, Integer pageSize) {
         List<Product> products = findProducts(category, keyword);
         return products.stream()
                       .map(productMapper::fromEntity)

@@ -1,7 +1,6 @@
 package dev.realtards.kuenyawz.services;
 
 import com.opencsv.bean.CsvToBeanBuilder;
-import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
 import dev.realtards.kuenyawz.dtos.csv.ProductCsvRecord;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
 import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
@@ -112,7 +111,7 @@ public class ProductCsvServiceImpl implements ProductCsvService {
         log.info("Import completed - Success: {}, Skipped: {}, Errors: {}",
                 successCount, skipCount, errorCount);
         log.info("Total products in database: {}",
-                productService.getAllProducts(null, null).size());
+                productService.getAllProducts(null, null, null, null).size());
     }
 
     private List<VariantPostDto> fromRecord(ProductCsvRecord record) {

@@ -45,9 +45,11 @@ public class ProductController extends BaseController {
 	@GetMapping
 	public ResponseEntity<Object> getAllProducts(
 		@RequestParam(required = false) String category,
-		@RequestParam(required = false) String keyword
+		@RequestParam(required = false) String keyword,
+		@RequestParam(required = false) Integer page,
+		@RequestParam(required = false) Integer pageSize
 	) {
-		List<ProductDto> productDtos = productService.getAllProducts(category, keyword);
+		List<ProductDto> productDtos = productService.getAllProducts(category, keyword, null, null);
 		return ResponseEntity.status(HttpStatus.OK).body(new ListOfProductDto(productDtos));
 	}
 
@@ -95,7 +97,7 @@ public class ProductController extends BaseController {
 	public ResponseEntity<Object> searchProducts(
 		@PathVariable String keyword
 	) {
-		List<ProductDto> productDtos = productService.getAllProducts(null, keyword);
+		List<ProductDto> productDtos = productService.getAllProducts(null, keyword, null, null);
 		return ResponseEntity.status(HttpStatus.OK).body(new ListOfProductDto(productDtos));
 	}
 
@@ -112,7 +114,7 @@ public class ProductController extends BaseController {
 	public ResponseEntity<Object> getProductsByCategory(
 		@PathVariable String category
 	) {
-		List<ProductDto> productDtos = productService.getAllProducts(category, null);
+		List<ProductDto> productDtos = productService.getAllProducts(category, null, null, null);
 		return ResponseEntity.status(HttpStatus.OK).body(new ListOfProductDto(productDtos));
 	}
 
