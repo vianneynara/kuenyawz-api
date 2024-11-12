@@ -13,6 +13,8 @@ import dev.realtards.kuenyawz.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -30,13 +32,61 @@ public class ProductServiceImpl implements ProductService {
 	private final ProductMapper productMapper;
 	private final ImageStorageService imageStorageService;
 
+	private final static int DEFAULT_PAGE = 0;
+	private final static int DEFAULT_PAGE_SIZE = 10;
+
     @Override
-    public List<ProductDto> getAllProducts(String category, String keyword, Integer page, Integer pageSize) {
+    public List<ProductDto> getAllProducts(String category, String keyword) {
         List<Product> products = findProducts(category, keyword);
         return products.stream()
                       .map(productMapper::fromEntity)
                       .toList();
     }
+
+	public Page<ProductDto> getAllProductsPaginated(String category, String keyword, Integer page, Integer pageSize) {
+		PageRequest pageRequest = buildPageRequest(page, pageSize);
+		Page<Product> products = findProductsPaginated(category, keyword, pageRequest);
+
+		Page<ProductDto> productDtos = products.map(productMapper::fromEntity);
+		return productDtos;
+	}
+
+	private PageRequest buildPageRequest(Integer page, Integer pageSize) {
+		if (page != null && page > 0) {
+			page = page - 1;
+		} else {
+			page = DEFAULT_PAGE;
+		}
+
+		if (pageSize != null && pageSize > 0) {
+			if (pageSize > 100)
+				pageSize = 100;
+		} else {
+			pageSize = DEFAULT_PAGE_SIZE;
+		}
+
+		return PageRequest.of(page, pageSize);
+	}
+
+	private Page<Product> findProductsPaginated(String category, String keyword, PageRequest pageRequest) {
+        boolean hasCategory = StringUtils.hasText(category);
+        boolean hasKeyword = StringUtils.hasText(keyword);
+
+		if (!hasCategory && !hasKeyword) {
+			return productRepository.findAll(pageRequest);
+		}
+
+		String processedKeyword = hasKeyword ? "%" + keyword.trim() + "%" : null;
+
+		if (hasCategory) {
+			Product.Category categoryEnum = parseCategoryOrThrow(category);
+			return hasKeyword
+				? productRepository.findAllByCategoryIsAndNameLikeIgnoreCase(categoryEnum, processedKeyword, pageRequest)
+				: productRepository.findAllByCategory(categoryEnum, pageRequest);
+		} else {
+			return productRepository.findAllByNameLikeIgnoreCase(processedKeyword, pageRequest);
+		}
+	}
 
     private List<Product> findProducts(String category, String keyword) {
         boolean hasCategory = StringUtils.hasText(category);
