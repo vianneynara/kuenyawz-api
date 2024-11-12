@@ -94,16 +94,6 @@ class ProductControllerIT {
 
     @Test
     void testGetAllProducts() throws Exception {
-        // Arrange
-        Product product = Product.builder()
-            .name("Test Product2")
-            .tagline("Test Tagline")
-            .description("Test Description")
-            .category(Product.Category.CAKE)
-            .build();
-
-        productRepository.save(product);
-
         // Act & Assert
         MvcResult result = mockMvc.perform(get("/api/products"))
             .andExpect(status().isOk())
@@ -111,6 +101,6 @@ class ProductControllerIT {
 //            .andDo(print()); // This helps with debugging
 
 		// Assert
-		assertThat(result.getResponse().getContentAsString()).contains("Test Product2");
+		assertThat(result.getResponse().getContentAsString()).contains("Marmer Buttercake");
 	}
 }

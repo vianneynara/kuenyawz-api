@@ -18,6 +18,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -104,12 +107,33 @@ public class ProductServiceImplTest {
 		when(productMapper.fromEntity(product)).thenReturn(productDto);
 
 		// Act
-		List<ProductDto> result = productService.getAllProducts(null, null, null, null);
+		List<ProductDto> result = productService.getAllProducts(null, null);
 
 		// Assert
 		assertThat(result).isEqualTo(expectedDtos);
 		verify(productRepository).findAll();
 		verify(productMapper).fromEntity(product);
+	}
+
+	@Test
+	void getAllProductsPaginated_ShouldReturnPaginatedListOfProducts() {
+		// Arrange
+		PageRequest pageRequest = PageRequest.of(0, 5); // page 1 becomes 0-based
+
+		List<Product> products = List.of(product);
+		Page<Product> productPage = new PageImpl<>(products, pageRequest, products.size());
+
+		// Mock with PageRequest parameter
+		when(productRepository.findAll(pageRequest)).thenReturn(productPage);
+		when(productMapper.fromEntity(product)).thenReturn(productDto);
+
+		// Act
+		Page<ProductDto> result = productService.getAllProductsPaginated(null, null, 1, 5);
+
+		// Assert
+		assertThat(result.getNumber()).isEqualTo(0);
+		assertThat(result.getSize()).isEqualTo(5);
+		verify(productRepository).findAll(pageRequest);
 	}
 
 	@Test
@@ -193,7 +217,7 @@ public class ProductServiceImplTest {
 		when(productMapper.fromEntity(product)).thenReturn(productDto);
 
 		// Act
-		List<ProductDto> result = productService.getAllProducts(null, keyword, null, null);
+		List<ProductDto> result = productService.getAllProducts(null, keyword);
 
 		// Assert
 		assertThat(result).isEqualTo(expectedDtos);
@@ -211,7 +235,7 @@ public class ProductServiceImplTest {
 		when(productMapper.fromEntity(product)).thenReturn(productDto);
 
 		// Act
-		List<ProductDto> result = productService.getAllProducts(category.toString(), null, null, null);
+		List<ProductDto> result = productService.getAllProducts(category.toString(), null);
 
 		// Assert
 		assertThat(result).isEqualTo(expectedDtos);
@@ -225,7 +249,7 @@ public class ProductServiceImplTest {
 		String invalidCategory = "invalid";
 
 		// Act & Assert
-		assertThatThrownBy(() -> productService.getAllProducts(invalidCategory, null, null, null))
+		assertThatThrownBy(() -> productService.getAllProducts(invalidCategory, null))
 			.isInstanceOf(InvalidRequestBodyValue.class)
 			.hasMessage("Invalid category: INVALID");
 	}
