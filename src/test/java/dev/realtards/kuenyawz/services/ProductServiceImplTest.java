@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -118,7 +119,7 @@ public class ProductServiceImplTest {
 	@Test
 	void getAllProductsPaginated_ShouldReturnPaginatedListOfProducts() {
 		// Arrange
-		PageRequest pageRequest = PageRequest.of(0, 5); // page 1 becomes 0-based
+		PageRequest pageRequest = PageRequest.of(0, 5, Sort.by(Sort.Order.asc("productId")));
 
 		List<Product> products = List.of(product);
 		Page<Product> productPage = new PageImpl<>(products, pageRequest, products.size());
