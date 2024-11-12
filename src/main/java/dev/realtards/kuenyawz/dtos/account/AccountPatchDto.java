@@ -26,7 +26,7 @@ public class AccountPatchDto {
 	private String email;
 
     @Schema(description = "User's phone number", example = "+12345678901", pattern = "^\\+?[1-9][0-9]{7,14}$")
-    @Pattern(regexp = "^?[1-9][0-9]{7,14}$", message = "Invalid phone number format")
+    @Pattern(regexp = "^[1-9][0-9]{7,14}$", message = "Invalid phone number format")
     private String phone;
 
 	public AccountPatchDto(Account account) {
