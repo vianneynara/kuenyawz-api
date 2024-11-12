@@ -27,7 +27,7 @@ for the actual website business logic.
 
 ## API documentation
 
-Refer to this **[Swagger Documentation](https://app.swaggerhub.com/apis-docs/NaraNarwandaru/wz-snack_and_bites_api/1.0.0)**
+Refer to this **[Swagger Documentation](https://app.swaggerhub.com/apis/vianneynara/kuenyawz_api/1.0.0/)**
 
 ## Prerequisites
 
