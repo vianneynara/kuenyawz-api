@@ -2,6 +2,8 @@ package dev.realtards.kuenyawz.repositories;
 
 import dev.realtards.kuenyawz.entities.Product;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,9 +17,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	List<Product> findAllByNameLikeIgnoreCase(String name);
 
+	Page<Product> findAllByNameLikeIgnoreCase(String name, Pageable pageable);
+
 	List<Product> findAllByCategory(Product.Category category);
 
+	Page<Product> findAllByCategory(Product.Category category, Pageable pageable);
+
 	List<Product> findAllByCategoryIsAndNameLikeIgnoreCase(Product.Category category, String name);
+
+	Page<Product> findAllByCategoryIsAndNameLikeIgnoreCase(Product.Category category, String name, Pageable pageable);
 
 	boolean existsByNameIgnoreCase(String name);
 
