@@ -110,7 +110,7 @@ public class ProductCsvServiceImpl implements ProductCsvService {
         log.info("Import completed - Success: {}, Skipped: {}, Errors: {}",
                 successCount, skipCount, errorCount);
         log.info("Total products in database: {}",
-                productService.getAllProducts(null, null, null, null).size());
+                productService.getAllProducts(null, null).size());
     }
 
     private List<VariantPostDto> fromRecord(ProductCsvRecord record) {
