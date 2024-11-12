@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -65,7 +66,13 @@ public class ProductServiceImpl implements ProductService {
 			pageSize = DEFAULT_PAGE_SIZE;
 		}
 
-		return PageRequest.of(page, pageSize);
+		// Persist results using sorting
+		Sort sort = Sort.by(
+//			Sort.Order.asc("category"),
+			Sort.Order.asc("productId")
+		);
+
+		return PageRequest.of(page, pageSize, sort);
 	}
 
 	private Page<Product> findProductsPaginated(String category, String keyword, PageRequest pageRequest) {
