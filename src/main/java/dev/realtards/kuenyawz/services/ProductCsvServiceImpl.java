@@ -49,10 +49,9 @@ public class ProductCsvServiceImpl implements ProductCsvService {
     public void saveProductFromFile(String path) {
         try {
             File file = ResourceUtils.getFile(path);
-            List<ProductCsvRecord> records = csvToProductCsvRecord(new FileInputStream(file));
-            processProductRecords(records);
+            saveProductFromFile(file);
         } catch (FileNotFoundException e) {
-            log.error("File not found: {}", e.getMessage());
+            log.error("Path not found: {}", e.getMessage());
             throw new ResourceUploadException("File not found: " + e.getMessage());
         }
     }
