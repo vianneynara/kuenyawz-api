@@ -1,7 +1,6 @@
 package dev.realtards.kuenyawz.services;
 
 import com.opencsv.bean.CsvToBeanBuilder;
-import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
 import dev.realtards.kuenyawz.dtos.csv.ProductCsvRecord;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
 import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
@@ -18,7 +17,6 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +24,6 @@ import java.util.Objects;
 public class ProductCsvServiceImpl implements ProductCsvService {
 
     private final ProductService productService;
-    private final ApplicationProperties applicationProperties;
 
     @Override
     public void saveProductFromMultipartFile(MultipartFile file) {
@@ -52,10 +49,9 @@ public class ProductCsvServiceImpl implements ProductCsvService {
     public void saveProductFromFile(String path) {
         try {
             File file = ResourceUtils.getFile(path);
-            List<ProductCsvRecord> records = csvToProductCsvRecord(new FileInputStream(file));
-            processProductRecords(records);
+            saveProductFromFile(file);
         } catch (FileNotFoundException e) {
-            log.error("File not found: {}", e.getMessage());
+            log.error("Path not found: {}", e.getMessage());
             throw new ResourceUploadException("File not found: " + e.getMessage());
         }
     }
@@ -114,7 +110,7 @@ public class ProductCsvServiceImpl implements ProductCsvService {
         log.info("Import completed - Success: {}, Skipped: {}, Errors: {}",
                 successCount, skipCount, errorCount);
         log.info("Total products in database: {}",
-                productService.getAllProducts(null).size());
+                productService.getAllProducts(null, null).size());
     }
 
     private List<VariantPostDto> fromRecord(ProductCsvRecord record) {

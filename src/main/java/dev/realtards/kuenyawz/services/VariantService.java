@@ -39,6 +39,7 @@ public interface VariantService {
 	 * @return {@link List} of {@link VariantDto}
 	 * @throws ResourceNotFoundException if the product is not found
 	 */
+	@Transactional
 	List<VariantDto> createVariants(Long productId, VariantPostDto... variantPostDtos);
 
 	/**

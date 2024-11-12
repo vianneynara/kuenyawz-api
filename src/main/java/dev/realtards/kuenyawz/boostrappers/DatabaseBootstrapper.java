@@ -81,7 +81,8 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 	}
 
 	public void injectProducts() {
-		if (productRepository.count() != 0) {
+		// Change this according to the number of seeds in product CSV
+		if (productRepository.count() >= 45) {
 			return;
 		}
 
@@ -98,7 +99,7 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent event) {
-		start();
+//		start();
 	}
 
 	@Override

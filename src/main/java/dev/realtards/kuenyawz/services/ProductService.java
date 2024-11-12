@@ -3,8 +3,8 @@ package dev.realtards.kuenyawz.services;
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPatchDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
-import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -14,10 +14,24 @@ public interface ProductService {
 	/**
 	 * Master method to get all products.
 	 *
+	 * @param category {@link String} optional category filter
+	 * @param keyword  {@link String} optional keyword filter
 	 * @return {@link List} of {@link ProductDto}
 	 */
 	@Transactional(readOnly = true)
-	List<ProductDto> getAllProducts(String category);
+	List<ProductDto> getAllProducts(String category, String keyword);
+
+	/**
+	 * Master method to get all products with paginated result.
+	 *
+	 * @param category {@link String} optional category filter
+	 * @param keyword  {@link String} optional keyword filter
+	 * @param page     {@link Integer} optional page number
+	 * @param pageSize {@link Integer} optional page size
+	 * @return {@link Page} of {@link ProductDto}
+	 */
+	@Transactional(readOnly = true)
+	Page<ProductDto> getAllProductsPaginated(String category, String keyword, Integer page, Integer pageSize);
 
 	/**
 	 * Creates a new product from the DTO with the provided variants' DTOs.
@@ -38,25 +52,6 @@ public interface ProductService {
 	@Transactional(readOnly = true)
 	ProductDto getProduct(long productId);
 
-	/**
-	 * Retrieves a product by a keyword.
-	 *
-	 * @param keyword {@link String}
-	 * @return {@link ProductDto}
-	 * @throws ResourceNotFoundException if the product is not found
-	 */
-	@Transactional(readOnly = true)
-	List<ProductDto> getAllProductByKeyword(String keyword);
-
-	/**
-	 * Retrieves all products by a category.
-	 *
-	 * @param category {@link String}
-	 * @return {@link List} of {@link ProductDto}
-	 * @throws InvalidRequestBodyValue if the category is invalid
-	 */
-//	@Transactional(readOnly = true)
-	List<ProductDto> getProductsByCategory(String category);
 
 	/**
 	 * Deletes a product by its ID.
@@ -93,6 +88,7 @@ public interface ProductService {
 	 *
 	 * @param productId {@link Long}
 	 */
+	@Transactional(readOnly = true)
 	void restoreSoftDeletedProduct(Long productId);
 
 	/**
@@ -112,5 +108,6 @@ public interface ProductService {
 	 * @param productId {@link Long}
 	 * @return {@link Boolean}
 	 */
+	@Transactional(readOnly = true)
 	boolean existsById(Long productId);
 }

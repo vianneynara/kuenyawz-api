@@ -45,7 +45,7 @@ public class ProductRepositoryTest {
 
 	@BeforeEach
 	void setUp() {
-		productCsvImportService = new ProductCsvServiceImpl(productService, applicationProperties);
+		productCsvImportService = new ProductCsvServiceImpl(productService);
 
 		productRepository.deleteAll();
 		productRepository.flush();
@@ -67,8 +67,8 @@ public class ProductRepositoryTest {
 
 
 	@Test
-	void testFindAllByCategoryIs() {
-		List<Product> productList = productRepository.findAllByCategoryIs(Product.Category.CAKE);
+	void testFindAllByCategory() {
+		List<Product> productList = productRepository.findAllByCategory(Product.Category.CAKE);
 
 		// Assertions
 		assertThat(productList.size()).isEqualTo(20);

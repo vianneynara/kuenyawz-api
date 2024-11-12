@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,10 +45,13 @@ public class ProductController extends BaseController {
 	})
 	@GetMapping
 	public ResponseEntity<Object> getAllProducts(
-		@RequestParam(required = false) String category
+		@RequestParam(required = false) String category,
+		@RequestParam(required = false) String keyword,
+		@RequestParam(required = false) Integer page,
+		@RequestParam(required = false) Integer pageSize
 	) {
-		List<ProductDto> productDtos = productService.getAllProducts(category);
-		return ResponseEntity.status(HttpStatus.OK).body(new ListOfProductDto(productDtos));
+		Page<ProductDto> productDtos = productService.getAllProductsPaginated(category, keyword, page, pageSize);
+		return ResponseEntity.status(HttpStatus.OK).body(productDtos);
 	}
 
 	@Operation(summary = "Creates a new product with variant")
@@ -90,12 +94,12 @@ public class ProductController extends BaseController {
 			schema = @Schema(implementation = ListOfProductDto.class)
 		)
 	)
-	@GetMapping("/search/{keyword}")
+	@GetMapping("/keyword/{keyword}")
 	public ResponseEntity<Object> searchProducts(
 		@PathVariable String keyword
 	) {
-		List<ProductDto> productDtos = productService.getAllProductByKeyword(keyword);
-		return ResponseEntity.status(HttpStatus.OK).body(new ListOfProductDto(productDtos));
+		Page<ProductDto> productDtos = productService.getAllProductsPaginated(null, keyword, null, null);
+		return ResponseEntity.status(HttpStatus.OK).body(productDtos);
 	}
 
 	@Operation(summary = "Get products by category")
@@ -111,8 +115,8 @@ public class ProductController extends BaseController {
 	public ResponseEntity<Object> getProductsByCategory(
 		@PathVariable String category
 	) {
-		List<ProductDto> productDtos = productService.getProductsByCategory(category);
-		return ResponseEntity.status(HttpStatus.OK).body(new ListOfProductDto(productDtos));
+		Page<ProductDto> productDtos = productService.getAllProductsPaginated(category, null, null, null);
+		return ResponseEntity.status(HttpStatus.OK).body(productDtos);
 	}
 
 	@Operation(summary = "Deletes a product by ID")
