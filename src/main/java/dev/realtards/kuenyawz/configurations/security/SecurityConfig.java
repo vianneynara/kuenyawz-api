@@ -3,6 +3,7 @@ package dev.realtards.kuenyawz.configurations.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,8 +33,10 @@ public class SecurityConfig {
 		httpSec
 			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**"))
 			.authorizeHttpRequests(auth -> auth
-//					.requestMatchers("/api/**").hasRole("ADMIN")
-					.anyRequest().permitAll()
+					.requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
+					.requestMatchers(HttpMethod.GET, "/api", "/api/status").permitAll()
+					.requestMatchers(HttpMethod.GET, "/api/images/**").permitAll()
+//					.anyRequest().permitAll()
 			)
 			.headers(headers -> headers
 				.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
