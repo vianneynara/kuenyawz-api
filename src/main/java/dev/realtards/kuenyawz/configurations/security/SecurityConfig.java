@@ -33,9 +33,27 @@ public class SecurityConfig {
 		httpSec
 			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**"))
 			.authorizeHttpRequests(auth -> auth
-					.requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
-					.requestMatchers(HttpMethod.GET, "/api", "/api/status").permitAll()
-					.requestMatchers(HttpMethod.GET, "/api/images/**").permitAll()
+					.requestMatchers(
+						"api/accounts/**").permitAll()
+//					.requestMatchers(HttpMethod.PATCH,
+//						"/api/accounts/**").hasAnyRole("ADMIN", "USER")
+					.requestMatchers(
+						"/api/sim/**").permitAll()
+					.requestMatchers(HttpMethod.GET,
+						"/api/products",
+						"/api/products/**").permitAll()
+					.requestMatchers(
+						"/api/products",
+						"/api/products/**").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.GET,
+						"/api/images").permitAll()
+					.requestMatchers(
+						"/api/images").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.GET,
+						"/api",
+						"/api/status").permitAll()
+					.requestMatchers(HttpMethod.GET,
+						"/api/images/**").permitAll()
 //					.anyRequest().permitAll()
 			)
 			.headers(headers -> headers
