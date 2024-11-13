@@ -40,7 +40,7 @@ public class AccountController extends BaseController {
 			schema = @Schema(implementation = AccountsResponse.class)
 		)
 	)
-	@GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping
 	public ResponseEntity<Object> getAllAccounts() {
 		List<AccountSecureDto> accounts = accountService.getAllAccounts();
 
