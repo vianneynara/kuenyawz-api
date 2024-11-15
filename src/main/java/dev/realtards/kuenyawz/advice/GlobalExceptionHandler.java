@@ -13,7 +13,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
@@ -143,7 +145,16 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(NoResourceFoundException.class)
 	public ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Resource or endpoint might not exist"));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Resource might not exist"));
+	}
+
+	// For future use
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(
+		MethodArgumentTypeMismatchException ex) {
+		String message = String.format("Failed to convert value '%s' to type %s",
+			ex.getValue(), Objects.requireNonNull(ex.getRequiredType()).getSimpleName());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(message));
 	}
 
 	/**
