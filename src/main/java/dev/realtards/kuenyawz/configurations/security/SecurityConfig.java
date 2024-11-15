@@ -33,6 +33,7 @@ public class SecurityConfig {
 		httpSec
 			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**"))
 			.authorizeHttpRequests(auth -> auth
+				.requestMatchers("/h2-console/**").permitAll()
 				.requestMatchers("/api/accounts/**").permitAll()
 				.requestMatchers("/api/sim/**").permitAll()
 				.requestMatchers(HttpMethod.GET,
