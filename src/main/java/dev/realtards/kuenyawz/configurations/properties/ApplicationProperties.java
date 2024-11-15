@@ -44,8 +44,8 @@ public class ApplicationProperties {
         this.database.username = dotenv.get("DB_USERNAME");
         this.database.password = dotenv.get("DB_PASSWORD");
 
-        this.security.username = dotenv.get("SECURITY_USERNAME");
-        this.security.password = dotenv.get("SECURITY_PASSWORD");
+        this.security.jwtSecret = dotenv.get("JWT_SECRET");
+        this.security.jwtExpiration = Long.parseLong(dotenv.get("JWT_EXPIRATION"));
 	}
 
 	@Getter
@@ -59,7 +59,7 @@ public class ApplicationProperties {
     @Getter
     @Setter
     public static class Security {
-        private String username;
-        private String password;
+        private String jwtSecret;
+        private long jwtExpiration;
     }
 }
