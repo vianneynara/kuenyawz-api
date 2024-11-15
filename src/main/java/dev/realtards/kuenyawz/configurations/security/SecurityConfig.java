@@ -26,7 +26,7 @@ import java.util.Map;
 public class SecurityConfig {
 
 	private final AuthenticationProvider authenticationProvider;
-	private final JwtAuthorizationFilter jwtAuthorizationFilter;
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSec) throws Exception {
@@ -48,7 +48,7 @@ public class SecurityConfig {
 			.headers(hs -> hs.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
 			.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authenticationProvider(authenticationProvider)
-			.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
 			// Special handler for 401 and 403
 			.exceptionHandling(exc -> exc
