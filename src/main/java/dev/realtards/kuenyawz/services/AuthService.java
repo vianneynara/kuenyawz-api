@@ -32,13 +32,6 @@ public interface AuthService {
 	AuthResponseDto refresh(String token);
 
 	/**
-	 * Revokes an active access token.
-	 *
-	 * @param token The token to revoke
-	 */
-	void revokeAccessToken(String token);
-
-	/**
 	 * Revokes an active refresh token.
 	 *
 	 * @param token The token to revoke
