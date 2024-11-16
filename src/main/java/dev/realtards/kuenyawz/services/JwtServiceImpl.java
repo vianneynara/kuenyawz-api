@@ -4,12 +4,14 @@ import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,9 +23,11 @@ import java.util.function.Function;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class JwtServiceImpl implements JwtService {
 
 	private final ApplicationProperties applicationProperties;
+	private static final long CLOCK_SKEW_SECONDS = 60;
 
 	@Override
 	public String generateAccessToken(UserDetails userDetails) {
@@ -45,11 +49,12 @@ public class JwtServiceImpl implements JwtService {
 		UserDetails userDetails,
 		long expiration
 	) {
+		Instant now = Instant.now();
 		return Jwts.builder()
 			.claims(extraClaims)
 			.subject(userDetails.getUsername())
-			.issuedAt(new Date(System.currentTimeMillis()))
-			.expiration(new Date(System.currentTimeMillis() + expiration))
+			.issuedAt(Date.from(now))
+			.expiration(Date.from(now.plusSeconds(expiration)))
 			.claim("tokenType", TokenType.ACCESS.name())
 			.signWith(getSignInKey())
 			.compact();
@@ -75,6 +80,7 @@ public class JwtServiceImpl implements JwtService {
 	public Claims extractAllClaims(String token) {
 		return Jwts.parser()
 			.verifyWith(getSignInKey())
+			.clockSkewSeconds(CLOCK_SKEW_SECONDS)
 			.build()
 			.parseSignedClaims(token)
 			.getPayload();
