@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor @NoArgsConstructor
 @Builder
-public class AuthRefreshDto {
+public class AuthRefreshTokenDto {
 
 	@Schema(description = "Refresh token that has already been issued", example = "eiawDSFOJo8oeJIOjoi...")
 	@NotBlank(message = "Refresh token is required")
