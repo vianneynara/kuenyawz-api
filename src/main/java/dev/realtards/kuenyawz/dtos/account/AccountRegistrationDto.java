@@ -20,14 +20,14 @@ public class AccountRegistrationDto {
 	@CleanString
 	private String fullName;
 
-	@Schema(description = "User's password", example = "emiliaBestGirl", minLength = 4)
-	@NotBlank(message = "Password is required")
-	@Size(min = 4, message = "Password must be at least 4 characters")
-	private String password;
-
 	@Schema(description = "User's email address", example = "emilia@example.com")
 	@NotBlank(message = "Email is required")
 	@Email(message = "Email format is invalid")
 	@CleanString
 	private String email;
+
+	@Schema(description = "User's password", example = "emiliaBestGirl", minLength = 4)
+	@NotBlank(message = "Password is required")
+	@Size(min = 4, message = "Password must be at least 4 characters")
+	private String password;
 }
