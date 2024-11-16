@@ -47,7 +47,11 @@ public class AuthResponseDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<String> roles;
 
+    @Schema(description = "Token issue time in seconds", example = "1620000000")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long iat;
+
     @Schema(description = "Token expiration time in seconds", example = "3600")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long expiresIn;
+    private Long exp;
 }
