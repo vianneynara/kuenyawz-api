@@ -29,26 +29,34 @@ public class Account extends Auditables implements UserDetails {
 	@SnowFlakeIdValue(name = "account_id")
 	@Column(name = "account_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
 	private Long accountId;
+
 	@Column
 	private String password;
+
 	@Column
 	private String fullName;
+
 	@Column(unique = true)
 	private String googleId;
+
 	@Column(unique = true)
 	private String email;
+
 	@Column
 	private LocalDateTime emailVerifiedAt;
+
 	@Column(unique = true)
 	private String phone;
+
 	@Column
 	private Privilege privilege;
+
 	@Version
 	private Long version;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of();
+		return List.of(privilege);
 	}
 
 	@Override
@@ -80,7 +88,7 @@ public class Account extends Auditables implements UserDetails {
 	 * Type of privilege of an account.
 	 */
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
-	public enum Privilege {
+	public enum Privilege implements GrantedAuthority {
 		@JsonProperty("ADMIN")
 		ADMIN("USER"),
 
@@ -110,6 +118,11 @@ public class Account extends Auditables implements UserDetails {
 				}
 			}
 			throw new IllegalArgumentException("Invalid privilege: " + value);
+		}
+
+		@Override
+		public String getAuthority() {
+			return privilege;
 		}
 	}
 }
