@@ -35,5 +35,4 @@ public class RefreshToken extends Auditables {
 
 	@Column
 	private boolean isRevoked;
-
 }
