@@ -104,6 +104,16 @@ public class JwtServiceImpl implements JwtService {
 	}
 
 	@Override
+	public long getIssuedAt(String token) {
+		return extractClaim(token, claims -> claims.getIssuedAt().getTime());
+	}
+
+	@Override
+	public long getExpiration(String token) {
+		return extractClaim(token, claims -> claims.getExpiration().getTime());
+	}
+
+	@Override
 	public boolean isAccessToken(String token) {
 		return extractClaim(token, claims -> claims.get("tokenType", String.class))
 			.equals(TokenType.ACCESS.name());

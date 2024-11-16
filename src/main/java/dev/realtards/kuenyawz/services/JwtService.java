@@ -36,5 +36,9 @@ public interface JwtService {
 
 	long getExpirationTime();
 
+	long getIssuedAt(String token);
+
+	long getExpiration(String token);
+
 	boolean isAccessToken(String token);
 }
