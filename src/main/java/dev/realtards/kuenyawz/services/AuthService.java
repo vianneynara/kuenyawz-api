@@ -24,6 +24,14 @@ public interface AuthService {
 	AuthResponseDto login(AuthRequestDto accountLoginDto);
 
 	/**
+	 * Refreshes an active access token with refresh token.
+	 *
+	 * @param token The refresh token to use
+	 * @return {@link AuthResponseDto} with new access token
+	 */
+	AuthResponseDto refresh(String token);
+
+	/**
 	 * Revokes an active access token.
 	 *
 	 * @param token The token to revoke
@@ -36,14 +44,6 @@ public interface AuthService {
 	 * @param token The token to revoke
 	 */
 	void revokeRefreshToken(String token);
-
-	/**
-	 * Refreshes an active access token with refresh token.
-	 *
-	 * @param token The refresh token to use
-	 * @return {@link AuthResponseDto} with new access token
-	 */
-	AuthResponseDto refresh(String token);
 
 	/**
 	 * Returns the corresponding user information of the token.
