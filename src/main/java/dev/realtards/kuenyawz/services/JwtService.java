@@ -9,18 +9,18 @@ import java.util.Map;
 import java.util.function.Function;
 
 public interface JwtService {
-	String extractUsername(String token);
 
-	<T> T extractClaim(String token, Function<Claims, T> claimsResolver);
+	String generateAccessToken(UserDetails userDetails);
 
-	String generateToken(UserDetails userDetails);
+	String generateAccessToken(Map<String, Object> extraClaims, UserDetails userDetails);
 
-	String generateToken(Map<String, Object> extraClaims, UserDetails userDetails);
+	String generateRefreshToken(UserDetails userDetails);
 
 	String buildToken(
 		Map<String, Object> extraClaims,
 		UserDetails userDetails,
-		long expiration
+		long expiration,
+		JwtServiceImpl.TokenType tokenType
 	);
 
 	boolean isTokenValid(String token, UserDetails userDetails);
@@ -31,7 +31,17 @@ public interface JwtService {
 
 	Claims extractAllClaims(String token);
 
+	<T> T extractClaim(String token, Function<Claims, T> claimsResolver);
+
+	String extractUsername(String token);
+
 	SecretKey getSignInKey();
 
 	long getExpirationTime();
+
+	boolean isAccessToken(String token);
+
+	boolean isRefreshToken(String token);
+
+	boolean isRefreshTokenValid(String token, UserDetails userDetails);
 }
