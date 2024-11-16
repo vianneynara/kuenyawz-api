@@ -4,6 +4,7 @@ import dev.realtards.kuenyawz.dtos.account.AccountRegistrationDto;
 import dev.realtards.kuenyawz.dtos.account.AccountSecureDto;
 import dev.realtards.kuenyawz.dtos.auth.AuthRequestDto;
 import dev.realtards.kuenyawz.dtos.auth.AuthResponseDto;
+import org.springframework.security.core.Authentication;
 
 public interface AuthService {
 	/**
@@ -45,6 +46,22 @@ public interface AuthService {
 	 * @return {@link AccountSecureDto} user information
 	 */
 	AccountSecureDto getUserInfo(String token);
+
+	/**
+	 * Returns the corresponding user information of the account id.
+	 *
+	 * @param accountId The token to extract user information from
+	 * @return {@link AccountSecureDto} user information
+	 */
+	AccountSecureDto getUserInfo(Long accountId);
+
+	/**
+	 * Returns the corresponding user information an authentication.
+	 *
+	 * @param authentication The authentication to peek
+	 * @return {@link AccountSecureDto} user information
+	 */
+	AccountSecureDto getUserInfo(Authentication authentication);
 
 	/**
 	 * Validate a token to check whether it has expired or not.

@@ -10,6 +10,7 @@ import dev.realtards.kuenyawz.exceptions.InvalidPasswordException;
 import dev.realtards.kuenyawz.exceptions.UnauthorizedException;
 import dev.realtards.kuenyawz.mapper.AccountMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -68,6 +69,23 @@ public class AuthServiceImpl implements AuthService {
 		Account account = accountService.getAccount(username);
 
 		AccountSecureDto accountSecureDto = accountMapper.fromEntity(account);
+		return accountSecureDto;
+	}
+
+	@Override
+	public AccountSecureDto getUserInfo(Long accountId) {
+		Account account = accountService.getAccount(accountId);
+		System.out.println(account);
+
+		AccountSecureDto accountSecureDto = accountMapper.fromEntity(account);
+		return accountSecureDto;
+	}
+
+	@Override
+	public AccountSecureDto getUserInfo(Authentication authentication) {
+		AccountSecureDto accountSecureDto = accountMapper.fromEntity(
+			(Account) authentication.getPrincipal()
+		);
 		return accountSecureDto;
 	}
 
