@@ -35,18 +35,7 @@ public class JwtServiceImpl implements JwtService {
 		return buildToken(
 			extraClaims,
 			userDetails,
-			applicationProperties.getSecurity().getJwtExpiration(),
-			TokenType.ACCESS
-		);
-	}
-
-	@Override
-	public String generateRefreshToken(UserDetails userDetails) {
-		return buildToken(
-			new HashMap<>(),
-			userDetails,
-			applicationProperties.getSecurity().getJwtExpiration(),
-			TokenType.REFRESH
+			applicationProperties.getSecurity().getJwtExpiration()
 		);
 	}
 
@@ -54,15 +43,14 @@ public class JwtServiceImpl implements JwtService {
 	public String buildToken(
 		Map<String, Object> extraClaims,
 		UserDetails userDetails,
-		long expiration,
-		TokenType tokenType
+		long expiration
 	) {
 		return Jwts.builder()
 			.claims(extraClaims)
 			.subject(userDetails.getUsername())
 			.issuedAt(new Date(System.currentTimeMillis()))
 			.expiration(new Date(System.currentTimeMillis() + expiration))
-			.claim("tokenType", tokenType.name())
+			.claim("tokenType", TokenType.ACCESS.name())
 			.signWith(getSignInKey())
 			.compact();
 	}
@@ -119,19 +107,6 @@ public class JwtServiceImpl implements JwtService {
 	public boolean isAccessToken(String token) {
 		return extractClaim(token, claims -> claims.get("tokenType", String.class))
 			.equals(TokenType.ACCESS.name());
-	}
-
-	@Override
-	public boolean isRefreshToken(String token) {
-		return extractClaim(token, claims -> claims.get("tokenType", String.class))
-			.equals(TokenType.REFRESH.name());
-	}
-
-	@Override
-	public boolean isRefreshTokenValid(String token, UserDetails userDetails) {
-		if (!isRefreshToken(token)) return false;
-		final String username = extractUsername(token);
-		return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
 	}
 
 	public enum TokenType {
