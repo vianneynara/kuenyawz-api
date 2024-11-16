@@ -80,6 +80,11 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
 	}
 
+	@ExceptionHandler(UnsupportedKeyException.class)
+	public ResponseEntity<Object> handleUnsupportedKeyException(UnsupportedKeyException ex) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("The key is too weak"));
+	}
+
 	// watch
 
 	@ExceptionHandler(InvalidPasswordException.class)
