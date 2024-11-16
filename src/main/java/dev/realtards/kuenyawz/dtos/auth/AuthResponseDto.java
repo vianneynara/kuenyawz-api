@@ -32,7 +32,7 @@ public class AuthResponseDto {
 
     @Schema(description = "Account identifier", example = "123e4567-e89b-12d3-a456-426614174000")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String accountId;
+    private Long accountId;
 
     @Schema(description = "Email address that also acts as username", example = "emilia@wz.com")
     @JsonInclude(JsonInclude.Include.NON_NULL)
