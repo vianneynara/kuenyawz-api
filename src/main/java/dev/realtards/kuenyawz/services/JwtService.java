@@ -14,13 +14,10 @@ public interface JwtService {
 
 	String generateAccessToken(Map<String, Object> extraClaims, UserDetails userDetails);
 
-	String generateRefreshToken(UserDetails userDetails);
-
 	String buildToken(
 		Map<String, Object> extraClaims,
 		UserDetails userDetails,
-		long expiration,
-		JwtServiceImpl.TokenType tokenType
+		long expiration
 	);
 
 	boolean isTokenValid(String token, UserDetails userDetails);
@@ -40,8 +37,4 @@ public interface JwtService {
 	long getExpirationTime();
 
 	boolean isAccessToken(String token);
-
-	boolean isRefreshToken(String token);
-
-	boolean isRefreshTokenValid(String token, UserDetails userDetails);
 }
