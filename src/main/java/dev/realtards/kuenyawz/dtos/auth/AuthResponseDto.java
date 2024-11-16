@@ -39,6 +39,15 @@ public class AuthResponseDto {
     @Email
     private String email;
 
-	@Schema(description = "Full name")
-	private String fullName;
+    @Schema(description = "User's full name", example = "Emilia")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String fullName;
+
+    @Schema(description = "User roles", example = "[\"USER\", \"ADMIN\"]")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Set<String> roles;
+
+    @Schema(description = "Token expiration time in seconds", example = "3600")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long expiresIn;
 }
