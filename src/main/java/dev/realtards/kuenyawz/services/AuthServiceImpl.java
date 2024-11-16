@@ -25,7 +25,7 @@ public class AuthServiceImpl implements AuthService {
 	public AuthResponseDto register(AccountRegistrationDto accountRegistrationDto) {
 		Account account = accountService.createAccount(accountRegistrationDto);
 
-		AuthResponseDto authResponseDto = createAuthResponse(account);
+		AuthResponseDto authResponseDto = generateTokensThenResponse(account);
 		return authResponseDto;
 	}
 
@@ -37,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
 			throw new InvalidPasswordException();
 		}
 
-		AuthResponseDto authResponseDto = createAuthResponse(account);
+		AuthResponseDto authResponseDto = generateTokensThenResponse(account);
 		return authResponseDto;
 	}
 
@@ -53,7 +53,7 @@ public class AuthServiceImpl implements AuthService {
 
 		refreshTokenService.revokeRefreshToken(token);
 
-		AuthResponseDto authResponseDto = createAuthResponse(account);
+		AuthResponseDto authResponseDto = generateTokensThenResponse(account);
 		return authResponseDto;
 	}
 
@@ -76,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
 		return jwtService.isAccessToken(token) && !jwtService.isTokenExpired(token);
 	}
 
-	private AuthResponseDto createAuthResponse(Account account) {
+	private AuthResponseDto generateTokensThenResponse(Account account) {
 		String accessToken = jwtService.generateAccessToken(account);
 		RefreshToken refreshToken = refreshTokenService.createRefreshToken(account);
 
