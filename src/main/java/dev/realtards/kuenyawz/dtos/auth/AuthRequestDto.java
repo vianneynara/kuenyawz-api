@@ -10,11 +10,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "Account login request")
+@Schema(description = "Authentication request")
 @Data
 @AllArgsConstructor @NoArgsConstructor
 @Builder
-public class AccountLoginDto {
+public class AuthRequestDto {
 
 	@Schema(description = "User's email address", example = "emilia@example.com")
 	@NotBlank(message = "Email is required")
