@@ -5,7 +5,6 @@ import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;
 import dev.realtards.kuenyawz.dtos.image.ImageUploadDto;
 import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.ProductImage;
-import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.annotation.Transactional;
 
