@@ -161,6 +161,25 @@ public class ProductController extends BaseController {
 		return ResponseEntity.status(HttpStatus.OK).body(productDto);
 	}
 
+	@Operation(summary = "Patch a product's availability by ID")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Product availability patched successfully",
+			content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+				schema = @Schema(implementation = ProductDto.class)
+			)
+		),
+		@ApiResponse(responseCode = "404", description = "Product not found"),
+		@ApiResponse(responseCode = "400", description = "Invalid request body")
+	})
+	@PatchMapping("{productId}/availability")
+	public ResponseEntity<Object> patchProductAvailability(
+		@PathVariable Long productId,
+		@Valid @RequestBody ProductPatchAvailabilityDto productAvailabilityPatchDto
+	) {
+		ProductDto productDto = productService.patchAvailability(productId, productAvailabilityPatchDto.isAvailable());
+		return ResponseEntity.status(HttpStatus.OK).body(productDto);
+	}
+
 	// VARIANT ENDPOINTS
 
 	@Operation(summary = "(Master) Get all variants")
