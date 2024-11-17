@@ -74,7 +74,7 @@ public class AuthController {
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
-	@Operation(summary = "Get the current user's information")
+	@Operation(summary = "Get the current user's information from Authorization header")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "User information retrieved successfully"),
 		@ApiResponse(responseCode = "404", description = "User not found")
