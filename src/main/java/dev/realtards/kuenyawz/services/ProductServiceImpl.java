@@ -199,6 +199,18 @@ public class ProductServiceImpl implements ProductService {
 		return productDto;
 	}
 
+	@Override
+	public ProductDto patchAvailability(Long productId, boolean isAvailable) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
+
+		product.setAvailable(isAvailable);
+		Product savedProduct = productRepository.save(product);
+
+		// Convert and return
+		ProductDto productDto = productMapper.fromEntity(savedProduct);
+		return productDto;
+	}
 
 	@Override
 	public boolean existsById(Long productId) {
