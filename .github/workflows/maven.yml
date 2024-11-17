@@ -30,6 +30,12 @@ permissions:
   contents: write
   deployments: write
   security-events: write
+  #Add these new permissions
+  checks: write
+  pull-requests: write
+#  dependencies: write  # Required for dependency submission
+  issues: write
+  packages: write
 
 jobs:
   build:
