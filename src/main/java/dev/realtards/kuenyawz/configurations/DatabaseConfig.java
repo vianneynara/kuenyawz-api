@@ -57,7 +57,6 @@ public class DatabaseConfig {
 		testConnection(dataSource);
 
 		log.info("Mounted profile for default datasource (H2 in-memory database)");
-
 		return dataSource;
 	}
 
