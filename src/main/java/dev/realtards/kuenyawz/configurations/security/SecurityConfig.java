@@ -33,17 +33,39 @@ public class SecurityConfig {
 		httpSec
 			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**"))
 			.authorizeHttpRequests(auth -> auth
+				// H2 Console access
 				.requestMatchers("/h2-console/**").permitAll()
-				.requestMatchers("/api/accounts/**").permitAll()
-				.requestMatchers("/api/sim/**").permitAll()
+
+				// Public endpoints
 				.requestMatchers(HttpMethod.GET,
-					"/api/products",
-					"/api/products/**",
-					"/api/images/**",
 					"/api",
-					"/api/status").permitAll()
-				.requestMatchers(HttpMethod.PATCH, "/api/accounts/**").hasAnyRole("ADMIN", "USER")
-				.requestMatchers("/api/products", "/api/products/**", "/api/images").hasRole("ADMIN")
+					"/api/status",
+					"/api/images/**",
+					"/api/products",
+					"/api/products/**").permitAll()
+
+				// Auth endpoints (all public)
+				.requestMatchers(HttpMethod.POST,
+					"/api/auth/register",
+					"/api/auth/login",
+					"/api/auth/revoke",
+					"/api/auth/refresh").permitAll()
+
+				// Simulator endpoints
+				.requestMatchers("/api/sim/**").permitAll()
+
+				// Account endpoints
+				.requestMatchers(HttpMethod.GET, "/api/accounts").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.POST, "/api/accounts").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.PATCH, "/api/accounts/{accountId:\\d+}/privilege").hasRole("ADMIN")
+				.requestMatchers("/api/accounts/**").hasAnyRole("ADMIN", "USER")
+
+				// Product/Image admin endpoints
+				.requestMatchers(HttpMethod.POST, "/api/products/**", "/api/images/**").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.PUT, "/api/products/**", "/api/images/**").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.DELETE, "/api/products/**", "/api/images/**").hasRole("ADMIN")
+
+				// Catch-all
 				.anyRequest().authenticated()
 			)
 			.headers(hs -> hs.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
@@ -68,7 +90,6 @@ public class SecurityConfig {
 
 		return httpSec.build();
 	}
-
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
