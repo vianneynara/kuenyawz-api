@@ -46,8 +46,7 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public AuthResponseDto refresh(String token) {
 		RefreshToken refreshToken = refreshTokenService.verifyRefreshToken(token);
-		String username = jwtService.extractUsername(token);
-		Account account = accountService.getAccount(username);
+		Account account = accountService.getAccount(refreshToken.getAccountId());
 
 		if (!refreshToken.getAccountId().equals(account.getAccountId())) {
 			throw new UnauthorizedException();
