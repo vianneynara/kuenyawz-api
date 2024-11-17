@@ -2,7 +2,8 @@ package dev.realtards.kuenyawz.dtos.product;
 
 import dev.realtards.kuenyawz.utils.stringtrimmer.CleanString;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,7 +32,10 @@ public class ProductPatchDto {
 	private String description;
 
 	@Schema(description = "Product category", example = "cake")
-	@Pattern(regexp = "cake|bread|pastry|pasta|other", message = "Invalid category")
+	@Pattern(regexp = "cake|pie|pastry|pasta|other", message = "Invalid category, should be any of [cake, pie, pastry, pasta, other]")
 	@CleanString
 	private String category;
+
+	@Schema(description = "Product availability", example = "true")
+	private boolean available;
 }

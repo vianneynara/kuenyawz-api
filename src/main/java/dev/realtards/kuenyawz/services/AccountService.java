@@ -34,4 +34,6 @@ public interface AccountService {
 
 	@Transactional
 	Account updatePrivilege(Long accountId, PrivilegeUpdateDto privilegeUpdateDto);
+
+	boolean passwordMatches(String password, Account account);
 }

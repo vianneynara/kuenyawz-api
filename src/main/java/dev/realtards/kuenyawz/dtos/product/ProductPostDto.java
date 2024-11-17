@@ -37,9 +37,12 @@ public class ProductPostDto {
 
 	@Schema(description = "Product category", example = "cake")
 	@NotNull(message = "Category is required")
-	@Pattern(regexp = "cake|bread|pastry|pasta|other", message = "Invalid category")
+	@Pattern(regexp = "cake|pie|pastry|pasta|other", message = "Invalid category")
 	@CleanString
 	private String category;
+
+	@Schema(description = "Product availability", example = "true", defaultValue = "false")
+	private boolean available;
 
 	@Schema(description = "Product variants")
 	@NotNull(message = "Variants are required")

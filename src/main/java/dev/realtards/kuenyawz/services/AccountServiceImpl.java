@@ -147,4 +147,9 @@ public class AccountServiceImpl implements AccountService {
 
 		return existingAccount;
 	}
+
+	@Override
+	public boolean passwordMatches(String password, Account account) {
+		return passwordEncoder.matches(password, account.getPassword());
+	}
 }

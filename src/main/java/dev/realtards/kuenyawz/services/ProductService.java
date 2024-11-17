@@ -24,14 +24,15 @@ public interface ProductService {
 	/**
 	 * Master method to get all products with paginated result.
 	 *
-	 * @param category {@link String} optional category filter
-	 * @param keyword  {@link String} optional keyword filter
-	 * @param page     {@link Integer} optional page number
-	 * @param pageSize {@link Integer} optional page size
+	 * @param category  {@link String} optional category filter
+	 * @param keyword   {@link String} optional keyword filter
+	 * @param available
+	 * @param page      {@link Integer} optional page number
+	 * @param pageSize  {@link Integer} optional page size
 	 * @return {@link Page} of {@link ProductDto}
 	 */
 	@Transactional(readOnly = true)
-	Page<ProductDto> getAllProductsPaginated(String category, String keyword, Integer page, Integer pageSize);
+	Page<ProductDto> getAllProductsPaginated(String category, String keyword, Boolean available, Integer page, Integer pageSize);
 
 	/**
 	 * Creates a new product from the DTO with the provided variants' DTOs.
@@ -101,6 +102,16 @@ public interface ProductService {
 	 */
 	@Transactional
 	ProductDto patchProduct(Long productId, ProductPatchDto productPatchDto);
+
+	/**
+	 * Patches the availability of a product by its ID.
+	 *
+	 * @param productId {@link Long}
+	 * @param available {@link Boolean}
+	 * @return {@link ProductDto}
+	 */
+	@Transactional
+	ProductDto patchAvailability(Long productId, boolean available);
 
 	/**
 	 * Checks if a product exists by its ID.
