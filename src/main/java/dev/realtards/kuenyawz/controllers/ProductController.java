@@ -47,10 +47,11 @@ public class ProductController extends BaseController {
 	public ResponseEntity<Object> getAllProducts(
 		@RequestParam(required = false) String category,
 		@RequestParam(required = false) String keyword,
+		@RequestParam(required = false) Boolean available,
 		@RequestParam(required = false) Integer page,
 		@RequestParam(required = false) Integer pageSize
 	) {
-		Page<ProductDto> productDtos = productService.getAllProductsPaginated(category, keyword, page, pageSize);
+		Page<ProductDto> productDtos = productService.getAllProductsPaginated(category, keyword, available, page, pageSize);
 		return ResponseEntity.status(HttpStatus.OK).body(productDtos);
 	}
 
@@ -98,7 +99,7 @@ public class ProductController extends BaseController {
 	public ResponseEntity<Object> searchProducts(
 		@PathVariable String keyword
 	) {
-		Page<ProductDto> productDtos = productService.getAllProductsPaginated(null, keyword, null, null);
+		Page<ProductDto> productDtos = productService.getAllProductsPaginated(null, keyword, null, null, null);
 		return ResponseEntity.status(HttpStatus.OK).body(productDtos);
 	}
 
@@ -115,7 +116,7 @@ public class ProductController extends BaseController {
 	public ResponseEntity<Object> getProductsByCategory(
 		@PathVariable String category
 	) {
-		Page<ProductDto> productDtos = productService.getAllProductsPaginated(category, null, null, null);
+		Page<ProductDto> productDtos = productService.getAllProductsPaginated(category, null, null, null, null);
 		return ResponseEntity.status(HttpStatus.OK).body(productDtos);
 	}
 
@@ -158,6 +159,25 @@ public class ProductController extends BaseController {
 		@Valid @RequestBody ProductPatchDto productPatchDto
 	) {
 		ProductDto productDto = productService.patchProduct(productId, productPatchDto);
+		return ResponseEntity.status(HttpStatus.OK).body(productDto);
+	}
+
+	@Operation(summary = "Patch a product's availability by ID")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Product availability patched successfully",
+			content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+				schema = @Schema(implementation = ProductDto.class)
+			)
+		),
+		@ApiResponse(responseCode = "404", description = "Product not found"),
+		@ApiResponse(responseCode = "400", description = "Invalid request body")
+	})
+	@PatchMapping("{productId}/availability")
+	public ResponseEntity<Object> patchProductAvailability(
+		@PathVariable Long productId,
+		@Valid @RequestBody ProductPatchAvailabilityDto productAvailabilityPatchDto
+	) {
+		ProductDto productDto = productService.patchAvailability(productId, productAvailabilityPatchDto.isAvailable());
 		return ResponseEntity.status(HttpStatus.OK).body(productDto);
 	}
 

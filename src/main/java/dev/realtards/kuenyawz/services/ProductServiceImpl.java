@@ -10,12 +10,14 @@ import dev.realtards.kuenyawz.exceptions.ResourceExistsException;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
+import dev.realtards.kuenyawz.repositories.ProductSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -44,9 +46,10 @@ public class ProductServiceImpl implements ProductService {
 			.toList();
 	}
 
-	public Page<ProductDto> getAllProductsPaginated(String category, String keyword, Integer page, Integer pageSize) {
+	public Page<ProductDto> getAllProductsPaginated(String category, String keyword, Boolean available, Integer page, Integer pageSize) {
 		PageRequest pageRequest = buildPageRequest(page, pageSize);
-		Page<Product> products = findProductsPaginated(category, keyword, pageRequest);
+		Specification<Product> specification = ProductSpecification.withFilters(category, keyword, available);
+		Page<Product> products = productRepository.findAll(specification, pageRequest);
 
 		Page<ProductDto> productDtos = products.map(productMapper::fromEntity);
 		return productDtos;
@@ -73,26 +76,6 @@ public class ProductServiceImpl implements ProductService {
 		);
 
 		return PageRequest.of(page, pageSize, sort);
-	}
-
-	private Page<Product> findProductsPaginated(String category, String keyword, PageRequest pageRequest) {
-		boolean hasCategory = StringUtils.hasText(category);
-		boolean hasKeyword = StringUtils.hasText(keyword);
-
-		if (!hasCategory && !hasKeyword) {
-			return productRepository.findAll(pageRequest);
-		}
-
-		String processedKeyword = hasKeyword ? "%" + keyword.trim() + "%" : null;
-
-		if (hasCategory) {
-			Product.Category categoryEnum = parseCategoryOrThrow(category);
-			return hasKeyword
-				? productRepository.findAllByCategoryIsAndNameLikeIgnoreCase(categoryEnum, processedKeyword, pageRequest)
-				: productRepository.findAllByCategory(categoryEnum, pageRequest);
-		} else {
-			return productRepository.findAllByNameLikeIgnoreCase(processedKeyword, pageRequest);
-		}
 	}
 
 	private List<Product> findProducts(String category, String keyword) {
@@ -199,6 +182,18 @@ public class ProductServiceImpl implements ProductService {
 		return productDto;
 	}
 
+	@Override
+	public ProductDto patchAvailability(Long productId, boolean available) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
+
+		product.setAvailable(available);
+		Product savedProduct = productRepository.save(product);
+
+		// Convert and return
+		ProductDto productDto = productMapper.fromEntity(savedProduct);
+		return productDto;
+	}
 
 	@Override
 	public boolean existsById(Long productId) {

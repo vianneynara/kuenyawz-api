@@ -39,4 +39,16 @@ public class Variant extends Auditables {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "product_id", nullable = false)
 	private Product product;
+
+	@Override
+	public String toString() {
+		return "Variant{" +
+				"variantId=" + variantId +
+				", price=" + price +
+				", type='" + type + '\'' +
+				", minQuantity=" + minQuantity +
+				", maxQuantity=" + maxQuantity +
+				", version=" + version +
+				'}';
+	}
 }

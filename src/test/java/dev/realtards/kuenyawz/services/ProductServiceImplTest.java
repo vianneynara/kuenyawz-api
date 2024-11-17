@@ -22,14 +22,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -124,17 +124,17 @@ public class ProductServiceImplTest {
 		List<Product> products = List.of(product);
 		Page<Product> productPage = new PageImpl<>(products, pageRequest, products.size());
 
-		// Mock with PageRequest parameter
-		when(productRepository.findAll(pageRequest)).thenReturn(productPage);
+		// Use any() for the Specification
+		when(productRepository.findAll(any(Specification.class), eq(pageRequest))).thenReturn(productPage);
 		when(productMapper.fromEntity(product)).thenReturn(productDto);
 
 		// Act
-		Page<ProductDto> result = productService.getAllProductsPaginated(null, null, 1, 5);
+		Page<ProductDto> result = productService.getAllProductsPaginated(null, null, null, 1, 5);
 
 		// Assert
 		assertThat(result.getNumber()).isEqualTo(0);
 		assertThat(result.getSize()).isEqualTo(5);
-		verify(productRepository).findAll(pageRequest);
+		verify(productRepository).findAll(any(Specification.class), eq(pageRequest));
 	}
 
 	@Test
