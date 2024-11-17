@@ -18,9 +18,9 @@ This project is to be implemented for our **[KuenyaWZ](https://github.com/vianne
     - [ ] Transaction
     - [ ] Likes
     - [ ] CustomSchedule
-- [ ] Authentication/Authorization
-    - [ ] Basic
-    - [ ] JWT
+- [x] Authentication/Authorization
+    - [ ] ~~Basic~~
+    - [x] JWT
 
 Should be noted that we'll need to implement integration of methods
 for the actual website business logic.
