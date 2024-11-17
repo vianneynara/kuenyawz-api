@@ -20,7 +20,6 @@ public interface ProductMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "variants", ignore = true)
     @Mapping(target = "images", ignore = true)
-    @Mapping(target = "available", ignore = true)
 	@BeanMapping(nullValuePropertyMappingStrategy = org.mapstruct.NullValuePropertyMappingStrategy.IGNORE)
 	Product updateProductFromPatch(ProductPatchDto dto, @MappingTarget Product product);
 }
