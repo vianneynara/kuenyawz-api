@@ -31,6 +31,9 @@ public class ProductDto {
 	@Schema(description = "Product category", example = "cake")
 	private Product.Category category;
 
+	@Schema(description = "Product availability", example = "true")
+	private boolean available;
+
 	@Schema(description = "Product variants")
 	private List<VariantDto> variants;
 

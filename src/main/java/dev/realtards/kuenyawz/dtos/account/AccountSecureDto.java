@@ -30,13 +30,4 @@ public class AccountSecureDto {
 
     @Schema(description = "User's privilege level", example = "user")
     private Account.Privilege privilege;
-
-	public AccountSecureDto(Account account) {
-		this.accountId = account.getAccountId();
-		this.fullName = account.getFullName();
-		this.email = account.getEmail();
-		this.emailVerifiedAt = account.getEmailVerifiedAt();
-		this.phone = account.getPhone();
-		this.privilege = account.getPrivilege();
-	}
 }

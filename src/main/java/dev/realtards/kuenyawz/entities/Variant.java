@@ -1,6 +1,5 @@
 package dev.realtards.kuenyawz.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,7 +10,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true, exclude = "product")
-//@ToString(callSuper = true, exclude = "product")
+@ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,21 +36,19 @@ public class Variant extends Auditables {
 	@Version
 	private Long version;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "product_id", nullable = false)
-	@JsonBackReference
 	private Product product;
 
 	@Override
 	public String toString() {
 		return "Variant{" +
-			"variantId=" + variantId +
-			", price=" + price +
-			", type='" + type + "'" +
-			", minQuantity=" + minQuantity +
-			", maxQuantity=" + maxQuantity +
-			", version=" + version +
-			", productId=" + (product != null ? product.getProductId() : null) +
-			'}';
+				"variantId=" + variantId +
+				", price=" + price +
+				", type='" + type + '\'' +
+				", minQuantity=" + minQuantity +
+				", maxQuantity=" + maxQuantity +
+				", version=" + version +
+				'}';
 	}
 }

@@ -25,6 +25,7 @@ on:
 permissions:
   contents: write
   deployments: write
+  security-events: write
 
 jobs:
   build:

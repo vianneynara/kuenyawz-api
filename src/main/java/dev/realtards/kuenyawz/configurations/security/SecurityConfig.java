@@ -1,47 +1,78 @@
 package dev.realtards.kuenyawz.configurations.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+	private final AuthenticationProvider authenticationProvider;
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSec) throws Exception {
 		httpSec
 			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**"))
 			.authorizeHttpRequests(auth -> auth
-//					.requestMatchers("/api/**").hasRole("ADMIN")
-					.anyRequest().permitAll()
+				// H2 Console access
+				.requestMatchers("/h2-console/**").permitAll()
+
+				// Public endpoints
+				.requestMatchers(HttpMethod.GET,
+					"/api",
+					"/api/status",
+					"/api/images/**",
+					"/api/products",
+					"/api/products/**").permitAll()
+
+				// Auth endpoints (all public)
+				.requestMatchers(HttpMethod.POST,
+					"/api/auth/register",
+					"/api/auth/login",
+					"/api/auth/revoke",
+					"/api/auth/refresh").permitAll()
+
+				// Simulator endpoints
+				.requestMatchers("/api/sim/**").permitAll()
+
+				// Account endpoints
+				.requestMatchers(HttpMethod.GET, "/api/accounts").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.POST, "/api/accounts").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.PATCH, "/api/accounts/{accountId:\\d+}/privilege").hasRole("ADMIN")
+				.requestMatchers("/api/accounts/**").hasAnyRole("ADMIN", "USER")
+
+				// Product/Image admin endpoints
+				.requestMatchers(HttpMethod.POST, "/api/products/**", "/api/images/**").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.PUT, "/api/products/**", "/api/images/**").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.DELETE, "/api/products/**", "/api/images/**").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole("ADMIN")
+
+				// Catch-all
+				.anyRequest().authenticated()
 			)
-			.headers(headers -> headers
-				.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
-			)
-			.sessionManagement(session -> session
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			)
-			.httpBasic(Customizer.withDefaults())
+			.headers(hs -> hs.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+			.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+			.authenticationProvider(authenticationProvider)
+			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
 			// Special handler for 401 and 403
 			.exceptionHandling(exc -> exc
@@ -61,7 +92,6 @@ public class SecurityConfig {
 		return httpSec.build();
 	}
 
-
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return (web) -> web.ignoring()
@@ -70,23 +100,5 @@ public class SecurityConfig {
 				"/swagger-ui/**",
 				"/swagger-ui.html"
 			);
-	}
-
-	@Bean
-	public AuthenticationProvider authenticationProvider(AccountUserDetailsService userDetailsService) {
-		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-		provider.setUserDetailsService(userDetailsService);
-		provider.setPasswordEncoder(passwordEncoder());
-		return provider;
-	}
-
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-		return authConfig.getAuthenticationManager();
-	}
-
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
 	}
 }

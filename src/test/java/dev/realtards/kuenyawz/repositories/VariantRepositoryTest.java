@@ -35,7 +35,7 @@ class VariantRepositoryTest {
             .tagline("Delicious muffin")
             .description("A test muffin description")
             .category(Product.Category.CAKE)
-            .isAvailable(true)
+            .available(true)
             .build();
         
         // Save the product first

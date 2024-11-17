@@ -32,7 +32,7 @@ public class ApplicationProperties {
 	private List<String> acceptedImageExtensions;
 
 	private Database database = new Database();
-    private Security security = new Security();
+	private Security security = new Security();
 
 	// Initializing through dotenv
 	@Autowired
@@ -40,12 +40,13 @@ public class ApplicationProperties {
 		this.version = dotenv.get("APP_VERSION", "0.0");
 		this.repositoryUrl = dotenv.get("APP_REPOSITORY_URL", "https://github.com/vianneynara/*");
 
-        this.database.url = dotenv.get("DB_URL");
-        this.database.username = dotenv.get("DB_USERNAME");
-        this.database.password = dotenv.get("DB_PASSWORD");
+		this.database.url = dotenv.get("DB_URL", "jdbc:postgresql://localhost:5432/kuenyawz");
+		this.database.username = dotenv.get("DB_USERNAME", "kuenyawz");
+		this.database.password = dotenv.get("DB_PASSWORD", "kuenyawz");
 
-        this.security.username = dotenv.get("SECURITY_USERNAME");
-        this.security.password = dotenv.get("SECURITY_PASSWORD");
+		this.security.jwtSecret = dotenv.get("JWT_SECRET", "secret");
+		this.security.jwtTokenExpSeconds = Long.parseLong(dotenv.get("JWT_ACCESS_EXP_SECONDS", "3600"));
+		this.security.jwtRefreshDays = Long.parseLong(dotenv.get("REFRESH_TOKEN_EXP_DAYS", "7"));
 	}
 
 	@Getter
@@ -56,10 +57,11 @@ public class ApplicationProperties {
 		private String password;
 	}
 
-    @Getter
-    @Setter
-    public static class Security {
-        private String username;
-        private String password;
-    }
+	@Getter
+	@Setter
+	public static class Security {
+		private String jwtSecret;
+		private long jwtTokenExpSeconds;
+		private long jwtRefreshDays;
+	}
 }

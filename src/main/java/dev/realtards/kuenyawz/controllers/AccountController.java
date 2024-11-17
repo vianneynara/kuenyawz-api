@@ -2,6 +2,7 @@ package dev.realtards.kuenyawz.controllers;
 
 import dev.realtards.kuenyawz.dtos.account.*;
 import dev.realtards.kuenyawz.entities.Account;
+import dev.realtards.kuenyawz.mapper.AccountMapper;
 import dev.realtards.kuenyawz.responses.AccountsResponse;
 import dev.realtards.kuenyawz.services.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +30,7 @@ import java.util.List;
 public class AccountController extends BaseController {
 
 	private final AccountService accountService;
+	private final AccountMapper accountMapper;
 
 	@Operation(summary = "(Master) Get all accounts",
 		description = "Retrieves a list of all accounts with secure information",
@@ -40,7 +42,7 @@ public class AccountController extends BaseController {
 			schema = @Schema(implementation = AccountsResponse.class)
 		)
 	)
-	@GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping
 	public ResponseEntity<Object> getAllAccounts() {
 		List<AccountSecureDto> accounts = accountService.getAllAccounts();
 
@@ -72,7 +74,7 @@ public class AccountController extends BaseController {
 		@Valid @RequestBody AccountRegistrationDto accountRegistrationDto
 	) {
 		Account account = accountService.createAccount(accountRegistrationDto);
-		return ResponseEntity.status(HttpStatus.CREATED).body(new AccountSecureDto(account));
+		return ResponseEntity.status(HttpStatus.CREATED).body(accountMapper.fromEntity(account));
 	}
 
 	@Operation(summary = "Get an account", description = "Retrieves an account with the provided account ID")
@@ -87,7 +89,7 @@ public class AccountController extends BaseController {
 		@PathVariable Long accountId
 	) {
 		Account account = accountService.getAccount(accountId);
-		return ResponseEntity.ok(new AccountSecureDto(account));
+		return ResponseEntity.ok(accountMapper.fromEntity(account));
 	}
 
 	@Operation(summary = "Update an account", description = "Updates an account with the provided request body")
@@ -103,7 +105,7 @@ public class AccountController extends BaseController {
 		@Valid @RequestBody AccountPutDto accountPutDto
 	) {
 		Account account = accountService.updateAccount(accountId, accountPutDto);
-		return ResponseEntity.ok(new AccountSecureDto(account));
+		return ResponseEntity.ok(accountMapper.fromEntity(account));
 	}
 
 	@Operation(summary = "Delete an account", description = "Deletes an account with the provided account ID")
@@ -131,7 +133,7 @@ public class AccountController extends BaseController {
 		@Valid @RequestBody AccountPatchDto accountPatchDto
 	) {
 		Account account = accountService.patchAccount(accountId, accountPatchDto);
-		return ResponseEntity.ok(new AccountSecureDto(account));
+		return ResponseEntity.ok(accountMapper.fromEntity(account));
 	}
 
 	@Operation(summary = "Patch an account's password",	description = "Patches with the provided request body")

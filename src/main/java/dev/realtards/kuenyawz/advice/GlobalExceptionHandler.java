@@ -3,16 +3,22 @@ package dev.realtards.kuenyawz.advice;
 import dev.realtards.kuenyawz.exceptions.*;
 import dev.realtards.kuenyawz.responses.ErrorResponse;
 import dev.realtards.kuenyawz.responses.ListedErrors;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
+import io.jsonwebtoken.security.UnsupportedKeyException;
 import jakarta.transaction.TransactionalException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -76,6 +82,31 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(MultipartException.class)
 	public ResponseEntity<Object> handleMultipartException(MultipartException ex) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
+	}
+
+	@ExceptionHandler(UnsupportedKeyException.class)
+	public ResponseEntity<Object> handleUnsupportedKeyException(UnsupportedKeyException ex) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("The key is too weak"));
+	}
+
+	@ExceptionHandler(UsernameNotFoundException.class)
+	public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage()));
+	}
+
+	@ExceptionHandler(ExpiredJwtException.class)
+	public ResponseEntity<Object> handleExpiredJwtException(ExpiredJwtException ex) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(ex.getMessage()));
+	}
+
+	@ExceptionHandler(SignatureException.class)
+	public ResponseEntity<Object> handleSignatureException(SignatureException ex) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Invalid signature"));
+	}
+
+	@ExceptionHandler(MalformedJwtException.class)
+	public ResponseEntity<Object> handleMalformedJwtException(MalformedJwtException ex) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(ex.getMessage()));
 	}
 
 	// watch
@@ -143,7 +174,16 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(NoResourceFoundException.class)
 	public ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Resource or endpoint might not exist"));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Resource might not exist"));
+	}
+
+	// For future use
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(
+		MethodArgumentTypeMismatchException ex) {
+		String message = String.format("Failed to convert value '%s' to type %s",
+			ex.getValue(), Objects.requireNonNull(ex.getRequiredType()).getSimpleName());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(message));
 	}
 
 	/**

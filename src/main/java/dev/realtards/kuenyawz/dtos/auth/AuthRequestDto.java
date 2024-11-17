@@ -1,24 +1,20 @@
-package dev.realtards.kuenyawz.dtos.account;
+package dev.realtards.kuenyawz.dtos.auth;
 
 import dev.realtards.kuenyawz.utils.stringtrimmer.CleanString;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Schema(description = "Account registration request")
+@Schema(description = "Authentication request")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor @NoArgsConstructor
 @Builder
-public class AccountRegistrationDto {
-
-	@Schema(description = "User's full name", example = "Emilia", minLength = 2, maxLength = 128)
-	@NotBlank(message = "Full name is required")
-	@Size(min = 2, max = 128, message = "Full name must be between 2 and 128 characters")
-	@CleanString
-	private String fullName;
+public class AuthRequestDto {
 
 	@Schema(description = "User's email address", example = "emilia@example.com")
 	@NotBlank(message = "Email is required")
