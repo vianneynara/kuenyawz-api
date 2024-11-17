@@ -37,10 +37,6 @@ public class Transactions extends Auditables {
     @Column(name = "invoice_link")
     private String invoiceLink;
 
-    public enum TransactionStatus {
-        DEPOSIT, PAID
-    }
-
     @Setter
     @Getter
     @Enumerated(EnumType.STRING)
@@ -53,4 +49,8 @@ public class Transactions extends Auditables {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
+
+    public enum TransactionStatus {
+        DEPOSIT, PAID
+    }
 }
