@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AccountUserDetailsService implements UserDetailsService {
+
 	private final AccountRepository accountRepository;
 
 	@Override
@@ -19,6 +20,6 @@ public class AccountUserDetailsService implements UserDetailsService {
 		Account account = accountRepository.findByEmail(username)
 			.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
 
-		return new AccountUserDetails(account);
+		return account;
 	}
 }

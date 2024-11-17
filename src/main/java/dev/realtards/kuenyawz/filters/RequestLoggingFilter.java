@@ -52,8 +52,16 @@ public class RequestLoggingFilter implements Filter {
         } finally {
             // log after processing
             long duration = System.currentTimeMillis() - startTime;
-            log.debug("RES: {} {} - {} ms (Status: {})",
-                method, uri, duration, httpResponse.getStatus());
+			int status = httpResponse.getStatus();
+
+			String logFormat = "RES: {} {} - {} ms (Status: {})";
+            if (status >= 500) {
+                log.error(logFormat, method, uri, duration, status);
+            } else if (status >= 400) {
+                log.warn(logFormat, method, uri, duration, status);
+            } else {
+                log.debug(logFormat, method, uri, duration, status);
+            }
         }
     }
 }

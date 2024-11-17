@@ -31,7 +31,7 @@ public class ProductPatchDto {
 	private String description;
 
 	@Schema(description = "Product category", example = "cake")
-	@Pattern(regexp = "cake|bread|pastry|pasta|other", message = "Invalid category")
+	@Pattern(regexp = "cake|pie|pastry|pasta|other", message = "Invalid category")
 	@CleanString
 	private String category;
 }

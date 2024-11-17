@@ -10,8 +10,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Data
@@ -19,39 +23,77 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Account extends Auditables {
+public class Account extends Auditables implements UserDetails {
 
 	@Id
 	@SnowFlakeIdValue(name = "account_id")
 	@Column(name = "account_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
 	private Long accountId;
+
 	@Column
 	private String password;
+
 	@Column
 	private String fullName;
+
 	@Column(unique = true)
 	private String googleId;
+
 	@Column(unique = true)
 	private String email;
+
 	@Column
 	private LocalDateTime emailVerifiedAt;
+
 	@Column(unique = true)
 	private String phone;
+
 	@Column
 	private Privilege privilege;
+
 	@Version
 	private Long version;
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return List.of(privilege);
+	}
+
+	@Override
+	public String getUsername() {
+		return email;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return UserDetails.super.isAccountNonExpired();
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return UserDetails.super.isAccountNonLocked();
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return UserDetails.super.isCredentialsNonExpired();
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return UserDetails.super.isEnabled();
+	}
 
 	/**
 	 * Type of privilege of an account.
 	 */
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
-	public enum Privilege {
+	public enum Privilege implements GrantedAuthority {
 		@JsonProperty("ADMIN")
-		ADMIN("USER"),
+		ADMIN("ROLE_ADMIN"),
 
 		@JsonProperty("USER")
-		USER("USER");
+		USER("ROLE_USER");
 
 		private final String privilege;
 
@@ -76,6 +118,11 @@ public class Account extends Auditables {
 				}
 			}
 			throw new IllegalArgumentException("Invalid privilege: " + value);
+		}
+
+		@Override
+		public String getAuthority() {
+			return privilege;
 		}
 	}
 }

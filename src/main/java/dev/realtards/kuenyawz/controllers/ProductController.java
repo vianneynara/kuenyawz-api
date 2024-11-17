@@ -172,7 +172,7 @@ public class ProductController extends BaseController {
 		),
 		@ApiResponse(responseCode = "403", description = "Forbidden")
 	})
-	@GetMapping("/variants/all")
+	@GetMapping("/variants")
 	public ResponseEntity<Object> getAllVariants() {
 		List<VariantDto> variantDtos = variantService.getAllVariants();
 		return ResponseEntity.status(HttpStatus.OK).body(new ListOfVariantDto(variantDtos));
