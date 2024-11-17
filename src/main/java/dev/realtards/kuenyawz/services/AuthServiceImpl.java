@@ -11,6 +11,7 @@ import dev.realtards.kuenyawz.exceptions.UnauthorizedException;
 import dev.realtards.kuenyawz.mapper.AccountMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -85,6 +86,15 @@ public class AuthServiceImpl implements AuthService {
 	public AccountSecureDto getUserInfo(Authentication authentication) {
 		AccountSecureDto accountSecureDto = accountMapper.fromEntity(
 			(Account) authentication.getPrincipal()
+		);
+		return accountSecureDto;
+	}
+
+	@Override
+	public AccountSecureDto getCurrentUserInfo() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		AccountSecureDto accountSecureDto = accountMapper.fromEntity(
+			(Account) auth.getPrincipal()
 		);
 		return accountSecureDto;
 	}

@@ -64,6 +64,13 @@ public interface AuthService {
 	AccountSecureDto getUserInfo(Authentication authentication);
 
 	/**
+	 * Returns the current user information from an authenticated session.
+	 *
+	 * @return {@link AccountSecureDto} user information
+	 */
+	AccountSecureDto getCurrentUserInfo();
+
+	/**
 	 * Validate a token to check whether it has expired or not.
 	 *
 	 * @param token The token to validate
