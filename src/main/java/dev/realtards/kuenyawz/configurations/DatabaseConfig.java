@@ -48,8 +48,8 @@ public class DatabaseConfig {
 		log.info("Mounting profile for default datasource (H2 in-memory database)");
 
 		DataSource dataSource = DataSourceBuilder.create()
-			.url("jdbc:h2:mem:testdb")
-			.username("sa")
+			.url("jdbc:h2:mem:kuenyawz")
+			.username("kuenyawz")
 			.password("")
 			.driverClassName("org.h2.Driver")
 			.build();
