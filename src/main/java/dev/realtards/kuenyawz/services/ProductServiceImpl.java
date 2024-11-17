@@ -44,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
 			.toList();
 	}
 
-	public Page<ProductDto> getAllProductsPaginated(String category, String keyword, Integer page, Integer pageSize) {
+	public Page<ProductDto> getAllProductsPaginated(String category, String keyword, Boolean available, Integer page, Integer pageSize) {
 		PageRequest pageRequest = buildPageRequest(page, pageSize);
 		Page<Product> products = findProductsPaginated(category, keyword, pageRequest);
 

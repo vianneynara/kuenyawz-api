@@ -129,7 +129,7 @@ public class ProductServiceImplTest {
 		when(productMapper.fromEntity(product)).thenReturn(productDto);
 
 		// Act
-		Page<ProductDto> result = productService.getAllProductsPaginated(null, null, 1, 5);
+		Page<ProductDto> result = productService.getAllProductsPaginated(null, null, null, 1, 5);
 
 		// Assert
 		assertThat(result.getNumber()).isEqualTo(0);

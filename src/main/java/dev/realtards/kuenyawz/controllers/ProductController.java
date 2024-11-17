@@ -47,10 +47,11 @@ public class ProductController extends BaseController {
 	public ResponseEntity<Object> getAllProducts(
 		@RequestParam(required = false) String category,
 		@RequestParam(required = false) String keyword,
+		@RequestParam(required = false) Boolean available,
 		@RequestParam(required = false) Integer page,
 		@RequestParam(required = false) Integer pageSize
 	) {
-		Page<ProductDto> productDtos = productService.getAllProductsPaginated(category, keyword, page, pageSize);
+		Page<ProductDto> productDtos = productService.getAllProductsPaginated(category, keyword, available, page, pageSize);
 		return ResponseEntity.status(HttpStatus.OK).body(productDtos);
 	}
 
@@ -98,7 +99,7 @@ public class ProductController extends BaseController {
 	public ResponseEntity<Object> searchProducts(
 		@PathVariable String keyword
 	) {
-		Page<ProductDto> productDtos = productService.getAllProductsPaginated(null, keyword, null, null);
+		Page<ProductDto> productDtos = productService.getAllProductsPaginated(null, keyword, null, null, null);
 		return ResponseEntity.status(HttpStatus.OK).body(productDtos);
 	}
 
@@ -115,7 +116,7 @@ public class ProductController extends BaseController {
 	public ResponseEntity<Object> getProductsByCategory(
 		@PathVariable String category
 	) {
-		Page<ProductDto> productDtos = productService.getAllProductsPaginated(category, null, null, null);
+		Page<ProductDto> productDtos = productService.getAllProductsPaginated(category, null, null, null, null);
 		return ResponseEntity.status(HttpStatus.OK).body(productDtos);
 	}
 
