@@ -32,7 +32,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 			.token(token)
 			.accountId(account.getAccountId())
 			.username(account.getUsername())
-			.expiresAt(LocalDateTime.now().plusDays(7L))
+			.expiresAt(LocalDateTime.now().plusDays(properties.getSecurity().getJwtRefreshDays() * 24))
 			.isRevoked(false)
 			.build();
 

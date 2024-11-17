@@ -45,7 +45,8 @@ public class ApplicationProperties {
 		this.database.password = dotenv.get("DB_PASSWORD", "kuenyawz");
 
 		this.security.jwtSecret = dotenv.get("JWT_SECRET", "secret");
-		this.security.jwtExpiration = Long.parseLong(dotenv.get("JWT_EXPIRATION", "86400000"));
+		this.security.jwtTokenExpSeconds = Long.parseLong(dotenv.get("JWT_ACCESS_EXP_SECONDS", "3600"));
+		this.security.jwtRefreshDays = Long.parseLong(dotenv.get("REFRESH_TOKEN_EXP_DAYS", "7"));
 	}
 
 	@Getter
@@ -60,6 +61,7 @@ public class ApplicationProperties {
 	@Setter
 	public static class Security {
 		private String jwtSecret;
-		private long jwtExpiration;
+		private long jwtTokenExpSeconds;
+		private long jwtRefreshDays;
 	}
 }

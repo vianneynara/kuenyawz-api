@@ -39,7 +39,7 @@ public class JwtServiceImpl implements JwtService {
 		return buildToken(
 			extraClaims,
 			userDetails,
-			applicationProperties.getSecurity().getJwtExpiration()
+			applicationProperties.getSecurity().getJwtTokenExpSeconds()
 		);
 	}
 
@@ -106,7 +106,7 @@ public class JwtServiceImpl implements JwtService {
 
 	@Override
 	public long getExpirationTime() {
-		return applicationProperties.getSecurity().getJwtExpiration();
+		return applicationProperties.getSecurity().getJwtTokenExpSeconds();
 	}
 
 	@Override
