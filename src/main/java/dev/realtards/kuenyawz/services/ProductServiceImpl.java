@@ -36,13 +36,13 @@ public class ProductServiceImpl implements ProductService {
 	private final static int DEFAULT_PAGE = 0;
 	private final static int DEFAULT_PAGE_SIZE = 10;
 
-    @Override
-    public List<ProductDto> getAllProducts(String category, String keyword) {
-        List<Product> products = findProducts(category, keyword);
-        return products.stream()
-                      .map(productMapper::fromEntity)
-                      .toList();
-    }
+	@Override
+	public List<ProductDto> getAllProducts(String category, String keyword) {
+		List<Product> products = findProducts(category, keyword);
+		return products.stream()
+			.map(productMapper::fromEntity)
+			.toList();
+	}
 
 	public Page<ProductDto> getAllProductsPaginated(String category, String keyword, Integer page, Integer pageSize) {
 		PageRequest pageRequest = buildPageRequest(page, pageSize);
@@ -76,8 +76,8 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	private Page<Product> findProductsPaginated(String category, String keyword, PageRequest pageRequest) {
-        boolean hasCategory = StringUtils.hasText(category);
-        boolean hasKeyword = StringUtils.hasText(keyword);
+		boolean hasCategory = StringUtils.hasText(category);
+		boolean hasKeyword = StringUtils.hasText(keyword);
 
 		if (!hasCategory && !hasKeyword) {
 			return productRepository.findAll(pageRequest);
@@ -95,25 +95,25 @@ public class ProductServiceImpl implements ProductService {
 		}
 	}
 
-    private List<Product> findProducts(String category, String keyword) {
-        boolean hasCategory = StringUtils.hasText(category);
-        boolean hasKeyword = StringUtils.hasText(keyword);
+	private List<Product> findProducts(String category, String keyword) {
+		boolean hasCategory = StringUtils.hasText(category);
+		boolean hasKeyword = StringUtils.hasText(keyword);
 
-        if (!hasCategory && !hasKeyword) {
-            return productRepository.findAll();
-        }
+		if (!hasCategory && !hasKeyword) {
+			return productRepository.findAll();
+		}
 
-        String processedKeyword = hasKeyword ? "%" + keyword.trim() + "%" : null;
+		String processedKeyword = hasKeyword ? "%" + keyword.trim() + "%" : null;
 
-        if (hasCategory) {
-            Product.Category categoryEnum = parseCategoryOrThrow(category);
-            return hasKeyword
-                ? productRepository.findAllByCategoryIsAndNameLikeIgnoreCase(categoryEnum, processedKeyword)
-                : productRepository.findAllByCategory(categoryEnum);
-        } else {
+		if (hasCategory) {
+			Product.Category categoryEnum = parseCategoryOrThrow(category);
+			return hasKeyword
+				? productRepository.findAllByCategoryIsAndNameLikeIgnoreCase(categoryEnum, processedKeyword)
+				: productRepository.findAllByCategory(categoryEnum);
+		} else {
 			return productRepository.findAllByNameLikeIgnoreCase(processedKeyword);
 		}
-    }
+	}
 
 	@Override
 	public ProductDto createProduct(ProductPostDto productPostDto) {
