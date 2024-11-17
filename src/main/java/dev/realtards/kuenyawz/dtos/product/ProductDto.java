@@ -32,7 +32,7 @@ public class ProductDto {
 	private Product.Category category;
 
 	@Schema(description = "Product availability", example = "true")
-	private boolean isAvailable;
+	private boolean available;
 
 	@Schema(description = "Product variants")
 	private List<VariantDto> variants;

@@ -107,11 +107,11 @@ public interface ProductService {
 	 * Patches the availability of a product by its ID.
 	 *
 	 * @param productId {@link Long}
-	 * @param isAvailable {@link Boolean}
+	 * @param available {@link Boolean}
 	 * @return {@link ProductDto}
 	 */
 	@Transactional
-	ProductDto patchAvailability(Long productId, boolean isAvailable);
+	ProductDto patchAvailability(Long productId, boolean available);
 
 	/**
 	 * Checks if a product exists by its ID.

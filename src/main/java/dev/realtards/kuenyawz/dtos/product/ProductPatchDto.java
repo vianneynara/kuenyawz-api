@@ -37,5 +37,5 @@ public class ProductPatchDto {
 	private String category;
 
 	@Schema(description = "Product availability", example = "true")
-	private boolean isAvailable;
+	private boolean available;
 }

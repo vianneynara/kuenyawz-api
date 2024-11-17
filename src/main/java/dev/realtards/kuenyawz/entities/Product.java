@@ -36,8 +36,8 @@ public class Product extends Auditables {
 	@Column
 	private Category category;
 
-	@Column
-	private boolean isAvailable;
+	@Column(name = "available", nullable = false)
+	private boolean available;
 
 	@Column(name = "deleted", nullable = false)
 	private boolean deleted = false;

@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 public class ProductPatchAvailabilityDto {
 
 	@Schema(description = "Product availability", example = "true")
-	private boolean isAvailable;
+	private boolean available;
 }
