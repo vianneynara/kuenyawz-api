@@ -90,10 +90,10 @@ public class Account extends Auditables implements UserDetails {
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	public enum Privilege implements GrantedAuthority {
 		@JsonProperty("ADMIN")
-		ADMIN("ADMIN"),
+		ADMIN("ROLE_ADMIN"),
 
 		@JsonProperty("USER")
-		USER("USER");
+		USER("ROLE_USER");
 
 		private final String privilege;
 
