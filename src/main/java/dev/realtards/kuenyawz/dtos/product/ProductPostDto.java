@@ -41,6 +41,9 @@ public class ProductPostDto {
 	@CleanString
 	private String category;
 
+	@Schema(description = "Product availability", example = "true", defaultValue = "false")
+	private boolean available;
+
 	@Schema(description = "Product variants")
 	@NotNull(message = "Variants are required")
     @Size(min = 1, message = "At least one variant is required")

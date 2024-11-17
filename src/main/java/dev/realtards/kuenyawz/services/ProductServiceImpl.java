@@ -235,6 +235,7 @@ public class ProductServiceImpl implements ProductService {
 			.tagline(productPostDto.getTagline())
 			.description(productPostDto.getDescription())
 			.category(Product.Category.fromString(productPostDto.getCategory()))
+			.available(productPostDto.isAvailable())
 			.deleted(false)
 			.build();
 
