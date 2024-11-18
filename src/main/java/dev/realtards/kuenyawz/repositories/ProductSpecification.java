@@ -1,6 +1,9 @@
 package dev.realtards.kuenyawz.repositories;
 
 import dev.realtards.kuenyawz.entities.Product;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -25,8 +28,8 @@ public class ProductSpecification {
 	/**
 	 * Combine all specifications.
 	 *
-	 * @param category {@link String}
-	 * @param keyword {@link String}
+	 * @param category     {@link String}
+	 * @param keyword      {@link String}
 	 * @param availability {@link Boolean}
 	 * @return {@link Specification<Product>}
 	 */
@@ -40,13 +43,13 @@ public class ProductSpecification {
 	/**
 	 * Combine all specifications but with more advanced parameters.
 	 *
-	 * @param category		{@link String}
-	 * @param keyword		{@link String}
-	 * @param availability	{@link Boolean}
-	 * @param orderBy		{@link String}
-	 * @param isAscending	{@link Boolean}
-	 * @param randomize		{@link Boolean}
-	 * @param productIdNot	{@link Long}
+	 * @param category     {@link String}
+	 * @param keyword      {@link String}
+	 * @param availability {@link Boolean}
+	 * @param orderBy      {@link String}
+	 * @param isAscending  {@link Boolean}
+	 * @param randomize    {@link Boolean}
+	 * @param productIdNot {@link Long}
 	 * @return {@link Specification<Product>}
 	 */
 	public static Specification<Product> withFilters(
@@ -105,7 +108,7 @@ public class ProductSpecification {
 	/**
 	 * Filter {@link Product} name with case-insensitive keyword.
 	 * Done by converting the keyword and name to lowercase.
-	 * */
+	 */
 	private static Specification<Product> withKeywordLike(String keyword) {
 		return ((root, query, criteriaBuilder) -> {
 			if (!StringUtils.hasText(keyword)) {
