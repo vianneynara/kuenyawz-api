@@ -1,24 +1,17 @@
 package dev.realtards.kuenyawz.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CollectionId;
-import org.springframework.data.domain.Auditable;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
-//@EqualsAndHashCode(callSuper = true, exclude = "product")
-//@ToString(callSuper = true, exclude = "product")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Orders extends Auditables {
     @Id
     @SnowFlakeIdValue(name = "order_id")
@@ -43,13 +36,37 @@ public class Orders extends Auditables {
     @JoinColumn(name = "fp_reference_id", referencedColumnName = "reference_id")
     private Transactions fpReferenceId;
 
-    public enum OrderStatus {
-        DEPOSIT, FULL_PAID
-    }
-
     @Setter
     @Getter
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private OrderStatus status;
+
+    /**
+     * Ongoing status (Process of making the product)
+     */
+    public enum OrderStatus {
+        WAITING_DOWN_PAYMENT("Waiting for down payment"),
+        CONFIRMING("Waiting for confirmation from seller"),
+        CONFIRMED("Confirmed by seller"),
+        WAITING_SETTLEMENT("Waiting for settlement"),
+        PROCESSING("Being processed"),
+        DELIVERED("Order delivered"),
+        CANCELLED("Order cancelled");
+
+        private final String value;
+
+        OrderStatus(String value) {
+            this.value = value;
+        }
+
+        public static OrderStatus fromString(String value) {
+            for (OrderStatus status : OrderStatus.values()) {
+                if (status.value.equalsIgnoreCase(value)) {
+                    return status;
+                }
+            }
+            throw new IllegalArgumentException("Invalid status: " + value);
+        }
+    }
 }
