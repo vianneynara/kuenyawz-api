@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class OrderItems {
     @Id
     @SnowFlakeIdValue(name = "transaction_id")

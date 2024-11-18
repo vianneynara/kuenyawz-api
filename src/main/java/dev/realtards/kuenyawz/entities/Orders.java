@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Orders extends Auditables {
     @Id
     @SnowFlakeIdValue(name = "order_id")
@@ -57,7 +56,9 @@ public class Orders extends Auditables {
 
         private final String value;
 
-        OrderStatus(String value) { this.value = value; }
+        OrderStatus(String value) {
+            this.value = value;
+        }
 
         public static OrderStatus fromString(String value) {
             for (OrderStatus status : OrderStatus.values()) {
