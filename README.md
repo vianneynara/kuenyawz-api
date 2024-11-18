@@ -18,9 +18,9 @@ This project is to be implemented for our **[KuenyaWZ](https://github.com/vianne
     - [ ] Transaction
     - [ ] Likes
     - [ ] CustomSchedule
-- [ ] Authentication/Authorization
-    - [ ] Basic
-    - [ ] JWT
+- [x] Authentication/Authorization
+    - [ ] ~~Basic~~
+    - [x] JWT
 
 Should be noted that we'll need to implement integration of methods
 for the actual website business logic.
@@ -55,3 +55,22 @@ please make sure you have PostgreSQL installed and running with the provided `.E
 
 1. Add profile to environment variable: `set SPRING_PROFILES_ACTIVE=postgres`
 2. Run `mvn spring-boot:run`
+
+## Authenticating
+
+Environment requirements:
+
+|key|description|
+|-|-|
+|JWT_SECRET|Base 64 secret key|
+JWT_ACCESS_EXP_SECONDS|Token availability until expiration (in seconds), default=3600|
+REFRESH_TOKEN_EXP_DAYS|Refresh token availability until expiration (in days), default=7|
+
+Authentication process:
+1. `POST /api/auth/register` Registration to create new account and retrieve authententication response
+2. `POST /api/auth/login` Login to authenticate to an account and retrieve authententication response
+3. `GET /api/auth/me` Me to retrieve current access token's user details/account/owner
+4. `POST /api/auth/refresh` Refresh to get new access token (JWT token)
+5. `POST /api/auth/revoke` Revoke to invalidate a refresh tokenn (used when logging out)
+
+The refresh token is generated using Java's `SecureRandom` and ancoded using Base64.
