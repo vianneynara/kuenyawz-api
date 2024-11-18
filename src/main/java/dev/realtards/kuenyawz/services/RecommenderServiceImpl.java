@@ -2,6 +2,7 @@ package dev.realtards.kuenyawz.services;
 
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.entities.Product;
+import dev.realtards.kuenyawz.exceptions.IllegalOperationException;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
 import dev.realtards.kuenyawz.repositories.ProductSpecification;
@@ -25,7 +26,7 @@ public class RecommenderServiceImpl implements RecommenderService {
 			throw new ResourceNotFoundException("Product not found");
 		}
 		if (productRepository.count() < 4) {
-			throw new ResourceNotFoundException("Not enough products to recommend");
+			throw new IllegalOperationException("Not enough products to recommend");
 		}
 		Specification<Product> spec = ProductSpecification.withFilters(
 			null, null, null,
