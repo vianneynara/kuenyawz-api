@@ -101,7 +101,7 @@ public class AuthController {
 			)),
 		@ApiResponse(responseCode = "404", description = "User not found")
 	})
-	@SecurityRequirement(name = "bearerAuth")
+	@SecurityRequirement(name = "bearerAuth", scopes = {"USER", "ADMIN"})
 	@GetMapping("/me")
 	public ResponseEntity<Object> me() {
 		AccountSecureDto accountSecureDto = authService.getCurrentUserInfo();
