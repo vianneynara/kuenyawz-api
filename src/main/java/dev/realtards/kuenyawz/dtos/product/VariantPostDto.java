@@ -25,7 +25,7 @@ public class VariantPostDto {
 
 	@Schema(description = "Variant price", example = "10000.0")
 	@NotNull(message = "Price is required")
-	@DecimalMin(value = "1.0", message = "Price must be at least 0.0")
+	@DecimalMin(value = "1.0", message = "Price must be at least 1.0")
 	private BigDecimal price;
 
 	@Schema(description = "Minimum quantity of variant that can be ordered", example = "1")
