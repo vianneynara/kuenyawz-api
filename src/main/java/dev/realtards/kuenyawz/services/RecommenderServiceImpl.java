@@ -24,13 +24,13 @@ public class RecommenderServiceImpl implements RecommenderService {
 		if (!productService.existsById(productId)) {
 			throw new ResourceNotFoundException("Product not found");
 		}
-		if (productRepository.count() < 3) {
+		if (productRepository.count() < 4) {
 			throw new ResourceNotFoundException("Not enough products to recommend");
 		}
 		Specification<Product> spec = ProductSpecification.withFilters(
 			null, null, null,
 			null, null, true, productId);
-		List<Product> products = productRepository.findAll(spec, PageRequest.of(0, 2)).toList();
+		List<Product> products = productRepository.findAll(spec, PageRequest.of(0, 3)).toList();
 
 		return products.stream().map(productService::convertToDto).toList();
 	}
