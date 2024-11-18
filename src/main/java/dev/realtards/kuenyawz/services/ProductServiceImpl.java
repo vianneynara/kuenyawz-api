@@ -42,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
 	public List<ProductDto> getAllProducts(String category, String keyword) {
 		List<Product> products = findProducts(category, keyword);
 		return products.stream()
-			.map(productMapper::fromEntity)
+			.map(this::convertToDto)
 			.toList();
 	}
 
@@ -51,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
 		Specification<Product> specification = ProductSpecification.withFilters(category, keyword, available);
 		Page<Product> products = productRepository.findAll(specification, pageRequest);
 
-		Page<ProductDto> productDtos = products.map(productMapper::fromEntity);
+		Page<ProductDto> productDtos = products.map(this::convertToDto);
 		return productDtos;
 	}
 
