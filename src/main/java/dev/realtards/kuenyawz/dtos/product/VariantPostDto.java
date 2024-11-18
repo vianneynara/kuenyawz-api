@@ -17,16 +17,16 @@ import java.math.BigDecimal;
 @Builder
 public class VariantPostDto {
 
-	@Schema(description = "Variant price", example = "10000.0")
-	@NotBlank(message = "Price is required")
-	@DecimalMin(value = "1.0", message = "Price must be at least 0.0")
-	private BigDecimal price;
-
 	@Schema(description = "Variant type", example = "chocolate")
 	@NotBlank(message = "Type is required")
 	@Size(min = 2, max = 50, message = "Type must be between 2 and 50 characters")
 	@CleanString
 	private String type;
+
+	@Schema(description = "Variant price", example = "10000.0")
+	@NotNull(message = "Price is required")
+	@DecimalMin(value = "1.0", message = "Price must be at least 1.0")
+	private BigDecimal price;
 
 	@Schema(description = "Minimum quantity of variant that can be ordered", example = "1")
 	@Min(value = 1, message = "Minimum quantity must be at least 1")

@@ -2,6 +2,7 @@ package dev.realtards.kuenyawz.dtos.product;
 
 import dev.realtards.kuenyawz.utils.stringtrimmer.CleanString;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,7 +37,7 @@ public class ProductPostDto {
 	private String description;
 
 	@Schema(description = "Product category", example = "cake")
-	@NotNull(message = "Category is required")
+	@NotBlank(message = "Category is required")
 	@Pattern(regexp = "cake|pie|pastry|pasta|other", message = "Invalid category")
 	@CleanString
 	private String category;
@@ -47,5 +48,6 @@ public class ProductPostDto {
 	@Schema(description = "Product variants")
 	@NotNull(message = "Variants are required")
     @Size(min = 1, message = "At least one variant is required")
+	@Valid
 	private List<VariantPostDto> variants;
 }
