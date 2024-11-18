@@ -43,7 +43,29 @@ public class Orders extends Auditables {
     @Column(name = "status", nullable = false)
     private OrderStatus status;
 
+    /**
+     * Ongoing status (Process of making the product)
+     */
     public enum OrderStatus {
-        DEPOSIT, FULL_PAID
+        WAITING_DOWN_PAYMENT("Waiting for down payment"),
+        CONFIRMING("Waiting for confirmation from seller"),
+        CONFIRMED("Confirmed by seller"),
+        WAITING_SETTLEMENT("Waiting for settlement"),
+        PROCESSING("Being processed"),
+        DELIVERED("Order delivered"),
+        CANCELLED("Order cancelled");
+
+        private final String value;
+
+        OrderStatus(String value) { this.value = value; }
+
+        public static OrderStatus fromString(String value) {
+            for (OrderStatus status : OrderStatus.values()) {
+                if (status.value.equalsIgnoreCase(value)) {
+                    return status;
+                }
+            }
+            throw new IllegalArgumentException("Invalid status: " + value);
+        }
     }
 }
