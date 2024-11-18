@@ -48,6 +48,6 @@ public class Transactions extends Auditables {
     private Account account;
 
     public enum TransactionStatus {
-        DEPOSIT, PAID
+        PENDING, EXPIRED, SUCCESS, CANCELLED
     }
 }
