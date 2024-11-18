@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -34,22 +33,22 @@ public class GlobalExceptionsHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleGenericException(Exception ex) {
 		log.error("Unhandled exception", ex);
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("An error occurred internally"));
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponse.of("An error occurred internally"));
 	}
 
 	@ExceptionHandler(MultipartException.class)
 	public ResponseEntity<Object> handleMultipartException(MultipartException ex) {
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse.of(ex.getMessage()));
 	}
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<Object> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse.of(ex.getMessage()));
 	}
 
 	@ExceptionHandler(NoResourceFoundException.class)
 	public ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Resource might not exist"));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of("Resource might not exist"));
 	}
 
 	@ExceptionHandler(TransactionSystemException.class)
@@ -78,7 +77,7 @@ public class GlobalExceptionsHandler {
 			));
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-			.body(new ListedErrors<Map<String, String>>("Validation failed", errors));
+			.body(ListedErrors.of("Validation failed", errors));
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
@@ -94,7 +93,7 @@ public class GlobalExceptionsHandler {
 			));
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-			.body(new ListedErrors<Map<String, String>>("Validation failed", errors));
+			.body(ListedErrors.of("Validation failed", errors));
 	}
 
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -102,6 +101,6 @@ public class GlobalExceptionsHandler {
 		MethodArgumentTypeMismatchException ex) {
 		String message = String.format("Failed to convert value '%s' to type %s",
 			ex.getValue(), Objects.requireNonNull(ex.getRequiredType()).getSimpleName());
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(message));
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse.of(message));
 	}
 }

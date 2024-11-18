@@ -21,26 +21,26 @@ public class JwtExceptionsHandler {
 
 	@ExceptionHandler(UnsupportedKeyException.class)
 	public ResponseEntity<Object> handleUnsupportedKeyException(UnsupportedKeyException ex) {
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("The key is too weak"));
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponse.of("The key is too weak"));
 	}
 
 	@ExceptionHandler(UsernameNotFoundException.class)
 	public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException ex) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage()));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of(ex.getMessage()));
 	}
 
 	@ExceptionHandler(ExpiredJwtException.class)
 	public ResponseEntity<Object> handleExpiredJwtException(ExpiredJwtException ex) {
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(ex.getMessage()));
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse.of(ex.getMessage()));
 	}
 
 	@ExceptionHandler(MalformedJwtException.class)
 	public ResponseEntity<Object> handleMalformedJwtException(MalformedJwtException ex) {
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(ex.getMessage()));
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse.of(ex.getMessage()));
 	}
 
 	@ExceptionHandler(SignatureException.class)
 	public ResponseEntity<Object> handleSignatureException(SignatureException ex) {
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Invalid signature"));
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse.of("Invalid signature"));
 	}
 }
