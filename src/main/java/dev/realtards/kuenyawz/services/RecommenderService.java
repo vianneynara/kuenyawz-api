@@ -12,5 +12,5 @@ public interface RecommenderService {
 	 * @return {@link List} of {@link ProductDto} recommended products
 	 * @apiNote It currently only mocks the function, it will be implemented in the future.
 	 */
-	List<ProductDto> getRecommendsOfProduct(Long productId, Object addRandom);
+	List<ProductDto> getRecommendsOfProduct(Long productId, Boolean addRandom);
 }
