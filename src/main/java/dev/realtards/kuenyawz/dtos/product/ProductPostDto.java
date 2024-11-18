@@ -37,7 +37,7 @@ public class ProductPostDto {
 	private String description;
 
 	@Schema(description = "Product category", example = "cake")
-	@NotNull(message = "Category is required")
+	@NotBlank(message = "Category is required")
 	@Pattern(regexp = "cake|pie|pastry|pasta|other", message = "Invalid category")
 	@CleanString
 	private String category;
