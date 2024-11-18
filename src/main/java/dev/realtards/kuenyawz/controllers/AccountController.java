@@ -3,7 +3,7 @@ package dev.realtards.kuenyawz.controllers;
 import dev.realtards.kuenyawz.dtos.account.*;
 import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.mapper.AccountMapper;
-import dev.realtards.kuenyawz.responses.AccountsResponse;
+import dev.realtards.kuenyawz.dtos.account.ListOfAccountDto;
 import dev.realtards.kuenyawz.services.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,7 +39,7 @@ public class AccountController extends BaseController {
 	@ApiResponse(responseCode = "200", description = "Successfully retrieved all accounts",
 		content = @Content(
 			mediaType = MediaType.APPLICATION_JSON_VALUE,
-			schema = @Schema(implementation = AccountsResponse.class)
+			schema = @Schema(implementation = ListOfAccountDto.class)
 		)
 	)
 	@SecurityRequirement(name = "bearerAuth", scopes = {"ADMIN"})
@@ -47,7 +47,7 @@ public class AccountController extends BaseController {
 	public ResponseEntity<Object> getAllAccounts() {
 		List<AccountSecureDto> accounts = accountService.getAllAccounts();
 
-		return ResponseEntity.status(HttpStatus.OK).body(new AccountsResponse(accounts));
+		return ResponseEntity.status(HttpStatus.OK).body(new ListOfAccountDto(accounts));
 	}
 
 	// CRUD operations
