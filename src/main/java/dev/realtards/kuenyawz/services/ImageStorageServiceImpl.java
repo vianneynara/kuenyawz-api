@@ -24,10 +24,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.nio.file.*;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Service
@@ -194,7 +195,10 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 		if (product.getImages() == null) {
 			return List.of();
 		}
-		return product.getImages().stream()
+		List<ProductImage> productImages = new ArrayList<>(product.getImages().stream().toList());
+		productImages.sort(Comparator.comparing(ProductImage::getProductImageId));
+
+		return productImages.stream()
 			.map(this::getImageUrl)
 			.toList();
 	}
