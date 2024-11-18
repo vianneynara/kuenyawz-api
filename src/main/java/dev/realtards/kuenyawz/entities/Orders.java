@@ -1,20 +1,14 @@
 package dev.realtards.kuenyawz.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CollectionId;
-import org.springframework.data.domain.Auditable;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
-//@EqualsAndHashCode(callSuper = true, exclude = "product")
-//@ToString(callSuper = true, exclude = "product")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,13 +37,13 @@ public class Orders extends Auditables {
     @JoinColumn(name = "fp_reference_id", referencedColumnName = "reference_id")
     private Transactions fpReferenceId;
 
-    public enum OrderStatus {
-        DEPOSIT, FULL_PAID
-    }
-
     @Setter
     @Getter
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private OrderStatus status;
+
+    public enum OrderStatus {
+        DEPOSIT, FULL_PAID
+    }
 }
