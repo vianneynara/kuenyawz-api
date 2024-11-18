@@ -22,13 +22,13 @@
     }
 
     function fetchProductIds() {
-        fetch('http://localhost:8081/api/products/all')
+        fetch('http://localhost:8081/api/products')
             .then(response => response.json())
             .then(data => {
                 const productSelect = document.getElementById('productId');
                 productSelect.innerHTML = '<option value="">Select a product</option>';
 
-                data.products.forEach(product => {
+                data.content.forEach(product => {
                     const option = document.createElement('option');
                     option.value = product.productId;
                     option.text = `(${product.productId}) ${product.name} - ${product.images.length} images`;
