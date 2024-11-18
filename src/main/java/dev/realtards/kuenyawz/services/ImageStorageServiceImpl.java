@@ -112,7 +112,6 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 				.orElseThrow(() -> new ResourceNotFoundException("Resource '" + productId + "/" + resourceId + "' not found"))
 				.getRelativePath();
 			Path requestedPath = Path.of(uploadLocation.toString(), relativePath).normalize().toAbsolutePath();
-			log.warn("Requested path: {}", requestedPath);
 			Resource resource = new UrlResource(requestedPath.toUri());
 
 			if (resource.exists() || resource.isReadable()) {
@@ -135,7 +134,6 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 				.orElseThrow(() -> new ResourceNotFoundException("Resource '" + productId + "/" + resourceId + "' not found"));
 
 			Path requestedPath = Path.of(uploadLocation.toString(), productImage.getRelativePath()).normalize().toAbsolutePath();
-			log.warn("Requested path for deletion: {}", requestedPath);
 			Files.deleteIfExists(requestedPath);
 			productImageRepository.delete(productImage);
 		} catch (NumberFormatException | IOException e) {
@@ -183,7 +181,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
 	@Override
 	public String getImageUrl(Long productId, String resourceUri) {
-		return applicationProperties.getBaseUrl() + "/api/v1/images/" + productId + "/" + resourceUri;
+		return applicationProperties.getBaseUrl() + "/api/images/" + productId + "/" + resourceUri;
 	}
 
 	@Override
