@@ -3,6 +3,7 @@ package dev.realtards.kuenyawz.services;
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPatchDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
+import dev.realtards.kuenyawz.dtos.product.VariantDto;
 import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
@@ -21,6 +22,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -211,8 +214,14 @@ public class ProductServiceImpl implements ProductService {
 	 * @param product {@link Product}
 	 * @return {@link ProductDto}
 	 */
-	private ProductDto convertToDto(Product product) {
+	@Override
+	public ProductDto convertToDto(Product product) {
 		ProductDto productDto = productMapper.fromEntity(product);
+		if (productDto.getVariants() == null) {
+			productDto.setVariants(new ArrayList<>());
+		}
+		productDto.getVariants().sort(Comparator.comparing(VariantDto::getVariantId));
+
 		productDto.setImages(imageStorageService.getImageUrls(product));
 		return productDto;
 	}
