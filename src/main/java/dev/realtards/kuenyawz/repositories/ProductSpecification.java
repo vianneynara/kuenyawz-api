@@ -82,4 +82,13 @@ public class ProductSpecification {
 			return criteriaBuilder.equal(root.get("available"), availability);
 		});
 	}
+
+	private static Specification<Product> withProductIdNot(Long productId) {
+		return ((root, query, criteriaBuilder) -> {
+			if (productId == null) {
+				return null;
+			}
+			return criteriaBuilder.notEqual(root.get("productId"), productId);
+		});
+	}
 }
