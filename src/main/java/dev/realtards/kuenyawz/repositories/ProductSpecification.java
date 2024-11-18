@@ -38,6 +38,54 @@ public class ProductSpecification {
 	}
 
 	/**
+	 * Combine all specifications but with more advanced parameters.
+	 *
+	 * @param category		{@link String}
+	 * @param keyword		{@link String}
+	 * @param availability	{@link Boolean}
+	 * @param orderBy		{@link String}
+	 * @param isAscending	{@link Boolean}
+	 * @param randomize		{@link Boolean}
+	 * @param productIdNot	{@link Long}
+	 * @return {@link Specification<Product>}
+	 */
+	public static Specification<Product> withFilters(
+		String category,
+		String keyword,
+		Boolean availability,
+		String orderBy,
+		Boolean isAscending,
+		Boolean randomize,
+		Long productIdNot
+	) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate finalPredicate = Specification
+				.where(withCategory(category))
+				.and(withKeywordLike(keyword))
+				.and(withAvailability(availability))
+				.and(withProductIdNot(productIdNot))
+				.toPredicate(root, query, criteriaBuilder);
+			// Order By
+			if (query != null && StringUtils.hasText(orderBy)) {
+				try {
+					Path<?> orderPath = root.get(orderBy);
+					Order order = (isAscending == null || isAscending)
+						? criteriaBuilder.asc(orderPath)
+						: criteriaBuilder.desc(orderPath);
+					query.orderBy(order);
+				} catch (IllegalArgumentException ignored) {
+				}
+			}
+			// Randomize
+			if (query != null && Boolean.TRUE.equals(randomize)) {
+				query.orderBy(criteriaBuilder.asc(criteriaBuilder.function("random", Double.class)));
+			}
+
+			return finalPredicate;
+		};
+	}
+
+	/**
 	 * Filter {@link Product} category with category enum.
 	 */
 	private static Specification<Product> withCategory(String category) {
