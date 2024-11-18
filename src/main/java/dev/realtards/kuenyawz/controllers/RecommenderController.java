@@ -3,6 +3,9 @@ package dev.realtards.kuenyawz.controllers;
 import dev.realtards.kuenyawz.dtos.product.ListOfProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.services.RecommenderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +22,13 @@ public class RecommenderController {
 
 	private final RecommenderService recommenderService;
 
+	@Operation(summary = "Get recommended products of a product by transaction history")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Successfully retrieved recommended products"),
+		@ApiResponse(responseCode = "403", description = "Not enough products to recommend"),
+		@ApiResponse(responseCode = "404", description = "Product not found"),
+
+	})
 	@GetMapping("/{productId}")
 	public ResponseEntity<Object> getRecommendsOfProduct(
 		@PathVariable Long productId,
