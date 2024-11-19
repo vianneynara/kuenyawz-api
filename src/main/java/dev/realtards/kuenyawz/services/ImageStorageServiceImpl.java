@@ -143,7 +143,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 	}
 
 	@Override
-	public void deleteAllOfProduct(Long productId) {
+	public void deleteAllOfProductId(Long productId) {
 		Path productDirectory = Paths.get(uploadLocation.toString(), productId.toString());
 		try (Stream<Path> paths = Files.walk(productDirectory)) {
 			paths
