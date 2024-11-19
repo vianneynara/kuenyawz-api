@@ -129,14 +129,14 @@ public class ProductServiceImpl implements ProductService {
 		Product product = productRepository.findOne(withProductId(productId))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
-		productRepository.updateProductDeletedStatusToFalse(productId);
-		productRepository.deleteProductPermanently(product.getProductId());
+		imageStorageService.deleteAllOfProductId(product.getProductId());
+		productRepository.deleteById(productId);
 	}
 
 	@Override
 	public void hardDeleteAllProducts() {
-		productRepository.updateAllDeletedStatusToFalse();
-		productRepository.deleteAllProductsPermanently();
+		imageStorageService.deleteAll();
+		productRepository.deleteAll();
 	}
 
 	@Override
