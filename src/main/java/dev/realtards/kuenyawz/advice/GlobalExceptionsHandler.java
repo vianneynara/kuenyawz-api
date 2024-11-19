@@ -5,6 +5,7 @@ import dev.realtards.kuenyawz.advice.responses.ListedErrors;
 import jakarta.transaction.TransactionalException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @ControllerAdvice
+@Order(3)
 public class GlobalExceptionsHandler {
 	/**
 	 * Unhandled exception handler.
