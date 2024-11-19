@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static dev.realtards.kuenyawz.repositories.ProductSpec.*;
+
 @Service
 @Primary
 @RequiredArgsConstructor
@@ -51,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
 
 	public Page<ProductDto> getAllProductsPaginated(String category, String keyword, Boolean available, Integer page, Integer pageSize) {
 		PageRequest pageRequest = buildPageRequest(page, pageSize);
-		Specification<Product> specification = ProductSpec.withFilters(category, keyword, available);
+		Specification<Product> specification = withFilters(category, keyword, available).and(isNotDeleted());
 		Page<Product> products = productRepository.findAll(specification, pageRequest);
 
 		Page<ProductDto> productDtos = products.map(this::convertToDto);
@@ -115,7 +117,7 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public ProductDto getProduct(long productId) {
-		Product product = productRepository.findById(productId)
+		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
 		ProductDto productDto = this.convertToDto(product);
@@ -124,7 +126,7 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public void hardDeleteProduct(Long productId) {
-		Product product = productRepository.findByIdUnfiltered(productId)
+		Product product = productRepository.findOne(withProductId(productId))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
 		productRepository.updateProductDeletedStatusToFalse(productId);
@@ -139,7 +141,7 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public void softDeleteProduct(Long productId) {
-		Product product = productRepository.findById(productId)
+		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
 		product.setDeleted(true);
@@ -156,26 +158,17 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public void restoreSoftDeletedProduct(Long productId) {
-		Product product = productRepository.findById(productId)
-			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
-
-		List<Product> nameDupeProducts = productRepository.findAllByNameLikeIgnoreCase(product.getName());
-		if (!nameDupeProducts.isEmpty()) {
-			throw new ResourceExistsException("Product with name '" + product.getName() + "' exists");
-		}
-
-		product.setDeleted(false);
-		productRepository.save(product);
-	}
-
-	@Override
 	public ProductDto patchProduct(Long productId, ProductPatchDto productPatchDto) {
-		Product product = productRepository.findById(productId)
+		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
-		if (productRepository.existsByNameIgnoreCaseAndProductIdNot(productPatchDto.getName(), productId))
+		if (productRepository.findOne(ProductSpec.withName(productPatchDto.getName())
+				.and(isNotDeleted())
+				.and(withProductIdNot(productId)))
+			.isPresent()
+		) {
 			throw new ResourceExistsException("Product with name '" + productPatchDto.getName() + "' exists");
+		}
 		if (productPatchDto.getCategory() != null) {
 			productPatchDto.setCategory(productPatchDto.getCategory().toUpperCase());
 		}
@@ -232,7 +225,7 @@ public class ProductServiceImpl implements ProductService {
 		if (productPostDto.getVariants() == null || productPostDto.getVariants().isEmpty()) {
 			throw new InvalidRequestBodyValue("Variants must not be empty");
 		}
-		if (productRepository.existsByNameIgnoreCase(productPostDto.getName())) {
+		if (productRepository.findOne(withName(productPostDto.getName()).and(isNotDeleted())).isPresent()) {
 			throw new ResourceExistsException("Product with name '" + productPostDto.getName() + "' exists");
 		}
 	}
