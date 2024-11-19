@@ -354,7 +354,7 @@ public class ProductServiceImplTest {
 		// Assert
 		verify(productRepository).findById(1L);
 		verify(productRepository).save(product);
-		assertThat(product.isDeleted()).isTrue();
+		assertThat(product.getDeleted()).isTrue();
 	}
 
 	@Test
