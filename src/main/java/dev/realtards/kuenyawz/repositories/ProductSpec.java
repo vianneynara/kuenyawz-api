@@ -133,4 +133,34 @@ public class ProductSpec {
 			return criteriaBuilder.notEqual(root.get("productId"), productId);
 		});
 	}
+
+	/**
+	 * Filter {@link Product} availability with boolean value.
+	 */
+	public static Specification<Product> withAvailable(Boolean available) {
+		return (root, query, criteriaBuilder) -> {
+			if (available == null) {
+				return null;
+			}
+			return criteriaBuilder.equal(root.get("available"), available);
+		};
+	}
+
+	/**
+	 * Filter only non-deleted products.
+	 */
+	public static Specification<Product> isNotDeleted() {
+		return (root, query, criteriaBuilder) -> {
+			return criteriaBuilder.equal(root.get("deletedAt"), null);
+		};
+	}
+
+	/**
+	 * Filter only deleted products.
+	 */
+	public static Specification<Product> isDeleted() {
+		return (root, query, criteriaBuilder) -> {
+			return criteriaBuilder.notEqual(root.get("deletedAt"), null);
+		};
+	}
 }
