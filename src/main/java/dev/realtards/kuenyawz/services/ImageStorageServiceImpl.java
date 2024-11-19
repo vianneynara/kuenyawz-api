@@ -24,10 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -151,6 +148,8 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 				.map(Path::toFile)
 				.forEach(File::delete);
 			Files.deleteIfExists(productDirectory);
+		} catch (NoSuchFileException e) {
+			log.warn("Upload directory of product {} does not exist", productId);
 		} catch (IOException e) {
 			log.warn("Failed to delete product directory for product {}", productId, e);
 		} catch (SecurityException e) {
@@ -166,10 +165,18 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 			try (Stream<Path> paths = directories.filter(Files::isDirectory)) {
 				paths
 					.map(Path::toFile)
-					.forEach(File::delete);
+					.forEach((File file) -> {
+						try (Stream<Path> files = Files.walk(file.toPath())) {
+							files.map(Path::toFile).forEach(File::delete);
+						} catch (IOException e) {
+							log.error("Failed to delete directory {}", file, e);
+						}
+					});
 			}
 			Files.deleteIfExists(uploadLocation);
 			Files.createDirectories(uploadLocation);
+		} catch (NoSuchFileException e) {
+			log.warn("Upload directory {} does not exist", uploadLocation);
 		} catch (IOException e) {
 			log.error("Failed to delete upload directory", e);
 			throw new ResourceUploadException("Could not delete upload directory");
