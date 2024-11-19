@@ -120,7 +120,7 @@ public class ProductImageController extends BaseController {
 	public ResponseEntity<Object> deleteAllImagesOfProduct(
 		@PathVariable Long productId
 	) {
-		imageStorageService.deleteAllOfProduct(productId);
+		imageStorageService.deleteAllOfProductId(productId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
