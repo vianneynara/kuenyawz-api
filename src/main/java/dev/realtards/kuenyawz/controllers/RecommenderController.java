@@ -32,7 +32,7 @@ public class RecommenderController {
 	@GetMapping("/{productId}")
 	public ResponseEntity<Object> getRecommendsOfProduct(
 		@PathVariable Long productId,
-		@RequestParam(required = false) Object addRandom
+		@RequestParam(required = false) Boolean addRandom
 	) {
 		List<ProductDto> productDtos = recommenderService.getRecommendsOfProduct(productId, addRandom);
 		return ResponseEntity.status(HttpStatus.OK).body(new ListOfProductDto(productDtos));

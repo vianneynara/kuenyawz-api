@@ -21,17 +21,20 @@ public class RecommenderServiceImpl implements RecommenderService {
 	private final ProductRepository productRepository;
 
 	@Override
-	public List<ProductDto> getRecommendsOfProduct(Long productId, Object addRandom) {
+	public List<ProductDto> getRecommendsOfProduct(Long productId, Boolean addRandom) {
 		if (!productService.existsById(productId)) {
 			throw new ResourceNotFoundException("Product not found");
 		}
 		if (productRepository.count() < 4) {
 			throw new IllegalOperationException("Not enough products to recommend");
 		}
+		addRandom = (addRandom != null && addRandom);
 		Specification<Product> spec = ProductSpecification.withFilters(
 			null, null, null,
 			null, null, true, productId);
-		List<Product> products = productRepository.findAll(spec, PageRequest.of(0, 3)).toList();
+		List<Product> products = productRepository.findAll(spec,
+			addRandom ? PageRequest.of(0, 3) : PageRequest.of(0, 1)
+		).toList();
 
 		return products.stream().map(productService::convertToDto).toList();
 	}

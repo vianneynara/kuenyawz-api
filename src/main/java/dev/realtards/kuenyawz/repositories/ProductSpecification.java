@@ -91,7 +91,7 @@ public class ProductSpecification {
 	/**
 	 * Filter {@link Product} category with category enum.
 	 */
-	private static Specification<Product> withCategory(String category) {
+	public static Specification<Product> withCategory(String category) {
 		return ((root, query, criteriaBuilder) -> {
 			if (!StringUtils.hasText(category)) {
 				return null;
@@ -109,7 +109,7 @@ public class ProductSpecification {
 	 * Filter {@link Product} name with case-insensitive keyword.
 	 * Done by converting the keyword and name to lowercase.
 	 */
-	private static Specification<Product> withKeywordLike(String keyword) {
+	public static Specification<Product> withKeywordLike(String keyword) {
 		return ((root, query, criteriaBuilder) -> {
 			if (!StringUtils.hasText(keyword)) {
 				return null;
@@ -125,7 +125,7 @@ public class ProductSpecification {
 	/**
 	 * Filter {@link Product} availability with boolean value.
 	 */
-	private static Specification<Product> withAvailability(Boolean availability) {
+	public static Specification<Product> withAvailability(Boolean availability) {
 		return ((root, query, criteriaBuilder) -> {
 			if (availability == null) {
 				return null;
@@ -134,7 +134,7 @@ public class ProductSpecification {
 		});
 	}
 
-	private static Specification<Product> withProductIdNot(Long productId) {
+	public static Specification<Product> withProductIdNot(Long productId) {
 		return ((root, query, criteriaBuilder) -> {
 			if (productId == null) {
 				return null;
