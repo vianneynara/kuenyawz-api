@@ -4,14 +4,12 @@ import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.util.HashSet;
 import java.util.Set;
 
 // TODO: Remove sql restriction and use a custom repository to filter out deleted products
 @Entity
-@SQLRestriction("deleted = false")
 @Getter @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
