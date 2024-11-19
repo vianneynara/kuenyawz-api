@@ -50,7 +50,8 @@ public class SecurityConfig {
 					"/api/status",
 					"/api/images/**",
 					"/api/products",
-					"/api/products/**").permitAll()
+					"/api/products/**",
+					"/api/recommender/**").permitAll()
 
 				// Auth endpoints (all public)
 				.requestMatchers(HttpMethod.POST,

@@ -22,6 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -173,8 +174,11 @@ public class ProductServiceImpl implements ProductService {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
-		if (productRepository.existsByNameIgnoreCase(productPatchDto.getName()))
+		if (productRepository.existsByNameIgnoreCaseAndProductIdNot(productPatchDto.getName(), productId))
 			throw new ResourceExistsException("Product with name '" + productPatchDto.getName() + "' exists");
+		if (productPatchDto.getCategory() != null) {
+			productPatchDto.setCategory(productPatchDto.getCategory().toUpperCase());
+		}
 
 		Product updatedProduct = productMapper.updateProductFromPatch(productPatchDto, product);
 		Product savedProduct = productRepository.save(updatedProduct);
@@ -213,8 +217,12 @@ public class ProductServiceImpl implements ProductService {
 	 * @param product {@link Product}
 	 * @return {@link ProductDto}
 	 */
-	private ProductDto convertToDto(Product product) {
+	@Override
+	public ProductDto convertToDto(Product product) {
 		ProductDto productDto = productMapper.fromEntity(product);
+		if (productDto.getVariants() == null) {
+			productDto.setVariants(new ArrayList<>());
+		}
 		productDto.getVariants().sort(Comparator.comparing(VariantDto::getVariantId));
 
 		productDto.setImages(imageStorageService.getImageUrls(product));

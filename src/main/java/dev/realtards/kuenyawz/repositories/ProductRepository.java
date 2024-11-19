@@ -26,6 +26,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	boolean existsByNameIgnoreCase(String name);
 
+	boolean existsByNameIgnoreCaseAndProductIdNot(String name, Long productId);
+
 	@Query("SELECT p FROM Product p WHERE p.productId = :productId")
 	@SQLRestriction("")
 	Optional<Product> findByIdUnfiltered(@Param("productId") Long id);

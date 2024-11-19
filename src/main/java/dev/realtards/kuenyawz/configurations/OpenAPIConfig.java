@@ -16,10 +16,11 @@ public class OpenAPIConfig {
 	public OpenAPI customOpenAPI() {
 		return new OpenAPI()
 			.components(new Components()
-				.addSecuritySchemes("basicAuth",
+				.addSecuritySchemes("bearerAuth",
 					new SecurityScheme()
 						.type(SecurityScheme.Type.HTTP)
-						.scheme("basic")))
+						.scheme("bearer")
+						.bearerFormat("JWT")))
 			.info(new Info()
 				.title("KuenyaWZ API")
 				.version("1.0.0")

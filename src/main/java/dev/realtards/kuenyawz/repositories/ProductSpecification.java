@@ -1,6 +1,9 @@
 package dev.realtards.kuenyawz.repositories;
 
 import dev.realtards.kuenyawz.entities.Product;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -25,8 +28,8 @@ public class ProductSpecification {
 	/**
 	 * Combine all specifications.
 	 *
-	 * @param category {@link String}
-	 * @param keyword {@link String}
+	 * @param category     {@link String}
+	 * @param keyword      {@link String}
 	 * @param availability {@link Boolean}
 	 * @return {@link Specification<Product>}
 	 */
@@ -38,9 +41,57 @@ public class ProductSpecification {
 	}
 
 	/**
+	 * Combine all specifications but with more advanced parameters.
+	 *
+	 * @param category     {@link String}
+	 * @param keyword      {@link String}
+	 * @param availability {@link Boolean}
+	 * @param orderBy      {@link String}
+	 * @param isAscending  {@link Boolean}
+	 * @param randomize    {@link Boolean}
+	 * @param productIdNot {@link Long}
+	 * @return {@link Specification<Product>}
+	 */
+	public static Specification<Product> withFilters(
+		String category,
+		String keyword,
+		Boolean availability,
+		String orderBy,
+		Boolean isAscending,
+		Boolean randomize,
+		Long productIdNot
+	) {
+		return (root, query, criteriaBuilder) -> {
+			Predicate finalPredicate = Specification
+				.where(withCategory(category))
+				.and(withKeywordLike(keyword))
+				.and(withAvailability(availability))
+				.and(withProductIdNot(productIdNot))
+				.toPredicate(root, query, criteriaBuilder);
+			// Order By
+			if (query != null && StringUtils.hasText(orderBy)) {
+				try {
+					Path<?> orderPath = root.get(orderBy);
+					Order order = (isAscending == null || isAscending)
+						? criteriaBuilder.asc(orderPath)
+						: criteriaBuilder.desc(orderPath);
+					query.orderBy(order);
+				} catch (IllegalArgumentException ignored) {
+				}
+			}
+			// Randomize
+			if (query != null && Boolean.TRUE.equals(randomize)) {
+				query.orderBy(criteriaBuilder.asc(criteriaBuilder.function("random", Double.class)));
+			}
+
+			return finalPredicate;
+		};
+	}
+
+	/**
 	 * Filter {@link Product} category with category enum.
 	 */
-	private static Specification<Product> withCategory(String category) {
+	public static Specification<Product> withCategory(String category) {
 		return ((root, query, criteriaBuilder) -> {
 			if (!StringUtils.hasText(category)) {
 				return null;
@@ -57,8 +108,8 @@ public class ProductSpecification {
 	/**
 	 * Filter {@link Product} name with case-insensitive keyword.
 	 * Done by converting the keyword and name to lowercase.
-	 * */
-	private static Specification<Product> withKeywordLike(String keyword) {
+	 */
+	public static Specification<Product> withKeywordLike(String keyword) {
 		return ((root, query, criteriaBuilder) -> {
 			if (!StringUtils.hasText(keyword)) {
 				return null;
@@ -74,12 +125,21 @@ public class ProductSpecification {
 	/**
 	 * Filter {@link Product} availability with boolean value.
 	 */
-	private static Specification<Product> withAvailability(Boolean availability) {
+	public static Specification<Product> withAvailability(Boolean availability) {
 		return ((root, query, criteriaBuilder) -> {
 			if (availability == null) {
 				return null;
 			}
 			return criteriaBuilder.equal(root.get("available"), availability);
+		});
+	}
+
+	public static Specification<Product> withProductIdNot(Long productId) {
+		return ((root, query, criteriaBuilder) -> {
+			if (productId == null) {
+				return null;
+			}
+			return criteriaBuilder.notEqual(root.get("productId"), productId);
 		});
 	}
 }

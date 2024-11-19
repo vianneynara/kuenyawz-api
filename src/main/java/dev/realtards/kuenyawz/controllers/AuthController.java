@@ -7,12 +7,16 @@ import dev.realtards.kuenyawz.dtos.auth.AuthRequestDto;
 import dev.realtards.kuenyawz.dtos.auth.AuthResponseDto;
 import dev.realtards.kuenyawz.services.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +32,11 @@ public class AuthController {
 
 	@Operation(summary = "Register a new user")
 	@ApiResponses({
-		@ApiResponse(responseCode = "204", description = "User registered successfully"),
+		@ApiResponse(responseCode = "204", description = "User registered successfully",
+			content = @Content(
+				mediaType = MediaType.APPLICATION_JSON_VALUE,
+				schema = @Schema(implementation = AuthResponseDto.class)
+			)),
 		@ApiResponse(responseCode = "409", description = "User exists")
 	})
 	@PostMapping("/register")
@@ -41,7 +49,11 @@ public class AuthController {
 
 	@Operation(summary = "Login as an existing user")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Login successful"),
+		@ApiResponse(responseCode = "200", description = "Login successful",
+			content = @Content(
+				mediaType = MediaType.APPLICATION_JSON_VALUE,
+				schema = @Schema(implementation = AuthResponseDto.class)
+			)),
 		@ApiResponse(responseCode = "401", description = "Invalid credentials")
 	})
 	@PostMapping("/login")
@@ -66,7 +78,11 @@ public class AuthController {
 
 	@Operation(summary = "Refresh the current access token")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Token refreshed successfully")
+		@ApiResponse(responseCode = "200", description = "Token refreshed successfully",
+			content = @Content(
+				mediaType = MediaType.APPLICATION_JSON_VALUE,
+				schema = @Schema(implementation = AuthResponseDto.class)
+			))
 	})
 	@PostMapping("/refresh")
 	public ResponseEntity<Object> refresh(
@@ -78,9 +94,14 @@ public class AuthController {
 
 	@Operation(summary = "Get the current user's information from Authorization header")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "User information retrieved successfully"),
+		@ApiResponse(responseCode = "200", description = "User information retrieved successfully",
+			content = @Content(
+				mediaType = MediaType.APPLICATION_JSON_VALUE,
+				schema = @Schema(implementation = AccountSecureDto.class)
+			)),
 		@ApiResponse(responseCode = "404", description = "User not found")
 	})
+	@SecurityRequirement(name = "bearerAuth", scopes = {"USER", "ADMIN"})
 	@GetMapping("/me")
 	public ResponseEntity<Object> me() {
 		AccountSecureDto accountSecureDto = authService.getCurrentUserInfo();
