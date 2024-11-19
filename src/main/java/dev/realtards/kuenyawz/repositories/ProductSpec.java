@@ -24,7 +24,7 @@ import org.springframework.util.StringUtils;
  * specification.
  */
 @Component
-public class ProductSpecification {
+public class ProductSpec {
 	/**
 	 * Combine all specifications.
 	 *
@@ -36,8 +36,8 @@ public class ProductSpecification {
 	public static Specification<Product> withFilters(String category, String keyword, Boolean availability) {
 		return Specification
 			.where(withCategory(category))
-			.and(withKeywordLike(keyword))
-			.and(withAvailability(availability));
+			.and(withNameLike(keyword))
+			.and(withAvailable(availability));
 	}
 
 	/**
@@ -64,8 +64,8 @@ public class ProductSpecification {
 		return (root, query, criteriaBuilder) -> {
 			Predicate finalPredicate = Specification
 				.where(withCategory(category))
-				.and(withKeywordLike(keyword))
-				.and(withAvailability(availability))
+				.and(withNameLike(keyword))
+				.and(withAvailable(availability))
 				.and(withProductIdNot(productIdNot))
 				.toPredicate(root, query, criteriaBuilder);
 			// Order By
@@ -109,12 +109,12 @@ public class ProductSpecification {
 	 * Filter {@link Product} name with case-insensitive keyword.
 	 * Done by converting the keyword and name to lowercase.
 	 */
-	public static Specification<Product> withKeywordLike(String keyword) {
+	public static Specification<Product> withNameLike(String nameAlike) {
 		return ((root, query, criteriaBuilder) -> {
-			if (!StringUtils.hasText(keyword)) {
+			if (!StringUtils.hasText(nameAlike)) {
 				return null;
 			}
-			final String queryKeyword = "%" + keyword.trim().toLowerCase() + "%";
+			final String queryKeyword = "%" + nameAlike.trim().toLowerCase() + "%";
 			return criteriaBuilder.like(
 				criteriaBuilder.lower(root.get("name")),
 				queryKeyword.toLowerCase()
@@ -123,17 +123,8 @@ public class ProductSpecification {
 	}
 
 	/**
-	 * Filter {@link Product} availability with boolean value.
+	 * Filter by excluding a specific product ID.
 	 */
-	public static Specification<Product> withAvailability(Boolean availability) {
-		return ((root, query, criteriaBuilder) -> {
-			if (availability == null) {
-				return null;
-			}
-			return criteriaBuilder.equal(root.get("available"), availability);
-		});
-	}
-
 	public static Specification<Product> withProductIdNot(Long productId) {
 		return ((root, query, criteriaBuilder) -> {
 			if (productId == null) {

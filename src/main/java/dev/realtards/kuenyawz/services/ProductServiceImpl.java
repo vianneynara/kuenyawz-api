@@ -11,7 +11,7 @@ import dev.realtards.kuenyawz.exceptions.ResourceExistsException;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
-import dev.realtards.kuenyawz.repositories.ProductSpecification;
+import dev.realtards.kuenyawz.repositories.ProductSpec;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -51,7 +51,7 @@ public class ProductServiceImpl implements ProductService {
 
 	public Page<ProductDto> getAllProductsPaginated(String category, String keyword, Boolean available, Integer page, Integer pageSize) {
 		PageRequest pageRequest = buildPageRequest(page, pageSize);
-		Specification<Product> specification = ProductSpecification.withFilters(category, keyword, available);
+		Specification<Product> specification = ProductSpec.withFilters(category, keyword, available);
 		Page<Product> products = productRepository.findAll(specification, pageRequest);
 
 		Page<ProductDto> productDtos = products.map(this::convertToDto);
@@ -206,10 +206,6 @@ public class ProductServiceImpl implements ProductService {
 		return productRepository.existsById(productId);
 	}
 
-	public boolean existsIncludingDeleted(Long productId) {
-		return productRepository.findByIdUnfiltered(productId).isPresent();
-	}
-
 	/**
 	 * Converts a Product entity to a ProductDto using the mapper, and then sets the image URLs using
 	 * {@link ImageStorageService#getImageUrls(Product)}.
@@ -273,8 +269,6 @@ public class ProductServiceImpl implements ProductService {
 		product.setVariants(variants);
 		return product;
 	}
-
-	// Get all products methods
 
 	private Product.Category parseCategoryOrThrow(String category) {
 		category = category.trim().toUpperCase();
