@@ -107,7 +107,8 @@ public class SecurityConfig {
 			.requestMatchers(
 				"/api/docs/v3/**",
 				"/swagger-ui/**",
-				"/swagger-ui.html"
+				"/swagger-ui.html",
+				"/favicon.ico"
 			);
 	}
 
