@@ -175,7 +175,7 @@ public class ProductSpec {
 	 */
 	public static Specification<Product> isNotDeleted() {
 		return (root, query, criteriaBuilder) -> {
-			return criteriaBuilder.equal(root.get("deletedAt"), null);
+			return criteriaBuilder.equal(root.get("deleted"), false);
 		};
 	}
 
@@ -184,7 +184,7 @@ public class ProductSpec {
 	 */
 	public static Specification<Product> isDeleted() {
 		return (root, query, criteriaBuilder) -> {
-			return criteriaBuilder.notEqual(root.get("deletedAt"), null);
+			return criteriaBuilder.equal(root.get("deleted"), true);
 		};
 	}
 }
