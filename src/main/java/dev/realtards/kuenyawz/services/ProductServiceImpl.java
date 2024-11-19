@@ -174,7 +174,7 @@ public class ProductServiceImpl implements ProductService {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
-		if (productRepository.existsByNameIgnoreCase(productPatchDto.getName()))
+		if (productRepository.existsByNameIgnoreCaseAndProductIdNot(productPatchDto.getName(), productId))
 			throw new ResourceExistsException("Product with name '" + productPatchDto.getName() + "' exists");
 		if (productPatchDto.getCategory() != null) {
 			productPatchDto.setCategory(productPatchDto.getCategory().toUpperCase());
