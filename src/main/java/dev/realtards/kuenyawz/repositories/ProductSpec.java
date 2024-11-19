@@ -123,6 +123,30 @@ public class ProductSpec {
 	}
 
 	/**
+	 * Filter {@link Product} name with exact name.
+	 */
+	public static Specification<Product> withName(String name) {
+		return ((root, query, criteriaBuilder) -> {
+			if (!StringUtils.hasText(name)) {
+				return null;
+			}
+			return criteriaBuilder.equal(root.get("name"), name);
+		});
+	}
+
+	/**
+	 * Filter by a specific product ID.
+	 */
+	public static Specification<Product> withProductId(Long productId) {
+		return ((root, query, criteriaBuilder) -> {
+			if (productId == null) {
+				return null;
+			}
+			return criteriaBuilder.equal(root.get("productId"), productId);
+		});
+	}
+
+	/**
 	 * Filter by excluding a specific product ID.
 	 */
 	public static Specification<Product> withProductIdNot(Long productId) {
