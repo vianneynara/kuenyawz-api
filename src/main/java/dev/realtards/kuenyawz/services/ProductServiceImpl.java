@@ -176,6 +176,9 @@ public class ProductServiceImpl implements ProductService {
 
 		if (productRepository.existsByNameIgnoreCase(productPatchDto.getName()))
 			throw new ResourceExistsException("Product with name '" + productPatchDto.getName() + "' exists");
+		if (productPatchDto.getCategory() != null) {
+			productPatchDto.setCategory(productPatchDto.getCategory().toUpperCase());
+		}
 
 		Product updatedProduct = productMapper.updateProductFromPatch(productPatchDto, product);
 		Product savedProduct = productRepository.save(updatedProduct);
