@@ -58,7 +58,9 @@
         })
             .then(response => response.json())
             .then(data => {
-                responseDiv.innerHTML = JSON.stringify(data, null, 2);
+                responseDiv.innerHTML = `<pre>
+${JSON.stringify(data, null, 2)}
+</pre>`;
             })
             .catch(error => {
                 responseDiv.innerHTML = 'Error uploading images: ' + error;
