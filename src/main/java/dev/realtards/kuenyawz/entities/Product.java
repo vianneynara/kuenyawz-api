@@ -8,6 +8,7 @@ import org.hibernate.annotations.SQLRestriction;
 import java.util.HashSet;
 import java.util.Set;
 
+// TODO: Remove sql restriction and use a custom repository to filter out deleted products
 @Entity
 @SQLRestriction("deleted = false")
 @Getter
@@ -55,11 +56,11 @@ public class Product extends Auditables {
 	 * This contains the category of foods available in the store.
 	 */
 	public enum Category {
-		CAKE("cake"),
-		PASTRY("pastry"),
-		PASTA("pasta"),
-		PIE("pie"),
-		OTHER("other");
+		CAKE("CAKE"),
+		PASTRY("PASTRY"),
+		PASTA("PASTA"),
+		PIE("PIE"),
+		OTHER("OTHER");
 
 		private final String value;
 
@@ -75,5 +76,7 @@ public class Product extends Auditables {
 			}
 			throw new IllegalArgumentException("Invalid category: " + value);
 		}
+
+
 	}
 }

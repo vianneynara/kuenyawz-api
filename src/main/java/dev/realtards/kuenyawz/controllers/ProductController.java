@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -64,6 +65,7 @@ public class ProductController extends BaseController {
 		),
 		@ApiResponse(responseCode = "400", description = "Invalid request body")
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@PostMapping
 	public ResponseEntity<Object> createProduct(
 		@Valid @RequestBody ProductPostDto productPostDto
@@ -125,6 +127,7 @@ public class ProductController extends BaseController {
 		@ApiResponse(responseCode = "204", description = "Product deleted successfully"),
 		@ApiResponse(responseCode = "404", description = "Product not found")
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@DeleteMapping("{productId}")
 	public ResponseEntity<Object> softDeleteAllProducts(
 		@PathVariable Long productId
@@ -137,6 +140,7 @@ public class ProductController extends BaseController {
 	@ApiResponses({
 		@ApiResponse(responseCode = "204", description = "All products deleted successfully")
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@DeleteMapping("/all")
 	public ResponseEntity<Object> softDeleteAllProducts() {
 		productService.softDeleteAllProducts();
@@ -153,6 +157,7 @@ public class ProductController extends BaseController {
 		@ApiResponse(responseCode = "404", description = "Product not found"),
 		@ApiResponse(responseCode = "400", description = "Invalid request body")
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@PatchMapping("{productId}")
 	public ResponseEntity<Object> patchProduct(
 		@PathVariable Long productId,
@@ -172,6 +177,7 @@ public class ProductController extends BaseController {
 		@ApiResponse(responseCode = "404", description = "Product not found"),
 		@ApiResponse(responseCode = "400", description = "Invalid request body")
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@PatchMapping("{productId}/availability")
 	public ResponseEntity<Object> patchProductAvailability(
 		@PathVariable Long productId,
@@ -227,6 +233,7 @@ public class ProductController extends BaseController {
 		@ApiResponse(responseCode = "404", description = "Product not found"),
 		@ApiResponse(responseCode = "400", description = "Invalid request body")
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@PostMapping("{productId}/variants/batch")
 	public ResponseEntity<Object> createVariants(
 		@PathVariable Long productId,
@@ -265,6 +272,7 @@ public class ProductController extends BaseController {
 		),
 		@ApiResponse(responseCode = "404", description = "Variant not found")
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@PatchMapping("{productId}/variants/{variantId}")
 	public ResponseEntity<Object> patchVariant(
 		@PathVariable Long productId,
@@ -280,6 +288,7 @@ public class ProductController extends BaseController {
 		@ApiResponse(responseCode = "204", description = "Variant deleted successfully"),
 		@ApiResponse(responseCode = "404", description = "Variant not found")
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@DeleteMapping("{productId}/variants/{variantId}")
 	public ResponseEntity<Object> deleteVariant(
 		@PathVariable Long productId,
@@ -294,6 +303,7 @@ public class ProductController extends BaseController {
 		@ApiResponse(responseCode = "200", description = "Products imported successfully"),
 		@ApiResponse(responseCode = "400", description = "Invalid request body")
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@PostMapping("/import")
 	public ResponseEntity<Object> importProductsFromCsv(
 		@Valid @ModelAttribute ProductCsvPostDto productCsvPostDto
@@ -304,6 +314,7 @@ public class ProductController extends BaseController {
 
 	// Non Exposed Endpoints
 
+	@SecurityRequirement(name = "bearerAuth")
 	@DeleteMapping("{productId}/permanent")
 	public ResponseEntity<Object> hardDeleteProduct(
 		@PathVariable Long productId
@@ -312,6 +323,7 @@ public class ProductController extends BaseController {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
+	@SecurityRequirement(name = "bearerAuth")
 	@DeleteMapping("all/permanent")
 	public ResponseEntity<Object> hardDeleteAllProducts() {
 		productService.hardDeleteAllProducts();
