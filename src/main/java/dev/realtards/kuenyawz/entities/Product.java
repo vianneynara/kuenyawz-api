@@ -36,10 +36,7 @@ public class Product extends DeletableAuditables {
 	private Category category;
 
 	@Column(name = "available", nullable = false)
-	private boolean available;
-
-	@Column(name = "deleted", nullable = false)
-	private boolean deleted = false;
+	private Boolean available;
 
 	@Version
 	private Long version;
