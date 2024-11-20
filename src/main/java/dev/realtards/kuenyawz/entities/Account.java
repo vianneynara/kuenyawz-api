@@ -38,13 +38,16 @@ public class Account extends Auditables implements UserDetails {
 	private String googleId;
 
 	@Column(unique = true)
+	private String phone;
+
+	@Column
+	private LocalDateTime phoneVerifiedAt;
+
+	@Column(unique = true)
 	private String email;
 
 	@Column
 	private LocalDateTime emailVerifiedAt;
-
-	@Column(unique = true)
-	private String phone;
 
 	@Column
 	private Privilege privilege;
@@ -59,7 +62,7 @@ public class Account extends Auditables implements UserDetails {
 
 	@Override
 	public String getUsername() {
-		return email;
+		return phone;
 	}
 
 	@Override
