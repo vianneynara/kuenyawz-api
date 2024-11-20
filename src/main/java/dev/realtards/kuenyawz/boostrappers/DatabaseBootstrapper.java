@@ -7,7 +7,6 @@ import dev.realtards.kuenyawz.exceptions.AccountExistsException;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
 import dev.realtards.kuenyawz.services.AccountService;
 import dev.realtards.kuenyawz.services.ProductCsvService;
-import dev.realtards.kuenyawz.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -36,27 +35,27 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 		AccountRegistrationDto.builder()
 			.password("testadmin")
 			.fullName("Test Admin")
-			.email("root@wz.com")
+			.phone("8130011")
 			.build(),
 		AccountRegistrationDto.builder()
 			.password("user")
 			.fullName("Nara")
-			.email("nara@example.com")
+			.phone("8130022")
 			.build(),
 		AccountRegistrationDto.builder()
 			.password("user")
 			.fullName("Emilia")
-			.email("emilia@example.com")
+			.phone("8130033")
 			.build(),
 		AccountRegistrationDto.builder()
 			.password("user")
 			.fullName("Emilia")
-			.email("emilia@example.com")
+			.phone("8130044")
 			.build(),
 		AccountRegistrationDto.builder()
 			.password("user")
 			.fullName("Bruh")
-			.email("bruh@example.com")
+			.phone("8130055")
 			.build()
 	);
 
@@ -72,7 +71,7 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 					accountService.createAccount(iterator.next());
 				}
 			} catch (AccountExistsException e) {
-				log.warn("Account already exists: {}", iterator.previous().getEmail());
+				log.warn("Account already exists: {}", iterator.previous().getPhone());
 				iterator.next();
 			}
 		}
