@@ -11,7 +11,7 @@ import dev.realtards.kuenyawz.exceptions.ResourceExistsException;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
-import dev.realtards.kuenyawz.repositories.ProductSpecification;
+import dev.realtards.kuenyawz.repositories.ProductSpec;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -27,6 +27,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static dev.realtards.kuenyawz.repositories.ProductSpec.*;
 
 @Service
 @Primary
@@ -51,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
 
 	public Page<ProductDto> getAllProductsPaginated(String category, String keyword, Boolean available, Integer page, Integer pageSize) {
 		PageRequest pageRequest = buildPageRequest(page, pageSize);
-		Specification<Product> specification = ProductSpecification.withFilters(category, keyword, available);
+		Specification<Product> specification = withFilters(category, keyword, available).and(isNotDeleted());
 		Page<Product> products = productRepository.findAll(specification, pageRequest);
 
 		Page<ProductDto> productDtos = products.map(this::convertToDto);
@@ -115,7 +117,7 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public ProductDto getProduct(long productId) {
-		Product product = productRepository.findById(productId)
+		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
 		ProductDto productDto = this.convertToDto(product);
@@ -124,22 +126,22 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public void hardDeleteProduct(Long productId) {
-		Product product = productRepository.findByIdUnfiltered(productId)
+		Product product = productRepository.findOne(withProductId(productId))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
-		productRepository.updateProductDeletedStatusToFalse(productId);
-		productRepository.deleteProductPermanently(product.getProductId());
+		imageStorageService.deleteAllOfProductId(product.getProductId());
+		productRepository.deleteById(productId);
 	}
 
 	@Override
 	public void hardDeleteAllProducts() {
-		productRepository.updateAllDeletedStatusToFalse();
-		productRepository.deleteAllProductsPermanently();
+		imageStorageService.deleteAll();
+		productRepository.deleteAll();
 	}
 
 	@Override
 	public void softDeleteProduct(Long productId) {
-		Product product = productRepository.findById(productId)
+		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
 		product.setDeleted(true);
@@ -156,26 +158,20 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public void restoreSoftDeletedProduct(Long productId) {
-		Product product = productRepository.findById(productId)
-			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
-
-		List<Product> nameDupeProducts = productRepository.findAllByNameLikeIgnoreCase(product.getName());
-		if (!nameDupeProducts.isEmpty()) {
-			throw new ResourceExistsException("Product with name '" + product.getName() + "' exists");
-		}
-
-		product.setDeleted(false);
-		productRepository.save(product);
-	}
-
-	@Override
 	public ProductDto patchProduct(Long productId, ProductPatchDto productPatchDto) {
-		Product product = productRepository.findById(productId)
+		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
-		if (productRepository.existsByNameIgnoreCase(productPatchDto.getName()))
+		if (productRepository.findOne(ProductSpec.withName(productPatchDto.getName())
+				.and(isNotDeleted())
+				.and(withProductIdNot(productId)))
+			.isPresent()
+		) {
 			throw new ResourceExistsException("Product with name '" + productPatchDto.getName() + "' exists");
+		}
+		if (productPatchDto.getCategory() != null) {
+			productPatchDto.setCategory(productPatchDto.getCategory().toUpperCase());
+		}
 
 		Product updatedProduct = productMapper.updateProductFromPatch(productPatchDto, product);
 		Product savedProduct = productRepository.save(updatedProduct);
@@ -201,10 +197,6 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public boolean existsById(Long productId) {
 		return productRepository.existsById(productId);
-	}
-
-	public boolean existsIncludingDeleted(Long productId) {
-		return productRepository.findByIdUnfiltered(productId).isPresent();
 	}
 
 	/**
@@ -233,7 +225,7 @@ public class ProductServiceImpl implements ProductService {
 		if (productPostDto.getVariants() == null || productPostDto.getVariants().isEmpty()) {
 			throw new InvalidRequestBodyValue("Variants must not be empty");
 		}
-		if (productRepository.existsByNameIgnoreCase(productPostDto.getName())) {
+		if (productRepository.findOne(withName(productPostDto.getName()).and(isNotDeleted())).isPresent()) {
 			throw new ResourceExistsException("Product with name '" + productPostDto.getName() + "' exists");
 		}
 	}
@@ -270,8 +262,6 @@ public class ProductServiceImpl implements ProductService {
 		product.setVariants(variants);
 		return product;
 	}
-
-	// Get all products methods
 
 	private Product.Category parseCategoryOrThrow(String category) {
 		category = category.trim().toUpperCase();

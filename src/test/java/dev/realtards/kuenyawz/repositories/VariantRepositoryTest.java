@@ -1,11 +1,5 @@
 package dev.realtards.kuenyawz.repositories;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
 import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +7,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class VariantRepositoryTest {
@@ -36,6 +36,7 @@ class VariantRepositoryTest {
             .description("A test muffin description")
             .category(Product.Category.CAKE)
             .available(true)
+            .deleted(false)
             .build();
         
         // Save the product first
