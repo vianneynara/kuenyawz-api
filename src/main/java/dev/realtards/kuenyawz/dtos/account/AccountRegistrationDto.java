@@ -2,10 +2,13 @@ package dev.realtards.kuenyawz.dtos.account;
 
 import dev.realtards.kuenyawz.utils.stringtrimmer.CleanString;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Schema(description = "Account registration request")
 @Data
@@ -20,11 +23,11 @@ public class AccountRegistrationDto {
 	@CleanString
 	private String fullName;
 
-	@Schema(description = "User's email address", example = "emilia@example.com")
-	@NotBlank(message = "Email is required")
-	@Email(message = "Email format is invalid")
+    @Schema(description = "User's valid phone number", example = "81234567890", pattern = "^[1-9][0-9]{7,14}$")
+    @Pattern(regexp = "^[1-9][0-9]{7,14}$", message = "Invalid phone number format")
+	@NotBlank(message = "Phone is required")
 	@CleanString
-	private String email;
+	private String phone;
 
 	@Schema(description = "User's password", example = "emiliaBestGirl", minLength = 4)
 	@NotBlank(message = "Password is required")
