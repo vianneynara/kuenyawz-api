@@ -37,13 +37,13 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public Account createAccount(AccountRegistrationDto accountRegistrationDto) {
-		if (accountRepository.existsByEmail(accountRegistrationDto.getEmail())) {
+		if (accountRepository.existsByPhone(accountRegistrationDto.getPhone())) {
 			throw new AccountExistsException();
 		}
 
 		Account account = Account.builder()
 			.fullName(accountRegistrationDto.getFullName())
-			.email(accountRegistrationDto.getEmail().toLowerCase())
+			.phone(accountRegistrationDto.getPhone())
 			.password(passwordEncoder.encode(accountRegistrationDto.getPassword()))
 			.privilege(Account.Privilege.USER)
 			.build();
@@ -61,8 +61,8 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public Account getAccount(String email) {
-		Account account = accountRepository.findByEmail(email)
+	public Account getAccount(String phone) {
+		Account account = accountRepository.findByEmail(phone)
 			.orElseThrow(AccountNotFoundException::new);
 		return account;
 	}
@@ -97,12 +97,12 @@ public class AccountServiceImpl implements AccountService {
 
 		Optional.ofNullable(accountPatchDto.getFullName())
 			.ifPresent(existingAccount::setFullName);
-		Optional.ofNullable(accountPatchDto.getEmail())
-			.ifPresent(email -> {
-				if (accountRepository.existsByEmail(email)) {
+		Optional.ofNullable(accountPatchDto.getPhone())
+			.ifPresent(phone -> {
+				if (accountRepository.existsByPhone(phone)) {
 					throw new AccountExistsException();
 				}
-				existingAccount.setEmail(email);
+				existingAccount.setEmail(phone);
 			});
 		Optional.ofNullable(accountPatchDto.getPhone())
 			.ifPresent(existingAccount::setPhone);
