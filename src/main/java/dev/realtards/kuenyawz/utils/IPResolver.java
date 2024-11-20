@@ -5,9 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.*;
 
 @Component
@@ -35,26 +32,7 @@ public class IPResolver {
 	 * Gets the full URL where the application is running
 	 */
 	public String getApplicationUrl() {
-		String ip;
-		try {
-			ip = getPublicIp();
-		} catch (IOException e) {
-			ip = getPrimaryIpAddress();
-		}
+		String ip = getPrimaryIpAddress();
 		return String.format("%s://%s:%s", properties.getHttpProtocol(), ip, serverPort);
-	}
-
-	/**
-	 * Gets the public IP address of the machine
-	 */
-	public String getPublicIp() throws IOException {
-		try {
-			URL url = new URI("https://api.ipify.org").toURL();
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
-				return reader.readLine();
-			}
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
-		}
 	}
 }
