@@ -10,7 +10,6 @@ import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
 import dev.realtards.kuenyawz.repositories.ProductImageRepository;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
-import dev.realtards.kuenyawz.utils.IPResolver;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdGenerator;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,6 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 	private final ProductRepository productRepository;
 
 	private final ApplicationProperties properties;
-	private final IPResolver ipResolver;
 	private final SnowFlakeIdGenerator idGenerator;
 	private final ProductImageRepository productImageRepository;
 
@@ -191,7 +189,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
 	@Override
 	public String getImageUrl(Long productId, String resourceUri) {
-		return ipResolver.getApplicationUrl() + "/api/images/" + productId + "/" + resourceUri;
+		return properties.getFullBaseUrl() + "/api/images/" + productId + "/" + resourceUri;
 	}
 
 	@Override

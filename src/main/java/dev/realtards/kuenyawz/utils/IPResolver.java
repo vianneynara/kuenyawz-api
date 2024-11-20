@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
 
+@Deprecated
 @Component
 @RequiredArgsConstructor
 public class IPResolver {
