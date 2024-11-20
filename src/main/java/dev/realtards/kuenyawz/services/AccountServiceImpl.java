@@ -62,7 +62,7 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public Account getAccount(String phone) {
-		Account account = accountRepository.findByEmail(phone)
+		Account account = accountRepository.findByPhone(phone)
 			.orElseThrow(AccountNotFoundException::new);
 		return account;
 	}
