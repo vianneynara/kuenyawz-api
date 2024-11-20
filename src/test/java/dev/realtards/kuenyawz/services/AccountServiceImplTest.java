@@ -99,8 +99,8 @@ class AccountServiceImplTest {
 
 		// Assert
 		assertThat(createdAccount).isNotNull();
-		assertThat(createdAccount.getEmail()).isEqualTo(testRegistrationDto.getPhone());
-		verify(accountRepository).existsByEmail(testRegistrationDto.getPhone());
+		assertThat(createdAccount.getPhone()).isEqualTo(testRegistrationDto.getPhone());
+		verify(accountRepository).existsByPhone(testRegistrationDto.getPhone());
 		verify(accountRepository).save(any(Account.class));
 	}
 
@@ -113,7 +113,7 @@ class AccountServiceImplTest {
 		assertThrows(AccountExistsException.class, () ->
 			accountServiceImpl.createAccount(testRegistrationDto)
 		);
-		verify(accountRepository).existsByEmail(testRegistrationDto.getPhone());
+		verify(accountRepository).existsByPhone(testRegistrationDto.getPhone());
 		verify(accountRepository, never()).save(any(Account.class));
 	}
 
@@ -176,7 +176,7 @@ class AccountServiceImplTest {
 	}
 
 	@Test
-	void patchAccount_WithExistingEmail_ShouldPatchAccount() {
+	void patchAccount_WithExistingPhone_ShouldPatchAccount() {
 		// Arrange
 		final Long persistentId = idIterator.next();
 
@@ -206,24 +206,24 @@ class AccountServiceImplTest {
 	}
 
 	@Test
-	void patchAccount_WithExistingEmail_ShouldThrowException() {
+	void patchAccount_WithExistingPhone_ShouldThrowException() {
 		// Arrange
 		final Long persistentId = idIterator.next();
 
 		Account existingAccount = Account.builder()
 			.accountId(persistentId)
 			.fullName("Test User")
-			.email("patch@test.com")
+			.phone("8130011")
 			.build();
 
 		AccountPatchDto patchDto = AccountPatchDto.builder()
-			.email("patched@test.com")
+			.phone("8130011")
 			.build();
 
 		// Mock findById to return our existing account
 		when(accountRepository.findById(persistentId)).thenReturn(Optional.of(existingAccount));
 		// Mock existsByEmail to return true (email already taken by another account)
-		when(accountRepository.existsByPhone(patchDto.getEmail())).thenReturn(true);
+		when(accountRepository.existsByPhone(patchDto.getPhone())).thenReturn(true);
 
 		// Act & Assert
 		assertThrows(AccountExistsException.class, () ->
@@ -232,7 +232,7 @@ class AccountServiceImplTest {
 
 		// Verify
 		verify(accountRepository).findById(persistentId);
-		verify(accountRepository).existsByEmail(patchDto.getEmail());
+		verify(accountRepository).existsByPhone(patchDto.getPhone());
 		verify(accountRepository, never()).save(any(Account.class)); // Should never reach save
 	}
 
