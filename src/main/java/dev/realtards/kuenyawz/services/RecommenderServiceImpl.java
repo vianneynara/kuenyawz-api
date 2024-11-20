@@ -5,7 +5,7 @@ import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.exceptions.IllegalOperationException;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
-import dev.realtards.kuenyawz.repositories.ProductSpecification;
+import dev.realtards.kuenyawz.repositories.ProductSpec;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -29,7 +29,7 @@ public class RecommenderServiceImpl implements RecommenderService {
 			throw new IllegalOperationException("Not enough products to recommend");
 		}
 		addRandom = (addRandom != null && addRandom);
-		Specification<Product> spec = ProductSpecification.withFilters(
+		Specification<Product> spec = ProductSpec.withFilters(
 			null, null, null,
 			null, null, true, productId);
 		List<Product> products = productRepository.findAll(spec,

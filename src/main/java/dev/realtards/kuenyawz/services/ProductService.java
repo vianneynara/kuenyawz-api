@@ -85,15 +85,6 @@ public interface ProductService {
 	void softDeleteAllProducts();
 
 	/**
-	 * Restores a soft-deleted product by its ID. It will not restore if exists a non soft-deleted product 
-	 * with the same name.
-	 *
-	 * @param productId {@link Long}
-	 */
-	@Transactional(readOnly = true)
-	void restoreSoftDeletedProduct(Long productId);
-
-	/**
 	 * Patches a product by its ID.
 	 *
 	 * @param productId {@link Long}

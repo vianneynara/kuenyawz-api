@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true, exclude = "product")
-@ToString(callSuper = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
