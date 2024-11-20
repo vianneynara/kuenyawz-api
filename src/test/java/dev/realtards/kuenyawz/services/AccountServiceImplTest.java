@@ -60,14 +60,14 @@ class AccountServiceImplTest {
 		testAccount = Account.builder()
 			.accountId(idIterator.next())
 			.fullName("Test User")
-			.email("test@example.com")
+			.phone("81234567890")
 			.password("password123")
 			.privilege(Account.Privilege.USER)
 			.build();
 
 		testRegistrationDto = new AccountRegistrationDto();
 		testRegistrationDto.setFullName("Test User");
-		testRegistrationDto.setEmail("test@example.com");
+		testRegistrationDto.setPhone("81234567890");
 		testRegistrationDto.setPassword("password123");
 	}
 
@@ -91,7 +91,7 @@ class AccountServiceImplTest {
 	@Test
 	void createAccount_WithNewEmail_ShouldCreateAccount() {
 		// Arrange
-		when(accountRepository.existsByEmail(anyString())).thenReturn(false);
+		when(accountRepository.existsByPhone(anyString())).thenReturn(false);
 		when(accountRepository.save(any(Account.class))).thenReturn(testAccount);
 
 		// Act
@@ -99,21 +99,21 @@ class AccountServiceImplTest {
 
 		// Assert
 		assertThat(createdAccount).isNotNull();
-		assertThat(createdAccount.getEmail()).isEqualTo(testRegistrationDto.getEmail());
-		verify(accountRepository).existsByEmail(testRegistrationDto.getEmail());
+		assertThat(createdAccount.getEmail()).isEqualTo(testRegistrationDto.getPhone());
+		verify(accountRepository).existsByEmail(testRegistrationDto.getPhone());
 		verify(accountRepository).save(any(Account.class));
 	}
 
 	@Test
 	void createAccount_WithExistingEmail_ShouldThrowException() {
 		// Arrange
-		when(accountRepository.existsByEmail(anyString())).thenReturn(true);
+		when(accountRepository.existsByPhone(anyString())).thenReturn(true);
 
 		// Act & Assert
 		assertThrows(AccountExistsException.class, () ->
 			accountServiceImpl.createAccount(testRegistrationDto)
 		);
-		verify(accountRepository).existsByEmail(testRegistrationDto.getEmail());
+		verify(accountRepository).existsByEmail(testRegistrationDto.getPhone());
 		verify(accountRepository, never()).save(any(Account.class));
 	}
 
@@ -223,7 +223,7 @@ class AccountServiceImplTest {
 		// Mock findById to return our existing account
 		when(accountRepository.findById(persistentId)).thenReturn(Optional.of(existingAccount));
 		// Mock existsByEmail to return true (email already taken by another account)
-		when(accountRepository.existsByEmail(patchDto.getEmail())).thenReturn(true);
+		when(accountRepository.existsByPhone(patchDto.getEmail())).thenReturn(true);
 
 		// Act & Assert
 		assertThrows(AccountExistsException.class, () ->

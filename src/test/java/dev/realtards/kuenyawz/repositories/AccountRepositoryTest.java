@@ -67,7 +67,7 @@ class AccountRepositoryTest {
     @Test
     void existsByEmail_ShouldReturnTrue_WhenEmailExists() {
         // When
-        boolean exists = accountRepository.existsByEmail(TEST_EMAIL);
+        boolean exists = accountRepository.existsByPhone(TEST_EMAIL);
 
         // Then
         assertThat(exists).isTrue();
@@ -76,7 +76,7 @@ class AccountRepositoryTest {
     @Test
     void existsByEmail_ShouldReturnFalse_WhenEmailDoesNotExist() {
         // When
-        boolean exists = accountRepository.existsByEmail(NON_EXISTENT_EMAIL);
+        boolean exists = accountRepository.existsByPhone(NON_EXISTENT_EMAIL);
 
         // Then
         assertThat(exists).isFalse();
