@@ -16,17 +16,15 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CartItemPatchDto {
 
-    @Schema(description = "Product(Cart Item) name", example = "Muffin", minLength = 2, maxLength = 128)
-    @NotBlank(message = "Name is required")
-    @CleanString
-    private String name;
+    @Schema(description = "Variant Id", example = "12345")
+    @NotBlank(message = "Variant Id is required")
+    private Long variantId;
 
-    @Schema(description = "Product(Cart Item) quantity", example = "10")
+    @Schema(description = "Variant quantity", example = "10")
     @NotBlank(message = "Quantity is required")
     private int quantity;
 
-    @Schema(description = "Product(Cart Item) variant")
-    @NotBlank(message = "Variant is required")
+    @Schema(description = "Note for variant")
     @CleanString
-    private VariantPostDto variant;
+    private String note;
 }
