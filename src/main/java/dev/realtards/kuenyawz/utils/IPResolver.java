@@ -20,15 +20,22 @@ public class IPResolver {
     /**
      * Gets the primary IP address of the machine
      */
-    public String getPrimaryIpAddress() throws UnknownHostException {
-        return InetAddress.getLocalHost().getHostAddress();
+    public String getPrimaryIpAddress() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            return "localhost";
+        }
     }
 
     /**
      * Gets the full URL where the application is running
      */
-    public String getApplicationUrl() throws UnknownHostException {
+    public String getApplicationUrl() {
         String ip = getPrimaryIpAddress();
+        if (properties.getDomain() != null) {
+            ip = properties.getDomain();
+        }
         return String.format("%s://%s:%s", properties.getHttpProtocol(), ip, serverPort);
     }
 }
