@@ -27,6 +27,8 @@ public class ApplicationProperties {
 	private String productImagesDir = "product-images";
 	private String baseUrl = "http://localhost:8081";
 	private Integer maxVariantQuantity = 250;
+	private String domain = "localhost";
+	private String httpProtocol = "http";
 
 	@Value("#{'${application.accepted-image-extensions}'.split(',')}")
 	private List<String> acceptedImageExtensions;
@@ -51,6 +53,18 @@ public class ApplicationProperties {
 		this.security.otpWaApiKey = dotenv.get("OTP_WA_API_KEY", null);
 		this.security.otpExpireSeconds = Long.parseLong(dotenv.get("OTP_EXPIRE_SECONDS", "300"));
 		this.security.otpLength = Integer.parseInt(dotenv.get("OTP_LENGTH", "6"));
+	}
+
+	public String getFullBaseUrl() {
+		return httpProtocol + "://" + domain;
+	}
+
+	public Database database() {
+		return database;
+	}
+
+	public Security security() {
+		return security;
 	}
 
 	@Getter
