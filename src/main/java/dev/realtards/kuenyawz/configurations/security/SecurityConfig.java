@@ -58,7 +58,9 @@ public class SecurityConfig {
 					"/api/auth/register",
 					"/api/auth/login",
 					"/api/auth/revoke",
-					"/api/auth/refresh").permitAll()
+					"/api/auth/refresh",
+					"/api/auth/otp/request",
+					"/api/auth/otp/verify").permitAll()
 
 				// Simulator endpoints
 				.requestMatchers("/api/sim/**").permitAll()
