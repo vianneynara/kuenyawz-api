@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.configurations.properties;
+package dev.realtards.kuenyawz.configurations;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
@@ -47,6 +47,10 @@ public class ApplicationProperties {
 		this.security.jwtSecret = dotenv.get("JWT_SECRET", "secret");
 		this.security.jwtTokenExpSeconds = Long.parseLong(dotenv.get("JWT_ACCESS_EXP_SECONDS", "3600"));
 		this.security.jwtRefreshDays = Long.parseLong(dotenv.get("REFRESH_TOKEN_EXP_DAYS", "7"));
+		this.security.otpPhoneNumber = dotenv.get("OTP_PHONE_NUMBER", null);
+		this.security.otpWaApiKey = dotenv.get("OTP_WA_API_KEY", null);
+		this.security.otpExpireSeconds = Long.parseLong(dotenv.get("OTP_EXPIRE_SECONDS", "300"));
+		this.security.otpLength = Integer.parseInt(dotenv.get("OTP_LENGTH", "6"));
 	}
 
 	@Getter
@@ -63,5 +67,9 @@ public class ApplicationProperties {
 		private String jwtSecret;
 		private long jwtTokenExpSeconds;
 		private long jwtRefreshDays;
+		private String otpPhoneNumber;
+		private String otpWaApiKey;
+		private long otpExpireSeconds;
+		private int otpLength;
 	}
 }

@@ -1,6 +1,6 @@
 package dev.realtards.kuenyawz.services;
 
-import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
+import dev.realtards.kuenyawz.configurations.ApplicationProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
