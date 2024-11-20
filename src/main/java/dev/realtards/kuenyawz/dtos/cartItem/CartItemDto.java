@@ -1,12 +1,7 @@
 package dev.realtards.kuenyawz.dtos.cartItem;
 
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
-import dev.realtards.kuenyawz.utils.stringtrimmer.CleanString;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CartItemResponseDto {
+public class CartItemDto {
+
+    @Schema(description = "Cart Item Id")
+    private Long CartItemId;
 
     @Schema(description = "Product in Cart Item")
     private ProductDto product;
