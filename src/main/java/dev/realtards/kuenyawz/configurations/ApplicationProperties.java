@@ -27,7 +27,7 @@ public class ApplicationProperties {
 	private String productImagesDir = "product-images";
 	private String baseUrl = "http://localhost:8081";
 	private Integer maxVariantQuantity = 250;
-	private String domain = "localhost";
+	private String publicIp = "localhost";
 	private String httpProtocol = "http";
 
 	@Value("#{'${application.accepted-image-extensions}'.split(',')}")
@@ -56,7 +56,7 @@ public class ApplicationProperties {
 	}
 
 	public String getFullBaseUrl() {
-		return httpProtocol + "://" + domain;
+		return httpProtocol + "://" + publicIp;
 	}
 
 	public Database database() {
