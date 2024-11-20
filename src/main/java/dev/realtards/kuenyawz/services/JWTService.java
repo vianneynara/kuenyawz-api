@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
 
-public interface JwtService {
+public interface JWTService {
 
 	String generateAccessToken(UserDetails userDetails);
 

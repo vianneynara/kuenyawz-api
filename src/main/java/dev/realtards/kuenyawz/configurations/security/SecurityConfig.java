@@ -30,7 +30,7 @@ import java.util.Map;
 public class SecurityConfig {
 
 	private final AuthenticationProvider authenticationProvider;
-	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSec) throws Exception {
