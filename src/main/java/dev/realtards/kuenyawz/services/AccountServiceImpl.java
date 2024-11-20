@@ -102,10 +102,15 @@ public class AccountServiceImpl implements AccountService {
 				if (accountRepository.existsByPhone(phone)) {
 					throw new AccountExistsException();
 				}
-				existingAccount.setEmail(phone);
+				existingAccount.setPhone(phone);
 			});
 		Optional.ofNullable(accountPatchDto.getPhone())
-			.ifPresent(existingAccount::setPhone);
+			.ifPresent(email -> {
+				if (accountRepository.existsByEmail(email)) {
+					throw new AccountExistsException();
+				}
+				existingAccount.setEmail(email);
+			});
 
 		Account savedAccount = accountRepository.save(existingAccount);
 
@@ -117,9 +122,6 @@ public class AccountServiceImpl implements AccountService {
 		Account existingAccount = accountRepository.findById(accountId)
 			.orElseThrow(() -> new AccountNotFoundException("Account with ID '" + accountId + "' not found"));
 
-		// checks whether the current password matches
-		log.debug("DTO Current password: {}", passwordUpdateDto.getCurrentPassword());
-		log.debug("ACC Existing password: {}", existingAccount.getPassword());
 		if (!passwordEncoder.matches(passwordUpdateDto.getCurrentPassword(), existingAccount.getPassword())) {
 			throw new InvalidPasswordException();
 		}
