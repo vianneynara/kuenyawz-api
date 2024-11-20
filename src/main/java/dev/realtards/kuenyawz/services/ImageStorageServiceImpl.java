@@ -1,6 +1,6 @@
 package dev.realtards.kuenyawz.services;
 
-import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
+import dev.realtards.kuenyawz.configurations.ApplicationProperties;
 import dev.realtards.kuenyawz.dtos.image.BatchImageUploadDto;
 import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;
 import dev.realtards.kuenyawz.dtos.image.ImageUploadDto;

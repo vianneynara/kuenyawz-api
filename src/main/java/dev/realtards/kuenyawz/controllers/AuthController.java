@@ -2,10 +2,9 @@ package dev.realtards.kuenyawz.controllers;
 
 import dev.realtards.kuenyawz.dtos.account.AccountRegistrationDto;
 import dev.realtards.kuenyawz.dtos.account.AccountSecureDto;
-import dev.realtards.kuenyawz.dtos.auth.AuthRefreshTokenDto;
-import dev.realtards.kuenyawz.dtos.auth.AuthRequestDto;
-import dev.realtards.kuenyawz.dtos.auth.AuthResponseDto;
+import dev.realtards.kuenyawz.dtos.auth.*;
 import dev.realtards.kuenyawz.services.AuthService;
+import dev.realtards.kuenyawz.services.OTPService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
 	private final AuthService authService;
+	private final OTPService otpService;
 
 	@Operation(summary = "Register a new user")
 	@ApiResponses({
@@ -106,5 +106,29 @@ public class AuthController {
 	public ResponseEntity<Object> me() {
 		AccountSecureDto accountSecureDto = authService.getCurrentUserInfo();
 		return ResponseEntity.status(HttpStatus.OK).body(accountSecureDto);
+	}
+
+	@Operation(summary = "Request an OTP to be sent to the user's phone number")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "OTP sent successfully")
+	})
+	@PostMapping("/otp/request")
+	public ResponseEntity<?> requestOtp(
+		@Valid @RequestBody OtpRequestDto otpRequestDto
+	) {
+		otpService.sendOTP(otpRequestDto);
+		return ResponseEntity.ok().build();
+	}
+
+	@Operation(summary = "Verify the OTP sent to the user's phone number")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "OTP verified successfully")
+	})
+	@PostMapping("/otp/verify")
+	public ResponseEntity<?> verifyOtp(
+		@Valid @RequestBody OtpVerifyDto otpVerifyDto
+	) {
+		otpService.verifyOTP(otpVerifyDto);
+		return ResponseEntity.ok().build();
 	}
 }

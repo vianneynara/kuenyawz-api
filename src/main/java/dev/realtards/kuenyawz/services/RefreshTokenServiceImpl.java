@@ -1,6 +1,6 @@
 package dev.realtards.kuenyawz.services;
 
-import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
+import dev.realtards.kuenyawz.configurations.ApplicationProperties;
 import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.entities.RefreshToken;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;

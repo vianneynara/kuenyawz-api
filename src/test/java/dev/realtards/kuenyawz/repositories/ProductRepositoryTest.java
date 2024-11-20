@@ -1,7 +1,7 @@
 package dev.realtards.kuenyawz.repositories;
 
 import dev.realtards.kuenyawz.boostrappers.DatabaseBootstrapper;
-import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
+import dev.realtards.kuenyawz.configurations.ApplicationProperties;
 import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
 import dev.realtards.kuenyawz.services.AccountService;

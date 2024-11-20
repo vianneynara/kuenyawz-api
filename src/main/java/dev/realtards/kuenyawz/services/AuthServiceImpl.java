@@ -20,7 +20,7 @@ public class AuthServiceImpl implements AuthService {
 
 	private final AccountService accountService;
 	private final AccountMapper accountMapper;
-	private final JwtService jwtService;
+	private final JWTService jwtService;
 	private final RefreshTokenService refreshTokenService;
 
 	@Override

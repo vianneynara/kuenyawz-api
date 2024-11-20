@@ -30,7 +30,7 @@ import java.util.Map;
 public class SecurityConfig {
 
 	private final AuthenticationProvider authenticationProvider;
-	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSec) throws Exception {
@@ -58,7 +58,9 @@ public class SecurityConfig {
 					"/api/auth/register",
 					"/api/auth/login",
 					"/api/auth/revoke",
-					"/api/auth/refresh").permitAll()
+					"/api/auth/refresh",
+					"/api/auth/otp/request",
+					"/api/auth/otp/verify").permitAll()
 
 				// Simulator endpoints
 				.requestMatchers("/api/sim/**").permitAll()
