@@ -19,4 +19,9 @@ public class OtpRequestDto {
 	@NotBlank(message = "Phone number is required")
 	@CleanString
 	private String phone;
+
+	@Schema(description = "User's IP address", example = "1.1.1.1")
+	@Pattern(regexp = "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$", message = "Invalid IP address format")
+	@CleanString
+	private String ipAddress;
 }
