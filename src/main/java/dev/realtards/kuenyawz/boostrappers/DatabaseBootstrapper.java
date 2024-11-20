@@ -35,27 +35,27 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 		AccountRegistrationDto.builder()
 			.password("testadmin")
 			.fullName("Test Admin")
-			.phone("8130011")
+			.phone("81100001")
 			.build(),
 		AccountRegistrationDto.builder()
 			.password("user")
 			.fullName("Nara")
-			.phone("8130022")
+			.phone("81100002")
 			.build(),
 		AccountRegistrationDto.builder()
 			.password("user")
 			.fullName("Emilia")
-			.phone("8130033")
+			.phone("81100003")
 			.build(),
 		AccountRegistrationDto.builder()
 			.password("user")
 			.fullName("Emilia")
-			.phone("8130044")
+			.phone("81100004")
 			.build(),
 		AccountRegistrationDto.builder()
 			.password("user")
 			.fullName("Bruh")
-			.phone("8130055")
+			.phone("81100005")
 			.build()
 	);
 
