@@ -1,9 +1,11 @@
 package dev.realtards.kuenyawz.dtos.cartItem;
 
-import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
 import dev.realtards.kuenyawz.utils.stringtrimmer.CleanString;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,17 +18,18 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CartItemPostDto {
 
-    @Schema(description = "Product(Cart Item) name", example = "Muffin", minLength = 2, maxLength = 128)
-    @NotBlank(message = "Name is required")
-    @CleanString
-    private String name;
+    @Schema(description = "Variant Id", example = "12345")
+    @NotBlank(message = "Variant Id is required")
+    private Long variantId;
 
-    @Schema(description = "Product(Cart Item) quantity", example = "10")
+    @Schema(description = "Variant quantity", example = "10", defaultValue = "1")
+    @Min(value = 1, message = "Minimum quantity must be at least 1")
+    @Max(value = 300, message = "Maximum quantity must be at most 300")
     @NotBlank(message = "Quantity is required")
     private int quantity;
 
-    @Schema(description = "Product(Cart Item) variant")
-    @NotBlank(message = "Variant is required")
+    @Schema(description = "Note for variant")
+    @Size(min = 1, max = 128, message = "Description must be between 1 and 128 characters")
     @CleanString
-    private VariantPostDto variant;
+    private String note;
 }
