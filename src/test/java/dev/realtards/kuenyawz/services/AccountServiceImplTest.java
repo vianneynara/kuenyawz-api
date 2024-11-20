@@ -213,11 +213,11 @@ class AccountServiceImplTest {
 		Account existingAccount = Account.builder()
 			.accountId(persistentId)
 			.fullName("Test User")
-			.phone("8130011")
+			.phone("81100011")
 			.build();
 
 		AccountPatchDto patchDto = AccountPatchDto.builder()
-			.phone("8130011")
+			.phone("81100011")
 			.build();
 
 		// Mock findById to return our existing account
