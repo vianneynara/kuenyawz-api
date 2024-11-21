@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.services;
+package dev.realtards.kuenyawz.services.logic;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 import dev.realtards.kuenyawz.dtos.csv.ProductCsvRecord;

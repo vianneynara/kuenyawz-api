@@ -1,7 +1,7 @@
 package dev.realtards.kuenyawz.controllers;
 
 import dev.realtards.kuenyawz.dtos.product.*;
-import dev.realtards.kuenyawz.services.ProductCsvService;
+import dev.realtards.kuenyawz.services.logic.ProductCsvService;
 import dev.realtards.kuenyawz.services.entity.ProductService;
 import dev.realtards.kuenyawz.services.entity.VariantService;
 import io.swagger.v3.oas.annotations.Operation;

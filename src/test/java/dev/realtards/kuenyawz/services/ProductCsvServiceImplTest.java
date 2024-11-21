@@ -1,7 +1,7 @@
 package dev.realtards.kuenyawz.services;
 
-import dev.realtards.kuenyawz.dtos.csv.ProductCsvRecord;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
+import dev.realtards.kuenyawz.services.logic.ProductCsvService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,6 @@ import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
