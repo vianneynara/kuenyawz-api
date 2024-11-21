@@ -24,7 +24,7 @@ public class CartItemDto {
     private Long selectedVariantId;
 
     @Schema(description = "Variant quantity", example = "10")
-    private int quantity;
+    private Integer quantity;
 
     @Schema(description = "Note for variant")
     private String note;
