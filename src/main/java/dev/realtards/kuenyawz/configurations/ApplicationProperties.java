@@ -30,6 +30,9 @@ public class ApplicationProperties {
 	private String publicIp = "localhost";
 	private String httpProtocol = "http";
 
+	@Value("${server.port:8081}")
+	private String serverPort;
+
 	@Value("#{'${application.accepted-image-extensions}'.split(',')}")
 	private List<String> acceptedImageExtensions;
 
@@ -56,7 +59,7 @@ public class ApplicationProperties {
 	}
 
 	public String getFullBaseUrl() {
-		return httpProtocol + "://" + publicIp;
+		return httpProtocol + "://" + publicIp + ":" + serverPort;
 	}
 
 	public Database database() {
