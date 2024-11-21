@@ -1,10 +1,8 @@
 package dev.realtards.kuenyawz.configurations;
 
-import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -22,7 +20,6 @@ import javax.sql.DataSource;
 public class DatabaseConfig {
 
 	private final ApplicationProperties applicationProperties;
-	private final ConfigurableApplicationContext applicationContext;
 
 	@Bean
 	@Profile("postgres")

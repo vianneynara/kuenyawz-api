@@ -4,17 +4,15 @@ import dev.realtards.kuenyawz.utils.stringtrimmer.CleanString;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "Authentication request")
+@Schema(description = "Request body for OTP request")
 @Data
-@AllArgsConstructor @NoArgsConstructor
-@Builder
-public class AuthRequestDto {
+@AllArgsConstructor @NoArgsConstructor @Builder
+public class OtpVerifyDto {
 
     @Schema(description = "User's valid phone number", example = "81234567890", pattern = "^[1-9][0-9]{7,14}$")
     @Pattern(regexp = "^[1-9][0-9]{7,14}$", message = "Invalid phone number format")
@@ -22,8 +20,9 @@ public class AuthRequestDto {
 	@CleanString
 	private String phone;
 
-	@Schema(description = "User's password", example = "emiliaBestGirl", minLength = 4)
-	@NotBlank(message = "Password is required")
-	@Size(min = 4, message = "Password must be at least 4 characters")
-	private String password;
+    @Schema(description = "OTP code", example = "123456", pattern = "^[1-9]{6}$")
+    @Pattern(regexp = "^[1-9a-zA-Z]{6}$", message = "Invalid OTP format")
+	@NotBlank(message = "OTP code is required")
+	@CleanString
+	private String otp;
 }

@@ -19,15 +19,15 @@ public class AccountPutDto {
 	@CleanString
 	private String fullName;
 
+    @Schema(description = "User's phone number", example = "+92345678909", pattern = "^\\+?[1-9][0-9]{7,14}$")
+    @Pattern(regexp = "^\\+?[1-9][0-9]{7,14}$", message = "Invalid phone number format")
+	@CleanString
+    private String phone;
+
     @Schema(description = "User's email address", example = "emilia.narwandaru@example.com")
-	@NotBlank(message = "Email is required")
 	@Email(message = "Email format is invalid")
 	@CleanString
 	private String email;
-
-    @Schema(description = "User's phone number", example = "+92345678909", pattern = "^\\+?[1-9][0-9]{7,14}$")
-    @Pattern(regexp = "^\\+?[1-9][0-9]{7,14}$", message = "Invalid phone number format")
-    private String phone;
 
 	public AccountPutDto(Account account) {
 		this.fullName = account.getFullName();

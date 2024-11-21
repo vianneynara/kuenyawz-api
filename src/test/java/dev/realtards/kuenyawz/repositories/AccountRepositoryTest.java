@@ -22,7 +22,9 @@ class AccountRepositoryTest {
 
     private Account testAccount;
     private final String TEST_EMAIL = "test@test.com";
+    private final String TEST_PHONE = "8120011";
     private final String NON_EXISTENT_EMAIL = "nonexistent@test.com";
+    private final String NON_EXISTENT_PHONE = "00000000";
 
     @BeforeEach
     void setUp() {
@@ -32,6 +34,7 @@ class AccountRepositoryTest {
         // Create and save test account
         testAccount = accountRepository.save(Account.builder()
                 .email(TEST_EMAIL)
+                .phone(TEST_PHONE)
                 .password("password")
                 .privilege(Account.Privilege.USER)
                 .build());
@@ -67,7 +70,7 @@ class AccountRepositoryTest {
     @Test
     void existsByEmail_ShouldReturnTrue_WhenEmailExists() {
         // When
-        boolean exists = accountRepository.existsByEmail(TEST_EMAIL);
+        boolean exists = accountRepository.existsByPhone(TEST_PHONE);
 
         // Then
         assertThat(exists).isTrue();
@@ -76,7 +79,7 @@ class AccountRepositoryTest {
     @Test
     void existsByEmail_ShouldReturnFalse_WhenEmailDoesNotExist() {
         // When
-        boolean exists = accountRepository.existsByEmail(NON_EXISTENT_EMAIL);
+        boolean exists = accountRepository.existsByPhone(NON_EXISTENT_PHONE);
 
         // Then
         assertThat(exists).isFalse();

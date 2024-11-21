@@ -18,7 +18,7 @@ public interface AccountService {
 	Account getAccount(long accountId);
 
 	@Transactional(readOnly = true)
-	Account getAccount(String email);
+	Account getAccount(String phone);
 
 	@Transactional
 	Account updateAccount(Long accountId, AccountPutDto accountPutDto);

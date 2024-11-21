@@ -1,6 +1,6 @@
 package dev.realtards.kuenyawz.configurations.security;
 
-import dev.realtards.kuenyawz.services.JwtService;
+import dev.realtards.kuenyawz.services.JWTService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +20,9 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-	private final JwtService jwtService;
+	private final JWTService jwtService;
 	private final AccountUserDetailsService accountUserDetailsService;
 	private final HandlerExceptionResolver handlerExceptionResolver;
 
@@ -40,12 +40,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			}
 
 			String token = authorizationHeader.substring(7);
-			String email = jwtService.extractUsername(token);
+			String phone = jwtService.extractUsername(token);
 
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-			if (email != null && auth == null) {
-				UserDetails userDetails = accountUserDetailsService.loadUserByUsername(email);
+			if (phone != null && auth == null) {
+				UserDetails userDetails = accountUserDetailsService.loadUserByUsername(phone);
 
 				if (jwtService.isTokenValid(token, userDetails)) {
 					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

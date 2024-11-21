@@ -1,6 +1,6 @@
 package dev.realtards.kuenyawz.services;
 
-import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
+import dev.realtards.kuenyawz.configurations.ApplicationProperties;
 import dev.realtards.kuenyawz.dtos.image.BatchImageUploadDto;
 import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;
 import dev.realtards.kuenyawz.dtos.image.ImageUploadDto;
@@ -35,7 +35,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
 	private final ProductRepository productRepository;
 
-	private final ApplicationProperties applicationProperties;
+	private final ApplicationProperties properties;
 	private final SnowFlakeIdGenerator idGenerator;
 	private final ProductImageRepository productImageRepository;
 
@@ -47,13 +47,13 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 	@Override
 	@PostConstruct
 	public void init() {
-		productImagesDir = applicationProperties.getProductImagesDir();
+		productImagesDir = properties.getProductImagesDir();
 		try {
 			uploadLocation = Path.of(System.getProperty("user.dir"), ROOT_TO_UPLOAD, productImagesDir)
 				.normalize()
 				.toAbsolutePath();
 			log.info("Upload directory set at '{}'", uploadLocation);
-			acceptedExtensions = Set.copyOf(applicationProperties.getAcceptedImageExtensions());
+			acceptedExtensions = Set.copyOf(properties.getAcceptedImageExtensions());
 			if (!Files.exists(uploadLocation)) {
 				log.info("Creating upload directory at: {}", uploadLocation);
 				Files.createDirectories(uploadLocation);
@@ -189,7 +189,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
 	@Override
 	public String getImageUrl(Long productId, String resourceUri) {
-		return applicationProperties.getBaseUrl() + "/api/images/" + productId + "/" + resourceUri;
+		return properties.getFullBaseUrl() + "/api/images/" + productId + "/" + resourceUri;
 	}
 
 	@Override
