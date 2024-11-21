@@ -22,11 +22,11 @@ public class CartItem {
     @Column
     private String note;
 
-    @ManyToOne
-    @JoinColumn(name = "variant_id", nullable = false)
-    private Variant variantId;
-
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "variant_id", nullable = false)
+    private Variant variant;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 }
