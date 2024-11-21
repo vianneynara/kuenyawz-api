@@ -17,7 +17,7 @@ public class CartItem {
     private Long cartItemId;
 
     @Column
-    private Long quantity;
+    private int quantity;
 
     @Column
     private String note;
