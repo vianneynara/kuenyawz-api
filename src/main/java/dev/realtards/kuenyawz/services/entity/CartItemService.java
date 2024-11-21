@@ -92,4 +92,15 @@ public interface CartItemService {
 	 */
 	@Transactional
 	boolean deleteCartItemsOfUser(Long accountId);
+
+	/**
+	 * Delete a cart item of a user by its ID. This method is used to prevent
+	 * unauthorized deletion.
+	 *
+	 * @param cartItemId {@link Long} the cart item ID
+	 * @param accountId  {@link Long} the account ID
+	 * @return {@link Boolean} whether the deletion is successful
+	 */
+	@Transactional
+	boolean deleteCartItemOfUser(Long cartItemId, Long accountId);
 }

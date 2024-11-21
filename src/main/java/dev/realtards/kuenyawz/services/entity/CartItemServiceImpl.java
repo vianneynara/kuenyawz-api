@@ -5,9 +5,11 @@ import dev.realtards.kuenyawz.dtos.cartItem.CartItemPatchDto;
 import dev.realtards.kuenyawz.dtos.cartItem.CartItemPostDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class CartItemServiceImpl implements CartItemService {
 	@Override
 	public List<CartItemDto> getAllCartItems() {
@@ -51,6 +53,11 @@ public class CartItemServiceImpl implements CartItemService {
 
 	@Override
 	public boolean deleteCartItemsOfUser(Long accountId) {
+		return false;
+	}
+
+	@Override
+	public boolean deleteCartItemOfUser(Long cartItemId, Long accountId) {
 		return false;
 	}
 }
