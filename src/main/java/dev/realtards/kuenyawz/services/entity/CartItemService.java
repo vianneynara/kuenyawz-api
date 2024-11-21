@@ -68,12 +68,13 @@ public interface CartItemService {
 	/**
 	 * Update a cart item by its ID.
 	 *
-	 * @param cartItemId      {@link Long} the cart item ID
+	 * @param cartItemId       {@link Long} the cart item ID
 	 * @param cartItemPatchDto {@link CartItemPatchDto} the cart item patch information
+	 * @param accountId
 	 * @return {@link CartItemDto}
 	 */
 	@Transactional
-	CartItemDto patchCartItem(Long cartItemId, CartItemPatchDto cartItemPatchDto);
+	CartItemDto patchCartItem(Long cartItemId, CartItemPatchDto cartItemPatchDto, Long accountId);
 
 	/**
 	 * Delete a cart item by its ID.

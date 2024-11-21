@@ -42,7 +42,7 @@ public class CartItemServiceImpl implements CartItemService {
 	}
 
 	@Override
-	public CartItemDto patchCartItem(Long cartItemId, CartItemPatchDto cartItemPatchDto) {
+	public CartItemDto patchCartItem(Long cartItemId, CartItemPatchDto cartItemPatchDto, Long accountId) {
 		return null;
 	}
 
