@@ -4,7 +4,7 @@ import dev.realtards.kuenyawz.dtos.account.AccountRegistrationDto;
 import dev.realtards.kuenyawz.dtos.account.AccountSecureDto;
 import dev.realtards.kuenyawz.dtos.auth.*;
 import dev.realtards.kuenyawz.services.AuthService;
-import dev.realtards.kuenyawz.services.OTPService;
+import dev.realtards.kuenyawz.services.entity.OTPService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

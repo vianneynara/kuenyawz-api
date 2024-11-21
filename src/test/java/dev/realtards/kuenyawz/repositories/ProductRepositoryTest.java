@@ -6,7 +6,7 @@ import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
 import dev.realtards.kuenyawz.services.entity.AccountService;
 import dev.realtards.kuenyawz.services.ProductCsvServiceImpl;
-import dev.realtards.kuenyawz.services.ProductService;
+import dev.realtards.kuenyawz.services.entity.ProductService;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;

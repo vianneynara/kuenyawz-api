@@ -8,6 +8,7 @@ import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
 import dev.realtards.kuenyawz.mapper.VariantMapper;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
+import dev.realtards.kuenyawz.services.entity.ProductServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

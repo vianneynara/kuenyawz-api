@@ -6,6 +6,7 @@ import dev.realtards.kuenyawz.exceptions.IllegalOperationException;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
 import dev.realtards.kuenyawz.repositories.ProductSpec;
+import dev.realtards.kuenyawz.services.entity.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
