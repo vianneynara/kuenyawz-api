@@ -107,7 +107,7 @@ public class SecurityConfig {
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return (web) -> web.ignoring()
 			.requestMatchers(
-				"/api/docs/v3/**",
+				"/api/docs/v3**",
 				"/swagger-ui/**",
 				"/swagger-ui.html",
 				"/favicon.ico"
