@@ -22,7 +22,7 @@ public class CartItem {
     @Column
     private String note;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "variant_id", nullable = false)
     private Variant variant;
 
