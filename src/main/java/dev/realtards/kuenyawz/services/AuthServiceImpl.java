@@ -20,7 +20,7 @@ public class AuthServiceImpl implements AuthService {
 
 	private final AccountService accountService;
 	private final AccountMapper accountMapper;
-	private final JwtService jwtService;
+	private final JWTService jwtService;
 	private final RefreshTokenService refreshTokenService;
 
 	@Override
@@ -33,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public AuthResponseDto login(AuthRequestDto accountLoginDto) {
-		Account account = accountService.getAccount(accountLoginDto.getEmail());
+		Account account = accountService.getAccount(accountLoginDto.getPhone());
 
 		if (!accountService.passwordMatches(accountLoginDto.getPassword(), account)) {
 			throw new InvalidPasswordException();

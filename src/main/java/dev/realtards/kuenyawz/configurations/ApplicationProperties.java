@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.configurations.properties;
+package dev.realtards.kuenyawz.configurations;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
@@ -27,6 +27,11 @@ public class ApplicationProperties {
 	private String productImagesDir = "product-images";
 	private String baseUrl = "http://localhost:8081";
 	private Integer maxVariantQuantity = 250;
+	private String publicIp = "localhost";
+	private String httpProtocol = "http";
+
+	@Value("${server.port:8081}")
+	private String serverPort;
 
 	@Value("#{'${application.accepted-image-extensions}'.split(',')}")
 	private List<String> acceptedImageExtensions;
@@ -47,6 +52,22 @@ public class ApplicationProperties {
 		this.security.jwtSecret = dotenv.get("JWT_SECRET", "secret");
 		this.security.jwtTokenExpSeconds = Long.parseLong(dotenv.get("JWT_ACCESS_EXP_SECONDS", "3600"));
 		this.security.jwtRefreshDays = Long.parseLong(dotenv.get("REFRESH_TOKEN_EXP_DAYS", "7"));
+		this.security.otpPhoneNumber = dotenv.get("OTP_PHONE_NUMBER", null);
+		this.security.otpWaApiKey = dotenv.get("OTP_WA_API_KEY", null);
+		this.security.otpExpireSeconds = Long.parseLong(dotenv.get("OTP_EXPIRE_SECONDS", "300"));
+		this.security.otpLength = Integer.parseInt(dotenv.get("OTP_LENGTH", "6"));
+	}
+
+	public String getFullBaseUrl() {
+		return httpProtocol + "://" + publicIp + ":" + serverPort;
+	}
+
+	public Database database() {
+		return database;
+	}
+
+	public Security security() {
+		return security;
 	}
 
 	@Getter
@@ -63,5 +84,9 @@ public class ApplicationProperties {
 		private String jwtSecret;
 		private long jwtTokenExpSeconds;
 		private long jwtRefreshDays;
+		private String otpPhoneNumber;
+		private String otpWaApiKey;
+		private long otpExpireSeconds;
+		private int otpLength;
 	}
 }

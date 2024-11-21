@@ -60,14 +60,14 @@ class AccountServiceImplTest {
 		testAccount = Account.builder()
 			.accountId(idIterator.next())
 			.fullName("Test User")
-			.email("test@example.com")
+			.phone("81234567890")
 			.password("password123")
 			.privilege(Account.Privilege.USER)
 			.build();
 
 		testRegistrationDto = new AccountRegistrationDto();
 		testRegistrationDto.setFullName("Test User");
-		testRegistrationDto.setEmail("test@example.com");
+		testRegistrationDto.setPhone("81234567890");
 		testRegistrationDto.setPassword("password123");
 	}
 
@@ -91,7 +91,7 @@ class AccountServiceImplTest {
 	@Test
 	void createAccount_WithNewEmail_ShouldCreateAccount() {
 		// Arrange
-		when(accountRepository.existsByEmail(anyString())).thenReturn(false);
+		when(accountRepository.existsByPhone(anyString())).thenReturn(false);
 		when(accountRepository.save(any(Account.class))).thenReturn(testAccount);
 
 		// Act
@@ -99,21 +99,21 @@ class AccountServiceImplTest {
 
 		// Assert
 		assertThat(createdAccount).isNotNull();
-		assertThat(createdAccount.getEmail()).isEqualTo(testRegistrationDto.getEmail());
-		verify(accountRepository).existsByEmail(testRegistrationDto.getEmail());
+		assertThat(createdAccount.getPhone()).isEqualTo(testRegistrationDto.getPhone());
+		verify(accountRepository).existsByPhone(testRegistrationDto.getPhone());
 		verify(accountRepository).save(any(Account.class));
 	}
 
 	@Test
 	void createAccount_WithExistingEmail_ShouldThrowException() {
 		// Arrange
-		when(accountRepository.existsByEmail(anyString())).thenReturn(true);
+		when(accountRepository.existsByPhone(anyString())).thenReturn(true);
 
 		// Act & Assert
 		assertThrows(AccountExistsException.class, () ->
 			accountServiceImpl.createAccount(testRegistrationDto)
 		);
-		verify(accountRepository).existsByEmail(testRegistrationDto.getEmail());
+		verify(accountRepository).existsByPhone(testRegistrationDto.getPhone());
 		verify(accountRepository, never()).save(any(Account.class));
 	}
 
@@ -176,7 +176,7 @@ class AccountServiceImplTest {
 	}
 
 	@Test
-	void patchAccount_WithExistingEmail_ShouldPatchAccount() {
+	void patchAccount_WithExistingPhone_ShouldPatchAccount() {
 		// Arrange
 		final Long persistentId = idIterator.next();
 
@@ -206,24 +206,24 @@ class AccountServiceImplTest {
 	}
 
 	@Test
-	void patchAccount_WithExistingEmail_ShouldThrowException() {
+	void patchAccount_WithExistingPhone_ShouldThrowException() {
 		// Arrange
 		final Long persistentId = idIterator.next();
 
 		Account existingAccount = Account.builder()
 			.accountId(persistentId)
 			.fullName("Test User")
-			.email("patch@test.com")
+			.phone("81100011")
 			.build();
 
 		AccountPatchDto patchDto = AccountPatchDto.builder()
-			.email("patched@test.com")
+			.phone("81100011")
 			.build();
 
 		// Mock findById to return our existing account
 		when(accountRepository.findById(persistentId)).thenReturn(Optional.of(existingAccount));
 		// Mock existsByEmail to return true (email already taken by another account)
-		when(accountRepository.existsByEmail(patchDto.getEmail())).thenReturn(true);
+		when(accountRepository.existsByPhone(patchDto.getPhone())).thenReturn(true);
 
 		// Act & Assert
 		assertThrows(AccountExistsException.class, () ->
@@ -232,7 +232,7 @@ class AccountServiceImplTest {
 
 		// Verify
 		verify(accountRepository).findById(persistentId);
-		verify(accountRepository).existsByEmail(patchDto.getEmail());
+		verify(accountRepository).existsByPhone(patchDto.getPhone());
 		verify(accountRepository, never()).save(any(Account.class)); // Should never reach save
 	}
 

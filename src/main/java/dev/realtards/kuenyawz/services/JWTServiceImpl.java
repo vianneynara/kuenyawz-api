@@ -1,6 +1,6 @@
 package dev.realtards.kuenyawz.services;
 
-import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
+import dev.realtards.kuenyawz.configurations.ApplicationProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class JwtServiceImpl implements JwtService {
+public class JWTServiceImpl implements JWTService {
 
 	private final ApplicationProperties applicationProperties;
 	private static final long CLOCK_SKEW_SECONDS = 60;

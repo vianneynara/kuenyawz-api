@@ -2,7 +2,7 @@ package dev.realtards.kuenyawz.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
+import dev.realtards.kuenyawz.configurations.ApplicationProperties;
 import dev.realtards.kuenyawz.utils.UptimeTracker;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

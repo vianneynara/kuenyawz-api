@@ -34,7 +34,7 @@ public class AccountController extends BaseController {
 
 	@Operation(summary = "(Master) Get all accounts",
 		description = "Retrieves a list of all accounts with secure information",
-		security = @SecurityRequirement(name = "basicAuth")
+		security = @SecurityRequirement(name = "bearerAuth")
 	)
 	@ApiResponse(responseCode = "200", description = "Successfully retrieved all accounts",
 		content = @Content(
