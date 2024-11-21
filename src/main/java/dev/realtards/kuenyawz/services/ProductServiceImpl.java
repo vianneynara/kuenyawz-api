@@ -51,6 +51,7 @@ public class ProductServiceImpl implements ProductService {
 			.toList();
 	}
 
+	@Override
 	public Page<ProductDto> getAllProductsPaginated(String category, String keyword, Boolean available, Integer page, Integer pageSize) {
 		PageRequest pageRequest = buildPageRequest(page, pageSize);
 		Specification<Product> specification = withFilters(category, keyword, available).and(isNotDeleted());
