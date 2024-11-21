@@ -5,6 +5,7 @@ import dev.realtards.kuenyawz.dtos.cartItem.CartItemPatchDto;
 import dev.realtards.kuenyawz.dtos.cartItem.CartItemPostDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ public interface CartItemService {
 	 *
 	 * @return {@link List} of {@link CartItemDto}
 	 */
+	@Transactional(readOnly = true)
 	List<CartItemDto> getAllCartItems();
 
 	/**
@@ -22,6 +24,7 @@ public interface CartItemService {
 	 * @param pageRequest {@link PageRequest} pagination request
 	 * @return {@link Page} of {@link CartItemDto}
 	 */
+	@Transactional(readOnly = true)
 	Page<CartItemDto> getAllCartItems(PageRequest pageRequest);
 
 	/**
@@ -30,6 +33,7 @@ public interface CartItemService {
 	 * @param cartItemId {@link Long} the cart item ID
 	 * @return {@link CartItemDto}
 	 */
+	@Transactional(readOnly = true)
 	CartItemDto getCartItem(Long cartItemId);
 
 	/**
@@ -38,6 +42,7 @@ public interface CartItemService {
 	 * @param accountId {@link Long} the account ID
 	 * @return {@link List} of {@link CartItemDto}
 	 */
+	@Transactional(readOnly = true)
 	List<CartItemDto> getCartItemsOfUser(Long accountId);
 
 	/**
@@ -47,6 +52,7 @@ public interface CartItemService {
 	 * @param pageRequest {@link PageRequest} pagination request
 	 * @return {@link Page} of {@link CartItemDto}
 	 */
+	@Transactional(readOnly = true)
 	Page<CartItemDto> getCartItemsOfUser(Long accountId, PageRequest pageRequest);
 
 	/**
@@ -56,6 +62,7 @@ public interface CartItemService {
 	 * @param cartItemPostDto {@link CartItemPostDto} the cart item information
 	 * @return {@link CartItemDto}
 	 */
+	@Transactional
 	CartItemDto createCartItem(Long accountId, CartItemPostDto cartItemPostDto);
 
 	/**
@@ -65,6 +72,7 @@ public interface CartItemService {
 	 * @param cartItemPatchDto {@link CartItemPatchDto} the cart item patch information
 	 * @return {@link CartItemDto}
 	 */
+	@Transactional
 	CartItemDto patchCartItem(Long cartItemId, CartItemPatchDto cartItemPatchDto);
 
 	/**
@@ -73,6 +81,7 @@ public interface CartItemService {
 	 * @param cartItemId {@link Long} the cart item ID
 	 * @return {@link Boolean} whether the deletion is successful
 	 */
+	@Transactional
 	boolean deleteCartItem(Long cartItemId);
 
 	/**
@@ -81,5 +90,6 @@ public interface CartItemService {
 	 * @param accountId {@link Long} the account ID
 	 * @return {@link Boolean} whether the deletion is successful
 	 */
+	@Transactional
 	boolean deleteCartItemsOfUser(Long accountId);
 }
