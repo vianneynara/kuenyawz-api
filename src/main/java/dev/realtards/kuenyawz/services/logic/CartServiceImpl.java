@@ -29,8 +29,8 @@ public class CartServiceImpl implements CartService {
 
 	@Override
 	public Page<CartItemDto> getCartItems(Integer page, Integer pageSize) {
-		page = page == null ? 0 : page;
-		pageSize = pageSize == null ? 10 : pageSize;
+		page = (page == null || page < 1) ? 0 : page;
+		pageSize = (pageSize == null || pageSize < 1) ? 10 : pageSize;
 
 		Account account = getAccountOrThrow();
 		PageRequest pageRequest = PageRequest.of(page, pageSize);
