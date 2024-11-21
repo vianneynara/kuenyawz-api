@@ -18,15 +18,11 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CartItemPostDto {
 
-    @Schema(description = "Variant Id", example = "12345")
-    @NotBlank(message = "Variant Id is required")
-    private Long variantId;
-
     @Schema(description = "Variant quantity", example = "10", defaultValue = "1")
     @Min(value = 1, message = "Minimum quantity must be at least 1")
-    @Max(value = 300, message = "Maximum quantity must be at most 300")
+    @Max(value = 250, message = "Maximum quantity must be at most 250")
     @NotBlank(message = "Quantity is required")
-    private int quantity;
+    private Integer quantity;
 
     @Schema(description = "Note for variant")
     @Size(min = 1, max = 128, message = "Description must be between 1 and 128 characters")
