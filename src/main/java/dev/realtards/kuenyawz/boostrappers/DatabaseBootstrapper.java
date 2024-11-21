@@ -5,7 +5,7 @@ import dev.realtards.kuenyawz.dtos.account.PrivilegeUpdateDto;
 import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.exceptions.AccountExistsException;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
-import dev.realtards.kuenyawz.services.AccountService;
+import dev.realtards.kuenyawz.services.entity.AccountService;
 import dev.realtards.kuenyawz.services.ProductCsvService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

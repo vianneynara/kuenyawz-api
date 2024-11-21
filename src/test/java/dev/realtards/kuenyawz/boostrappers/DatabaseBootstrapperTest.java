@@ -1,7 +1,7 @@
 package dev.realtards.kuenyawz.boostrappers;
 
 import dev.realtards.kuenyawz.repositories.ProductRepository;
-import dev.realtards.kuenyawz.services.AccountService;
+import dev.realtards.kuenyawz.services.entity.AccountService;
 import dev.realtards.kuenyawz.services.ProductCsvService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

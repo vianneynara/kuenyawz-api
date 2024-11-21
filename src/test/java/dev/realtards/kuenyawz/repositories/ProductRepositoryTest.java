@@ -4,7 +4,7 @@ import dev.realtards.kuenyawz.boostrappers.DatabaseBootstrapper;
 import dev.realtards.kuenyawz.configurations.ApplicationProperties;
 import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
-import dev.realtards.kuenyawz.services.AccountService;
+import dev.realtards.kuenyawz.services.entity.AccountService;
 import dev.realtards.kuenyawz.services.ProductCsvServiceImpl;
 import dev.realtards.kuenyawz.services.ProductService;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdGenerator;
