@@ -7,7 +7,7 @@ import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.entities.CartItem;
 import dev.realtards.kuenyawz.entities.Variant;
-import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
+import dev.realtards.kuenyawz.exceptions.IllegalOperationException;
 import dev.realtards.kuenyawz.exceptions.ResourceExistsException;
 import dev.realtards.kuenyawz.mapper.CartItemMapper;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
@@ -72,8 +72,8 @@ public class CartItemServiceImpl implements CartItemService {
 
 	@Override
 	public CartItemDto createCartItem(Long accountId, CartItemPostDto cartItemPostDto) {
-		validateVariantExists(cartItemPostDto);
-		validateNoSameProductInAccountCart(cartItemPostDto);
+		validateVariantExists(cartItemPostDto.getVariantId());
+		validateNoSameProductInAccountCart(cartItemPostDto.getVariantId());
 
 		CartItem cartItem = toEntity(cartItemPostDto);
 
@@ -83,13 +83,26 @@ public class CartItemServiceImpl implements CartItemService {
 		return cartItemDto;
 	}
 
-	// TODO: don't validate for self cart item's product, but make sure no duplication occurs
 	@Override
 	public CartItemDto patchCartItem(Long cartItemId, CartItemPatchDto cartItemPatchDto, Long accountId) {
 		CartItem cartItem = cartItemRepository.findById(cartItemId)
 			.orElseThrow(() -> new EntityNotFoundException("CartItem not found for ID: " + cartItemId));
+		Variant newVariant = null;
 
-		cartItem.patchFromDto(cartItemPatchDto);
+		// Prevent necessary validation when the variant id is changed (skipped if the variant id is unchanged)
+		if (cartItemPatchDto.getVariantId() != null
+			&& !cartItemPatchDto.getVariantId().equals(cartItem.getVariant().getVariantId())
+		) {
+			newVariant = variantRepository.findById(cartItemPatchDto.getVariantId())
+				.orElseThrow(() -> new EntityNotFoundException("Variant not found with ID: " + cartItemPatchDto.getVariantId()));
+
+			// Compares whether the variant's of the same product as the cart item's variant's product
+			if (!newVariant.getProduct().getProductId().equals(cartItem.getVariant().getProduct().getProductId())) {
+				throw new IllegalOperationException("Variant not found for the product in this cart item");
+			}
+		}
+
+		cartItem.patchFromDto(cartItemPatchDto, newVariant);
 		CartItem savedCartItem = cartItemRepository.save(cartItem);
 
 		return convertToDto(savedCartItem);
@@ -138,20 +151,17 @@ public class CartItemServiceImpl implements CartItemService {
 		return cartItem;
 	}
 
-	private void validateVariantExists(CartItemPostDto cartItemPostDto) {
-		if (cartItemPostDto == null)
-			throw new InvalidRequestBodyValue("CartItemPostDto cannot be null");
-
-		variantRepository.findById(cartItemPostDto.getVariantId())
-			.orElseThrow(() -> new EntityNotFoundException("Variant not found with ID: " + cartItemPostDto.getVariantId()));
+	private void validateVariantExists(Long variantId) {
+		variantRepository.findById(variantId)
+			.orElseThrow(() -> new EntityNotFoundException("Variant not found with ID: " + variantId));
 	}
 
-	private void validateNoSameProductInAccountCart(CartItemPostDto cartItemPostDto) {
+	private void validateNoSameProductInAccountCart(Long variantId) {
 		Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 		// Scalable approach using JPA Specification
 		boolean exists = cartItemRepository.exists(
-			CartItemSpec.withSameProductAsVariantIdAndAccountId(cartItemPostDto.getVariantId(), account.getAccountId())
+			CartItemSpec.withSameProductAsVariantIdAndAccountId(variantId, account.getAccountId())
 		);
 		if (exists) {
 			throw new ResourceExistsException("Cart Item with the same product as the variant ID already exists");
