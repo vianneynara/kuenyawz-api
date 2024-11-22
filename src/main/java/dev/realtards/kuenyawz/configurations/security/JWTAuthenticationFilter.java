@@ -34,11 +34,15 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 		@NotNull FilterChain filterChain
 	) throws ServletException, IOException {
 		try {
-			String authorizationHeader = request.getHeader("Authorization");
-			if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-				filterChain.doFilter(request, response);
-				return;
-			}
+            String token = extractAccessTokenFromHeader(request);
+            if (token == null) {
+                token = extractAccessTokenFromCookie(request);
+            }
+
+            if (token == null) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
 			String phone = jwtService.extractUsername(token);
 
