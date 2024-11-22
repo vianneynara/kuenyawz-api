@@ -155,4 +155,9 @@ public class CartItemServiceImpl implements CartItemService {
 
 		return cartItemDto;
 	}
+
+	@Override
+	public boolean deleteCartItemOfUser(Long cartItemId, Long accountId) {
+		return false;
+	}
 }

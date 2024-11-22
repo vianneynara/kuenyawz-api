@@ -68,12 +68,13 @@ public interface CartItemService {
 	/**
 	 * Update a cart item by its ID.
 	 *
-	 * @param cartItemId      {@link Long} the cart item ID
+	 * @param cartItemId       {@link Long} the cart item ID
 	 * @param cartItemPatchDto {@link CartItemPatchDto} the cart item patch information
+	 * @param accountId
 	 * @return {@link CartItemDto}
 	 */
 	@Transactional
-	CartItemDto patchCartItem(Long cartItemId, CartItemPatchDto cartItemPatchDto);
+	CartItemDto patchCartItem(Long cartItemId, CartItemPatchDto cartItemPatchDto, Long accountId);
 
 	/**
 	 * Delete a cart item by its ID.
@@ -92,4 +93,15 @@ public interface CartItemService {
 	 */
 	@Transactional
 	boolean deleteCartItemsOfAccount(Long accountId);
+  
+	/**
+	 * Delete a cart item of a user by its ID. This method is used to prevent
+	 * unauthorized deletion.
+	 *
+	 * @param cartItemId {@link Long} the cart item ID
+	 * @param accountId  {@link Long} the account ID
+	 * @return {@link Boolean} whether the deletion is successful
+	 */
+	@Transactional
+	boolean deleteCartItemOfUser(Long cartItemId, Long accountId);
 }
