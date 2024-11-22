@@ -59,7 +59,7 @@ public interface ImageStorageService {
 	 * @param productId {@link Long} the product id to be associated with the file.
 	 */
 	@Transactional
-	void deleteAllOfProduct(Long productId);
+	void deleteAllOfProductId(Long productId);
 
 	/**
 	 * Deletes all resources.

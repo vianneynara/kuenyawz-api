@@ -1,6 +1,5 @@
 package dev.realtards.kuenyawz.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,12 +11,9 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-//@EqualsAndHashCode(callSuper = true, exclude = "product")
-//@ToString(callSuper = true, exclude = "product")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Transactions extends Auditables {
     @Id
     @SnowFlakeIdValue(name = "transaction_id")
@@ -51,6 +47,6 @@ public class Transactions extends Auditables {
     private Account account;
 
     public enum TransactionStatus {
-        DEPOSIT, PAID
+        PENDING, EXPIRED, SUCCESS, CANCELLED
     }
 }

@@ -16,8 +16,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -26,15 +30,19 @@ import java.util.Map;
 public class SecurityConfig {
 
 	private final AuthenticationProvider authenticationProvider;
-	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSec) throws Exception {
 		httpSec
+			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**"))
 			.authorizeHttpRequests(auth -> auth
 				// H2 Console access
 				.requestMatchers("/h2-console/**").permitAll()
+
+				// Allow preflight requests
+				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
 				// Public endpoints
 				.requestMatchers(HttpMethod.GET,
@@ -42,14 +50,17 @@ public class SecurityConfig {
 					"/api/status",
 					"/api/images/**",
 					"/api/products",
-					"/api/products/**").permitAll()
+					"/api/products/**",
+					"/api/recommender/**").permitAll()
 
 				// Auth endpoints (all public)
 				.requestMatchers(HttpMethod.POST,
 					"/api/auth/register",
 					"/api/auth/login",
 					"/api/auth/revoke",
-					"/api/auth/refresh").permitAll()
+					"/api/auth/refresh",
+					"/api/auth/otp/request",
+					"/api/auth/otp/verify").permitAll()
 
 				// Simulator endpoints
 				.requestMatchers("/api/sim/**").permitAll()
@@ -96,9 +107,23 @@ public class SecurityConfig {
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return (web) -> web.ignoring()
 			.requestMatchers(
-				"/api/docs/v3/**",
+				"/api/docs/v3**",
 				"/swagger-ui/**",
-				"/swagger-ui.html"
+				"/swagger-ui.html",
+				"/favicon.ico"
 			);
+	}
+
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+		configuration.setAllowedHeaders(List.of("*"));
+		configuration.setAllowCredentials(true);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
 	}
 }

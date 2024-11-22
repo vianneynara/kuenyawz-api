@@ -1,6 +1,6 @@
 package dev.realtards.kuenyawz.services;
 
-import dev.realtards.kuenyawz.configurations.properties.ApplicationProperties;
+import dev.realtards.kuenyawz.configurations.ApplicationProperties;
 import dev.realtards.kuenyawz.dtos.image.BatchImageUploadDto;
 import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;
 import dev.realtards.kuenyawz.dtos.image.ImageUploadDto;
@@ -25,9 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.*;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Service
@@ -37,7 +35,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
 	private final ProductRepository productRepository;
 
-	private final ApplicationProperties applicationProperties;
+	private final ApplicationProperties properties;
 	private final SnowFlakeIdGenerator idGenerator;
 	private final ProductImageRepository productImageRepository;
 
@@ -49,13 +47,13 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 	@Override
 	@PostConstruct
 	public void init() {
-		productImagesDir = applicationProperties.getProductImagesDir();
+		productImagesDir = properties.getProductImagesDir();
 		try {
 			uploadLocation = Path.of(System.getProperty("user.dir"), ROOT_TO_UPLOAD, productImagesDir)
 				.normalize()
 				.toAbsolutePath();
 			log.info("Upload directory set at '{}'", uploadLocation);
-			acceptedExtensions = Set.copyOf(applicationProperties.getAcceptedImageExtensions());
+			acceptedExtensions = Set.copyOf(properties.getAcceptedImageExtensions());
 			if (!Files.exists(uploadLocation)) {
 				log.info("Creating upload directory at: {}", uploadLocation);
 				Files.createDirectories(uploadLocation);
@@ -112,7 +110,6 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 				.orElseThrow(() -> new ResourceNotFoundException("Resource '" + productId + "/" + resourceId + "' not found"))
 				.getRelativePath();
 			Path requestedPath = Path.of(uploadLocation.toString(), relativePath).normalize().toAbsolutePath();
-			log.warn("Requested path: {}", requestedPath);
 			Resource resource = new UrlResource(requestedPath.toUri());
 
 			if (resource.exists() || resource.isReadable()) {
@@ -135,7 +132,6 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 				.orElseThrow(() -> new ResourceNotFoundException("Resource '" + productId + "/" + resourceId + "' not found"));
 
 			Path requestedPath = Path.of(uploadLocation.toString(), productImage.getRelativePath()).normalize().toAbsolutePath();
-			log.warn("Requested path for deletion: {}", requestedPath);
 			Files.deleteIfExists(requestedPath);
 			productImageRepository.delete(productImage);
 		} catch (NumberFormatException | IOException e) {
@@ -144,7 +140,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 	}
 
 	@Override
-	public void deleteAllOfProduct(Long productId) {
+	public void deleteAllOfProductId(Long productId) {
 		Path productDirectory = Paths.get(uploadLocation.toString(), productId.toString());
 		try (Stream<Path> paths = Files.walk(productDirectory)) {
 			paths
@@ -152,6 +148,8 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 				.map(Path::toFile)
 				.forEach(File::delete);
 			Files.deleteIfExists(productDirectory);
+		} catch (NoSuchFileException e) {
+			log.warn("Upload directory of product {} does not exist", productId);
 		} catch (IOException e) {
 			log.warn("Failed to delete product directory for product {}", productId, e);
 		} catch (SecurityException e) {
@@ -167,10 +165,18 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 			try (Stream<Path> paths = directories.filter(Files::isDirectory)) {
 				paths
 					.map(Path::toFile)
-					.forEach(File::delete);
+					.forEach((File file) -> {
+						try (Stream<Path> files = Files.walk(file.toPath())) {
+							files.map(Path::toFile).forEach(File::delete);
+						} catch (IOException e) {
+							log.error("Failed to delete directory {}", file, e);
+						}
+					});
 			}
 			Files.deleteIfExists(uploadLocation);
 			Files.createDirectories(uploadLocation);
+		} catch (NoSuchFileException e) {
+			log.warn("Upload directory {} does not exist", uploadLocation);
 		} catch (IOException e) {
 			log.error("Failed to delete upload directory", e);
 			throw new ResourceUploadException("Could not delete upload directory");
@@ -183,7 +189,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 
 	@Override
 	public String getImageUrl(Long productId, String resourceUri) {
-		return applicationProperties.getBaseUrl() + "/api/v1/images/" + productId + "/" + resourceUri;
+		return properties.getFullBaseUrl() + "/api/images/" + productId + "/" + resourceUri;
 	}
 
 	@Override
@@ -196,7 +202,10 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 		if (product.getImages() == null) {
 			return List.of();
 		}
-		return product.getImages().stream()
+		List<ProductImage> productImages = new ArrayList<>(product.getImages().stream().toList());
+		productImages.sort(Comparator.comparing(ProductImage::getProductImageId));
+
+		return productImages.stream()
 			.map(this::getImageUrl)
 			.toList();
 	}

@@ -3,6 +3,7 @@ package dev.realtards.kuenyawz.services;
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPatchDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
+import dev.realtards.kuenyawz.dtos.product.VariantDto;
 import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
@@ -10,7 +11,7 @@ import dev.realtards.kuenyawz.exceptions.ResourceExistsException;
 import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
-import dev.realtards.kuenyawz.repositories.ProductSpecification;
+import dev.realtards.kuenyawz.repositories.ProductSpec;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -21,9 +22,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static dev.realtards.kuenyawz.repositories.ProductSpec.*;
 
 @Service
 @Primary
@@ -42,16 +47,16 @@ public class ProductServiceImpl implements ProductService {
 	public List<ProductDto> getAllProducts(String category, String keyword) {
 		List<Product> products = findProducts(category, keyword);
 		return products.stream()
-			.map(productMapper::fromEntity)
+			.map(this::convertToDto)
 			.toList();
 	}
 
 	public Page<ProductDto> getAllProductsPaginated(String category, String keyword, Boolean available, Integer page, Integer pageSize) {
 		PageRequest pageRequest = buildPageRequest(page, pageSize);
-		Specification<Product> specification = ProductSpecification.withFilters(category, keyword, available);
+		Specification<Product> specification = withFilters(category, keyword, available).and(isNotDeleted());
 		Page<Product> products = productRepository.findAll(specification, pageRequest);
 
-		Page<ProductDto> productDtos = products.map(productMapper::fromEntity);
+		Page<ProductDto> productDtos = products.map(this::convertToDto);
 		return productDtos;
 	}
 
@@ -112,7 +117,7 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public ProductDto getProduct(long productId) {
-		Product product = productRepository.findById(productId)
+		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
 		ProductDto productDto = this.convertToDto(product);
@@ -121,22 +126,22 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public void hardDeleteProduct(Long productId) {
-		Product product = productRepository.findByIdUnfiltered(productId)
+		Product product = productRepository.findOne(withProductId(productId))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
-		productRepository.updateProductDeletedStatusToFalse(productId);
-		productRepository.deleteProductPermanently(product.getProductId());
+		imageStorageService.deleteAllOfProductId(product.getProductId());
+		productRepository.deleteById(productId);
 	}
 
 	@Override
 	public void hardDeleteAllProducts() {
-		productRepository.updateAllDeletedStatusToFalse();
-		productRepository.deleteAllProductsPermanently();
+		imageStorageService.deleteAll();
+		productRepository.deleteAll();
 	}
 
 	@Override
 	public void softDeleteProduct(Long productId) {
-		Product product = productRepository.findById(productId)
+		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
 		product.setDeleted(true);
@@ -153,26 +158,20 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public void restoreSoftDeletedProduct(Long productId) {
-		Product product = productRepository.findById(productId)
-			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
-
-		List<Product> nameDupeProducts = productRepository.findAllByNameLikeIgnoreCase(product.getName());
-		if (!nameDupeProducts.isEmpty()) {
-			throw new ResourceExistsException("Product with name '" + product.getName() + "' exists");
-		}
-
-		product.setDeleted(false);
-		productRepository.save(product);
-	}
-
-	@Override
 	public ProductDto patchProduct(Long productId, ProductPatchDto productPatchDto) {
-		Product product = productRepository.findById(productId)
+		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
-		if (productRepository.existsByNameIgnoreCase(productPatchDto.getName()))
+		if (productRepository.findOne(ProductSpec.withName(productPatchDto.getName())
+				.and(isNotDeleted())
+				.and(withProductIdNot(productId)))
+			.isPresent()
+		) {
 			throw new ResourceExistsException("Product with name '" + productPatchDto.getName() + "' exists");
+		}
+		if (productPatchDto.getCategory() != null) {
+			productPatchDto.setCategory(productPatchDto.getCategory().toUpperCase());
+		}
 
 		Product updatedProduct = productMapper.updateProductFromPatch(productPatchDto, product);
 		Product savedProduct = productRepository.save(updatedProduct);
@@ -200,10 +199,6 @@ public class ProductServiceImpl implements ProductService {
 		return productRepository.existsById(productId);
 	}
 
-	public boolean existsIncludingDeleted(Long productId) {
-		return productRepository.findByIdUnfiltered(productId).isPresent();
-	}
-
 	/**
 	 * Converts a Product entity to a ProductDto using the mapper, and then sets the image URLs using
 	 * {@link ImageStorageService#getImageUrls(Product)}.
@@ -211,8 +206,14 @@ public class ProductServiceImpl implements ProductService {
 	 * @param product {@link Product}
 	 * @return {@link ProductDto}
 	 */
-	private ProductDto convertToDto(Product product) {
+	@Override
+	public ProductDto convertToDto(Product product) {
 		ProductDto productDto = productMapper.fromEntity(product);
+		if (productDto.getVariants() == null) {
+			productDto.setVariants(new ArrayList<>());
+		}
+		productDto.getVariants().sort(Comparator.comparing(VariantDto::getVariantId));
+
 		productDto.setImages(imageStorageService.getImageUrls(product));
 		return productDto;
 	}
@@ -224,7 +225,7 @@ public class ProductServiceImpl implements ProductService {
 		if (productPostDto.getVariants() == null || productPostDto.getVariants().isEmpty()) {
 			throw new InvalidRequestBodyValue("Variants must not be empty");
 		}
-		if (productRepository.existsByNameIgnoreCase(productPostDto.getName())) {
+		if (productRepository.findOne(withName(productPostDto.getName()).and(isNotDeleted())).isPresent()) {
 			throw new ResourceExistsException("Product with name '" + productPostDto.getName() + "' exists");
 		}
 	}
@@ -261,8 +262,6 @@ public class ProductServiceImpl implements ProductService {
 		product.setVariants(variants);
 		return product;
 	}
-
-	// Get all products methods
 
 	private Product.Category parseCategoryOrThrow(String category) {
 		category = category.trim().toUpperCase();

@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +44,7 @@ public class ProductImageController extends BaseController {
 		@ApiResponse(responseCode = "400", description = "Invalid image file"),
 		@ApiResponse(responseCode = "404", description = "Product not found"),
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@PostMapping("{productId}")
 	public ResponseEntity<Object> uploadImage(
 		@PathVariable Long productId,
@@ -59,6 +61,7 @@ public class ProductImageController extends BaseController {
 		@ApiResponse(responseCode = "400", description = "Invalid image file"),
 		@ApiResponse(responseCode = "404", description = "Product not found"),
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@PostMapping("{productId}/batch")
 	public ResponseEntity<Object> batchUploadImage(
 		@PathVariable Long productId,
@@ -97,6 +100,7 @@ public class ProductImageController extends BaseController {
 		@ApiResponse(responseCode = "204", description = "Image deleted successfully"),
 		@ApiResponse(responseCode = "404", description = "Product or image not found"),
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@DeleteMapping("{productId}/{resourceUri}")
 	public ResponseEntity<Object> deleteImage(
 		@PathVariable Long productId,
@@ -111,11 +115,12 @@ public class ProductImageController extends BaseController {
 		@ApiResponse(responseCode = "204", description = "Images deleted successfully"),
 		@ApiResponse(responseCode = "404", description = "Product not found"),
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@DeleteMapping("{productId}")
 	public ResponseEntity<Object> deleteAllImagesOfProduct(
 		@PathVariable Long productId
 	) {
-		imageStorageService.deleteAllOfProduct(productId);
+		imageStorageService.deleteAllOfProductId(productId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
@@ -123,6 +128,7 @@ public class ProductImageController extends BaseController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "204", description = "Images deleted successfully"),
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@DeleteMapping("all")
 	public ResponseEntity<Object> deleteAllImages() {
 		imageStorageService.deleteAll();

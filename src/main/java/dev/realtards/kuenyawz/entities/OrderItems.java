@@ -1,22 +1,17 @@
 package dev.realtards.kuenyawz.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CollectionId;
 
 import java.math.BigDecimal;
 
 @Entity
 @Getter
 @Setter
-//@EqualsAndHashCode(callSuper = true, exclude = "product")
-//@ToString(callSuper = true, exclude = "product")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class OrderItems {
     @Id
     @SnowFlakeIdValue(name = "transaction_id")

@@ -40,8 +40,8 @@ public class ApplicationConfiguration {
 
 	@Bean
 	public UserDetailsService userService() {
-		return email -> {
-			Account account = accountRepository.findByEmail(email)
+		return phone -> {
+			Account account = accountRepository.findByPhone(phone)
 				.orElseThrow(AccountNotFoundException::new);
 
 			return account;

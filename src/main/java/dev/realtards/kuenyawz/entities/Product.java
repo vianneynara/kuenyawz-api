@@ -3,21 +3,18 @@ package dev.realtards.kuenyawz.entities;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLRestriction;
+import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
 
+// TODO: Remove sql restriction and use a custom repository to filter out deleted products
 @Entity
-@SQLRestriction("deleted = false")
-@Getter
-@Setter
+@Getter @Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class Product extends Auditables {
+@AllArgsConstructor @NoArgsConstructor @SuperBuilder
+public class Product extends DeletableAuditables {
 
 	@Id
 	@SnowFlakeIdValue(name = "product_id")
@@ -37,10 +34,7 @@ public class Product extends Auditables {
 	private Category category;
 
 	@Column(name = "available", nullable = false)
-	private boolean available;
-
-	@Column(name = "deleted", nullable = false)
-	private boolean deleted = false;
+	private Boolean available;
 
 	@Version
 	private Long version;
@@ -55,11 +49,11 @@ public class Product extends Auditables {
 	 * This contains the category of foods available in the store.
 	 */
 	public enum Category {
-		CAKE("cake"),
-		PASTRY("pastry"),
-		PASTA("pasta"),
-		PIE("pie"),
-		OTHER("other");
+		CAKE("CAKE"),
+		PASTRY("PASTRY"),
+		PASTA("PASTA"),
+		PIE("PIE"),
+		OTHER("OTHER");
 
 		private final String value;
 
