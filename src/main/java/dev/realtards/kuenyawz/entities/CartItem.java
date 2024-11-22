@@ -23,7 +23,7 @@ public class CartItem {
     @Column
     private String note;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "variant_id", nullable = false)
     private Variant variant;
 
@@ -36,7 +36,7 @@ public class CartItem {
     }
 
     public CartItem patchFromDto(CartItemPatchDto cartItemPatchDto, Variant variant) {
-        if (cartItemPatchDto.getVariantId() != null)
+        if (variant != null)
             this.variant = variant;
 
         if (cartItemPatchDto.getQuantity() != null)
