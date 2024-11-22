@@ -43,7 +43,7 @@ public interface CartItemService {
 	 * @return {@link List} of {@link CartItemDto}
 	 */
 	@Transactional(readOnly = true)
-	List<CartItemDto> getCartItemsOfUser(Long accountId);
+	List<CartItemDto> getCartItemsOfAccount(Long accountId);
 
 	/**
 	 * Get paginated cart items of a user by its ID.
@@ -53,7 +53,7 @@ public interface CartItemService {
 	 * @return {@link Page} of {@link CartItemDto}
 	 */
 	@Transactional(readOnly = true)
-	Page<CartItemDto> getCartItemsOfUser(Long accountId, PageRequest pageRequest);
+	Page<CartItemDto> getCartItemsOfAccount(Long accountId, PageRequest pageRequest);
 
 	/**
 	 * Create a new cart item.
@@ -91,5 +91,5 @@ public interface CartItemService {
 	 * @return {@link Boolean} whether the deletion is successful
 	 */
 	@Transactional
-	boolean deleteCartItemsOfUser(Long accountId);
+	boolean deleteCartItemsOfAccount(Long accountId);
 }

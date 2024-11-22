@@ -55,7 +55,7 @@ public class CartItemServiceImpl implements CartItemService {
 	}
 
 	@Override
-	public List<CartItemDto> getCartItemsOfUser(Long accountId) {
+	public List<CartItemDto> getCartItemsOfAccount(Long accountId) {
 		List<CartItem> cartItems = cartItemRepository.findAllByAccountId(accountId);
 
 		return cartItems.stream()
@@ -64,7 +64,7 @@ public class CartItemServiceImpl implements CartItemService {
 	}
 
 	@Override
-	public Page<CartItemDto> getCartItemsOfUser(Long accountId, PageRequest pageRequest) {
+	public Page<CartItemDto> getCartItemsOfAccount(Long accountId, PageRequest pageRequest) {
 		Page<CartItem> cartItems = cartItemRepository.findAll(accountId, pageRequest);
 
 		return cartItems.map(this::convertToDto);
@@ -106,8 +106,7 @@ public class CartItemServiceImpl implements CartItemService {
 
 
 	@Override
-	@Transactional
-	public boolean deleteCartItemsOfUser(Long accountId) {
+	public boolean deleteCartItemsOfAccount(Long accountId) {
 		int count = cartItemRepository.countCartItemByAccountId(accountId);
 		if (count == 0) {
 			return false;
