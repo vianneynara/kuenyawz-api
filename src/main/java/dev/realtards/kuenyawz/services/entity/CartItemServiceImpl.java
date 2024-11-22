@@ -110,4 +110,35 @@ public class CartItemServiceImpl implements CartItemService {
 		int affected = cartItemRepository.deleteByCartItemIdAndAccount_AccountId(cartItemId, accountId);
 		return affected > 0;
 	}
+
+	private void validateVariantExists(CartItemPostDto cartItemPostDto) {
+		if (cartItemPostDto == null)
+			throw new InvalidRequestBodyValue("CartItemPostDto cannot be null");
+
+		variantRepository.findById(cartItemPostDto.getVariantId())
+			.orElseThrow(() -> new EntityNotFoundException("Cart Item not found for ID: " + cartItemPostDto.getVariantId()));
+	}
+
+	public CartItemDto convertToDto(CartItem cartItem) {
+		ProductDto productDto = productMapper.fromEntity(cartItem.getVariant().getProduct());
+
+		CartItemDto cartItemDto = cartItemMapper.fromEntity(cartItem, productDto, cartItem.getVariant().getVariantId());
+		return cartItemDto;
+	}
+
+	private CartItem toEntity(CartItemPostDto cartItemPostDto) {
+		Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		Variant variant = variantRepository.findById(cartItemPostDto.getVariantId())
+			.orElseThrow(() -> new EntityNotFoundException("Cart Item not found for ID: " + cartItemPostDto.getVariantId()));
+
+		CartItem cartItem = CartItem.builder()
+			.variant(variant)
+			.note(cartItemPostDto.getNote())
+			.quantity(cartItemPostDto.getQuantity())
+			.account(account)
+			.build();
+
+		return cartItem;
+	}
 }
