@@ -87,6 +87,7 @@ public class CartController {
 		@ApiResponse(responseCode = "403", description = "Unauthorized access"),
 		@ApiResponse(responseCode = "404", description = "Cart item not found"),
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@DeleteMapping("/{cartItemId}")
 	public ResponseEntity<?> deleteCartItem(
 		@PathVariable Long cartItemId
@@ -101,6 +102,7 @@ public class CartController {
 		@ApiResponse(responseCode = "403", description = "Unauthorized access"),
 		@ApiResponse(responseCode = "404", description = "Cart items not found"),
 	})
+	@SecurityRequirement(name = "bearerAuth")
 	@DeleteMapping("/all")
 	public ResponseEntity<?> deleteCartItems() {
 		boolean deleted = cartService.deleteCartItems();
