@@ -101,6 +101,7 @@ public class AuthController {
 	) {
 		String token = extractRefreshToken(tokenDto);
 		AuthResponseDto response = authService.refresh(token);
+		extractTokensToCookies(response);
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
