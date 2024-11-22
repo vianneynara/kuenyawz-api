@@ -207,6 +207,9 @@ public class AuthController {
         }
 	}
 
+	/**
+	 * Remove access and refresh tokens from the cookies.
+	 */
 	private void removeTokensFromCookies() {
 		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 		assert requestAttributes != null : "Request attributes must not be null";
