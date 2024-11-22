@@ -36,7 +36,7 @@ public class CartItem {
     }
 
     public CartItem patchFromDto(CartItemPatchDto cartItemPatchDto, Variant variant) {
-        if (variant != null)
+        if (variant != null && !variant.equals(this.variant))
             this.variant = variant;
 
         if (cartItemPatchDto.getQuantity() != null)
