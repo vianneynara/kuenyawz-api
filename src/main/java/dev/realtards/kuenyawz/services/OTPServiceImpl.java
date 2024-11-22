@@ -22,26 +22,32 @@ public class OTPServiceImpl implements OTPService {
 
 	private final ApplicationProperties properties;
 	private final OTPRepository otpRepository;
+	private final WhatsappApiService whatsappApiService;
 
 	public static final OTPType DEFAULT_OTP_TYPE = OTPType.ALPHA_NUMERIC;
 
 	@Override
 	public void sendOTP(OtpRequestDto otpRequestDto) {
-		String otp = generateOTP(DEFAULT_OTP_TYPE);
+		String newOtp = generateOTP(DEFAULT_OTP_TYPE);
 		otpRepository.findByPhone(otpRequestDto.getPhone())
 			.ifPresent(otpRepository::delete);
-		otpRepository.save(OTP.builder()
+		OTP otp = otpRepository.save(OTP.builder()
 			.phone(otpRequestDto.getPhone())
-			.otp(otp)
+			.otp(newOtp)
 			.ipAddress(otpRequestDto.getIpAddress())
 			.expiresAt(LocalDateTime.now().plusSeconds(properties.getSecurity().getOtpExpireSeconds()))
 			.build()
 		);
 
-		log.info("Simulating sending OTP {} to request: {}", otp, otpRequestDto);
-		{
-			// TODO: Send OTP to the user's phone number via a WhatsApp message
-		}
+		String otpMessage = String.format(
+			"Kode verifikasi %s anda adalah:\n %s\n\nKode ini berlaku selama %s menit.",
+			"https://kuenyawz.com",
+			newOtp,
+			properties.getSecurity().getOtpExpireSeconds() / 60
+		);
+
+//		String response = whatsappApiService.send(otpRequestDto.getPhone(), otpMessage, "62");
+//		log.warn("Response from WhatsApp API: {}", response);
 	}
 
 	@Override
