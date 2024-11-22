@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.services;
+package dev.realtards.kuenyawz.services.entity;
 
 import dev.realtards.kuenyawz.configurations.ApplicationProperties;
 import dev.realtards.kuenyawz.dtos.auth.OtpRequestDto;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static dev.realtards.kuenyawz.services.OTPService.OTPGenerator.generateNumeric;
+import static dev.realtards.kuenyawz.services.entity.OTPService.OTPGenerator.generateNumeric;
 
 @Service
 @RequiredArgsConstructor
