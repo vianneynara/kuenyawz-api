@@ -103,5 +103,5 @@ public interface CartItemService {
 	 * @return {@link Boolean} whether the deletion is successful
 	 */
 	@Transactional
-	boolean deleteCartItemOfUser(Long cartItemId, Long accountId);
+	boolean deleteCartItemOfAccount(Long cartItemId, Long accountId);
 }
