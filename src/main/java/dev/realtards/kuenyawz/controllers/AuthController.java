@@ -84,6 +84,7 @@ public class AuthController {
 	) {
 		String token = extractRefreshToken(tokenDto);
 		authService.revokeRefreshToken(token);
+		removeTokensFromCookies();
 		return ResponseEntity.ok().build();
 	}
 
@@ -204,5 +205,25 @@ public class AuthController {
         } catch (Exception e) {
             throw new InvalidRefreshTokenException("Failed to extract refresh token from cookie: " + e.getMessage());
         }
+	}
+
+	private void removeTokensFromCookies() {
+		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+		assert requestAttributes != null : "Request attributes must not be null";
+		HttpServletResponse response = ((ServletRequestAttributes) requestAttributes).getResponse();
+		assert response != null : "Response must not be null";
+
+		Cookie accessTokenCookie = new Cookie("accessToken", null);
+		accessTokenCookie.setHttpOnly(true);
+		accessTokenCookie.setPath("/");
+		accessTokenCookie.setMaxAge(0);
+
+		Cookie refreshTokenCookie = new Cookie("refreshToken", null);
+		refreshTokenCookie.setHttpOnly(true);
+		refreshTokenCookie.setPath("/");
+		refreshTokenCookie.setMaxAge(0);
+
+		response.addCookie(accessTokenCookie);
+		response.addCookie(refreshTokenCookie);
 	}
 }
