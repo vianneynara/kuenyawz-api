@@ -80,10 +80,9 @@ public interface CartItemService {
 	 * Delete a cart item by its ID.
 	 *
 	 * @param cartItemId {@link Long} the cart item ID
-	 * @return {@link Boolean} whether the deletion is successful
 	 */
 	@Transactional
-	boolean deleteCartItem(Long cartItemId);
+	void deleteCartItem(Long cartItemId);
 
 	/**
 	 * Delete all cart items of a user by its ID.
