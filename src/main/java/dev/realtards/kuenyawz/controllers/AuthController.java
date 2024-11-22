@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Tag(name = "Authentication Routes", description = "Authentication and authorization endpoints")
 @RequestMapping("/auth")
@@ -43,8 +48,9 @@ public class AuthController {
 	public ResponseEntity<Object> register(
 		@Valid @RequestBody AccountRegistrationDto accountRegistrationDto
 	) {
-		AuthResponseDto response = authService.register(accountRegistrationDto);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		AuthResponseDto authResponseDto = authService.register(accountRegistrationDto);
+		extractTokensToCookies(authResponseDto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(authResponseDto);
 	}
 
 	@Operation(summary = "Login as an existing user")
@@ -60,8 +66,9 @@ public class AuthController {
 	public ResponseEntity<Object> login(
 		@Valid @RequestBody AuthRequestDto authRequestDto
 	) {
-		AuthResponseDto response = authService.login(authRequestDto);
-		return ResponseEntity.status(HttpStatus.OK).body(response);
+		AuthResponseDto authResponseDto = authService.login(authRequestDto);
+		extractTokensToCookies(authResponseDto);
+		return ResponseEntity.status(HttpStatus.OK).body(authResponseDto);
 	}
 
 	@Operation(summary = "Revoke the current refresh token")
@@ -130,5 +137,28 @@ public class AuthController {
 	) {
 		otpService.verifyOTP(otpVerifyDto);
 		return ResponseEntity.ok().build();
+	}
+
+	private void extractTokensToCookies(final AuthResponseDto authResponseDto) {
+
+		Cookie accessTokenCookie = new Cookie("accessToken", authResponseDto.getAccessToken());
+		accessTokenCookie.setHttpOnly(true);
+		accessTokenCookie.setPath("/");
+		accessTokenCookie.setMaxAge(60 * 60);
+
+		Cookie refreshTokenCookie = new Cookie("refreshToken", authResponseDto.getRefreshToken());
+		refreshTokenCookie.setHttpOnly(true);
+		refreshTokenCookie.setPath("/");
+		refreshTokenCookie.setMaxAge(60 * 60 * 24 * 7);
+
+		authResponseDto.setAccessToken(null);
+		authResponseDto.setRefreshToken(null);
+
+		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+		assert requestAttributes != null : "Request attributes must not be null";
+		HttpServletResponse response = ((ServletRequestAttributes) requestAttributes).getResponse();
+		assert response != null : "Response must not be null";
+		response.addCookie(accessTokenCookie);
+		response.addCookie(refreshTokenCookie);
 	}
 }
