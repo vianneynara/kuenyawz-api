@@ -111,14 +111,6 @@ public class CartItemServiceImpl implements CartItemService {
 		return affected > 0;
 	}
 
-	private void validateVariantExists(CartItemPostDto cartItemPostDto) {
-		if (cartItemPostDto == null)
-			throw new InvalidRequestBodyValue("CartItemPostDto cannot be null");
-
-		variantRepository.findById(cartItemPostDto.getVariantId())
-			.orElseThrow(() -> new EntityNotFoundException("Cart Item not found for ID: " + cartItemPostDto.getVariantId()));
-	}
-
 	public CartItemDto convertToDto(CartItem cartItem) {
 		ProductDto productDto = productMapper.fromEntity(cartItem.getVariant().getProduct());
 
@@ -130,7 +122,7 @@ public class CartItemServiceImpl implements CartItemService {
 		Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 		Variant variant = variantRepository.findById(cartItemPostDto.getVariantId())
-			.orElseThrow(() -> new EntityNotFoundException("Cart Item not found for ID: " + cartItemPostDto.getVariantId()));
+			.orElseThrow(() -> new EntityNotFoundException("Variant not found with ID: " + cartItemPostDto.getVariantId()));
 
 		CartItem cartItem = CartItem.builder()
 			.variant(variant)
