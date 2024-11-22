@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.services;
+package dev.realtards.kuenyawz.services.logic;
 
 import dev.realtards.kuenyawz.dtos.image.BatchImageUploadDto;
 import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;

@@ -2,7 +2,7 @@ package dev.realtards.kuenyawz.controllers;
 
 import dev.realtards.kuenyawz.dtos.product.ListOfProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
-import dev.realtards.kuenyawz.services.RecommenderService;
+import dev.realtards.kuenyawz.services.logic.RecommenderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

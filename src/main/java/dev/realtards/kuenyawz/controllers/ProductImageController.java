@@ -4,7 +4,7 @@ import dev.realtards.kuenyawz.dtos.image.BatchImageUploadDto;
 import dev.realtards.kuenyawz.dtos.image.ImageResourceDTO;
 import dev.realtards.kuenyawz.dtos.image.ImageUploadDto;
 import dev.realtards.kuenyawz.dtos.image.ListOfImageResourceDto;
-import dev.realtards.kuenyawz.services.ImageStorageService;
+import dev.realtards.kuenyawz.services.logic.ImageStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.services;
+package dev.realtards.kuenyawz.services.logic;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 import dev.realtards.kuenyawz.dtos.csv.ProductCsvRecord;
@@ -6,6 +6,7 @@ import dev.realtards.kuenyawz.dtos.product.ProductPostDto;
 import dev.realtards.kuenyawz.dtos.product.VariantPostDto;
 import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.realtards.kuenyawz.exceptions.ResourceUploadException;
+import dev.realtards.kuenyawz.services.entity.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
