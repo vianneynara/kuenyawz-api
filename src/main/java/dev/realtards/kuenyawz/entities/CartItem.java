@@ -32,6 +32,13 @@ public class CartItem {
     private Account account;
 
     public CartItem patchFromDto(CartItemPatchDto cartItemPatchDto) {
+        return patchFromDto(cartItemPatchDto, this.variant);
+    }
+
+    public CartItem patchFromDto(CartItemPatchDto cartItemPatchDto, Variant variant) {
+        if (cartItemPatchDto.getVariantId() != null)
+            this.variant = variant;
+
         if (cartItemPatchDto.getQuantity() != null)
             this.quantity = cartItemPatchDto.getQuantity();
 
