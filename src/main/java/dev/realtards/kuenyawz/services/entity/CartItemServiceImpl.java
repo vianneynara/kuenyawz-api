@@ -87,7 +87,7 @@ public class CartItemServiceImpl implements CartItemService {
 	public CartItemDto patchCartItem(Long cartItemId, CartItemPatchDto cartItemPatchDto, Long accountId) {
 		CartItem cartItem = cartItemRepository.findById(cartItemId)
 			.orElseThrow(() -> new EntityNotFoundException("CartItem not found for ID: " + cartItemId));
-		Variant newVariant = null;
+		Variant newVariant = cartItem.getVariant();
 
 		// Prevent necessary validation when the variant id is changed (skipped if the variant id is unchanged)
 		if (cartItemPatchDto.getVariantId() != null
@@ -100,6 +100,12 @@ public class CartItemServiceImpl implements CartItemService {
 			if (!newVariant.getProduct().getProductId().equals(cartItem.getVariant().getProduct().getProductId())) {
 				throw new IllegalOperationException("Variant not found for the product in this cart item");
 			}
+		}
+		if (cartItemPatchDto.getQuantity() != null
+			&& cartItemPatchDto.getQuantity() >= newVariant.getMinQuantity()
+			&& cartItemPatchDto.getQuantity() <= newVariant.getMaxQuantity()
+		) {
+			throw new IllegalOperationException("Quantity must be between " + newVariant.getMinQuantity() + " and " + newVariant.getMaxQuantity());
 		}
 
 		cartItem.patchFromDto(cartItemPatchDto, newVariant);
