@@ -34,7 +34,7 @@ public class AccountController extends BaseController {
 
 	@Operation(summary = "(Master) Get all accounts",
 		description = "Retrieves a list of all accounts with secure information",
-		security = @SecurityRequirement(name = "bearerAuth")
+		security = @SecurityRequirement(name = "cookieAuth")
 	)
 	@ApiResponse(responseCode = "200", description = "Successfully retrieved all accounts",
 		content = @Content(
@@ -42,7 +42,7 @@ public class AccountController extends BaseController {
 			schema = @Schema(implementation = ListOfAccountDto.class)
 		)
 	)
-	@SecurityRequirement(name = "bearerAuth", scopes = {"ADMIN"})
+	@SecurityRequirement(name = "cookieAuth", scopes = {"ADMIN"})
 	@GetMapping
 	public ResponseEntity<Object> getAllAccounts() {
 		List<AccountSecureDto> accounts = accountService.getAllAccounts();
@@ -70,7 +70,7 @@ public class AccountController extends BaseController {
 			)
 		)
 	)
-	@SecurityRequirement(name = "bearerAuth", scopes = {"ADMIN"})
+	@SecurityRequirement(name = "cookieAuth", scopes = {"ADMIN"})
 	@PostMapping
 	public ResponseEntity<Object> createAccount(
 		@Valid @RequestBody AccountRegistrationDto accountRegistrationDto
@@ -86,7 +86,7 @@ public class AccountController extends BaseController {
 			schema = @Schema(implementation = AccountSecureDto.class)
 		)
 	)
-	@SecurityRequirement(name = "bearerAuth", scopes = {"ADMIN", "USER"})
+	@SecurityRequirement(name = "cookieAuth", scopes = {"ADMIN", "USER"})
 	@GetMapping("{accountId}")
 	public ResponseEntity<Object> getAccount(
 		@PathVariable Long accountId
@@ -102,7 +102,7 @@ public class AccountController extends BaseController {
 			schema = @Schema(implementation = AccountSecureDto.class)
 		)
 	)
-	@SecurityRequirement(name = "bearerAuth", scopes = {"ADMIN", "USER"})
+	@SecurityRequirement(name = "cookieAuth", scopes = {"ADMIN", "USER"})
 	@PutMapping("{accountId}")
 	public ResponseEntity<Object> updateAccount(
 		@PathVariable Long accountId,
@@ -114,7 +114,7 @@ public class AccountController extends BaseController {
 
 	@Operation(summary = "Delete an account", description = "Deletes an account with the provided account ID")
 	@ApiResponse(responseCode = "204", description = "Successfully deleted account")
-	@SecurityRequirement(name = "bearerAuth", scopes = {"ADMIN"})
+	@SecurityRequirement(name = "cookieAuth", scopes = {"ADMIN"})
 	@DeleteMapping("{accountId}")
 	public ResponseEntity<Object> deleteAccount(
 		@PathVariable Long accountId
@@ -132,7 +132,7 @@ public class AccountController extends BaseController {
 			schema = @Schema(implementation = AccountSecureDto.class)
 		)
 	)
-	@SecurityRequirement(name = "bearerAuth", scopes = {"ADMIN", "USER"})
+	@SecurityRequirement(name = "cookieAuth", scopes = {"ADMIN", "USER"})
 	@PatchMapping("{accountId}/account")
 	public ResponseEntity<Object> patchAccount(
 		@PathVariable Long accountId,
@@ -144,7 +144,7 @@ public class AccountController extends BaseController {
 
 	@Operation(summary = "Patch an account's password", description = "Patches with the provided request body")
 	@ApiResponse(responseCode = "204", description = "Successfully patched account's password")
-	@SecurityRequirement(name = "bearerAuth", scopes = {"ADMIN", "USER"})
+	@SecurityRequirement(name = "cookieAuth", scopes = {"ADMIN", "USER"})
 	@PatchMapping("{accountId}/password")
 	public ResponseEntity<Object> updatePassword(
 		@PathVariable Long accountId,
@@ -156,7 +156,7 @@ public class AccountController extends BaseController {
 
 	@Operation(summary = "Patch an account's privilege", description = "Patches with the provided request body")
 	@ApiResponse(responseCode = "204", description = "Successfully patched account's privilege")
-	@SecurityRequirement(name = "bearerAuth", scopes = {"ADMIN"})
+	@SecurityRequirement(name = "cookieAuth", scopes = {"ADMIN"})
 	@PatchMapping("{accountId}/privilege")
 	public ResponseEntity<Object> updatePrivilege(
 		@PathVariable Long accountId,
