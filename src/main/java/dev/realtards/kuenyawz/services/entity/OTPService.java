@@ -65,6 +65,17 @@ public interface OTPService {
 
 	enum OTPType {
 		NUMERIC,
-		ALPHA_NUMERIC
+		ALPHA_NUMERIC;
+
+		OTPType fromString(String type) {
+			if (type == null) {
+				return NUMERIC;
+			}
+			return switch (type.toUpperCase()) {
+				case "NUMERIC" -> NUMERIC;
+				case "ALPHA_NUMERIC" -> ALPHA_NUMERIC;
+				default -> throw new IllegalArgumentException("Invalid OTP type: " + type);
+			};
+		}
 	}
 }
