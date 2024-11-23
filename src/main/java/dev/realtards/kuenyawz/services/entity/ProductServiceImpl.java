@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.services;
+package dev.realtards.kuenyawz.services.entity;
 
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPatchDto;
@@ -12,6 +12,7 @@ import dev.realtards.kuenyawz.exceptions.ResourceNotFoundException;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
 import dev.realtards.kuenyawz.repositories.ProductRepository;
 import dev.realtards.kuenyawz.repositories.ProductSpec;
+import dev.realtards.kuenyawz.services.logic.ImageStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -51,6 +52,7 @@ public class ProductServiceImpl implements ProductService {
 			.toList();
 	}
 
+	@Override
 	public Page<ProductDto> getAllProductsPaginated(String category, String keyword, Boolean available, Integer page, Integer pageSize) {
 		PageRequest pageRequest = buildPageRequest(page, pageSize);
 		Specification<Product> specification = withFilters(category, keyword, available).and(isNotDeleted());

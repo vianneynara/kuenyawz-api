@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.services;
+package dev.realtards.kuenyawz.services.logic;
 
 import dev.realtards.kuenyawz.dtos.account.AccountRegistrationDto;
 import dev.realtards.kuenyawz.dtos.account.AccountSecureDto;
@@ -9,6 +9,7 @@ import dev.realtards.kuenyawz.entities.RefreshToken;
 import dev.realtards.kuenyawz.exceptions.InvalidPasswordException;
 import dev.realtards.kuenyawz.exceptions.UnauthorizedException;
 import dev.realtards.kuenyawz.mapper.AccountMapper;
+import dev.realtards.kuenyawz.services.entity.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -82,20 +83,20 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public AccountSecureDto getUserInfo(Authentication authentication) {
-		AccountSecureDto accountSecureDto = accountMapper.fromEntity(
-			(Account) authentication.getPrincipal()
-		);
-		return accountSecureDto;
+	public AccountSecureDto getUserInfo(Authentication auth) {
+		try {
+			Account account = (Account) auth.getPrincipal();
+			AccountSecureDto accountSecureDto = accountMapper.fromEntity(account);
+			return accountSecureDto;
+		} catch (ClassCastException e) {
+			throw new UnauthorizedException();
+		}
 	}
 
 	@Override
 	public AccountSecureDto getCurrentUserInfo() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		AccountSecureDto accountSecureDto = accountMapper.fromEntity(
-			(Account) auth.getPrincipal()
-		);
-		return accountSecureDto;
+		return getUserInfo(auth);
 	}
 
 	@Override
@@ -107,7 +108,7 @@ public class AuthServiceImpl implements AuthService {
 		String accessToken = jwtService.generateAccessToken(account);
 		RefreshToken refreshToken = refreshTokenService.createRefreshToken(account);
 
-		AuthResponseDto authResponseDto =  AuthResponseDto.builder()
+		AuthResponseDto authResponseDto = AuthResponseDto.builder()
 			.accessToken(accessToken)
 			.refreshToken(refreshToken.getToken())
 			.iat(jwtService.getIssuedAt(accessToken))

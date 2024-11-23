@@ -8,6 +8,7 @@ import dev.realtards.kuenyawz.exceptions.InvalidPasswordException;
 import dev.realtards.kuenyawz.exceptions.PasswordMismatchException;
 import dev.realtards.kuenyawz.mapper.AccountMapper;
 import dev.realtards.kuenyawz.repositories.AccountRepository;
+import dev.realtards.kuenyawz.services.entity.AccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -35,50 +34,52 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSec) throws Exception {
 		httpSec
+			// TODO: uncomment security configurations
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**"))
 			.authorizeHttpRequests(auth -> auth
-				// H2 Console access
-				.requestMatchers("/h2-console/**").permitAll()
-
-				// Allow preflight requests
-				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-				// Public endpoints
-				.requestMatchers(HttpMethod.GET,
-					"/api",
-					"/api/status",
-					"/api/images/**",
-					"/api/products",
-					"/api/products/**",
-					"/api/recommender/**").permitAll()
-
-				// Auth endpoints (all public)
-				.requestMatchers(HttpMethod.POST,
-					"/api/auth/register",
-					"/api/auth/login",
-					"/api/auth/revoke",
-					"/api/auth/refresh",
-					"/api/auth/otp/request",
-					"/api/auth/otp/verify").permitAll()
-
-				// Simulator endpoints
-				.requestMatchers("/api/sim/**").permitAll()
-
-				// Account endpoints
-				.requestMatchers(HttpMethod.GET, "/api/accounts").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.POST, "/api/accounts").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.PATCH, "/api/accounts/{accountId:\\d+}/privilege").hasRole("ADMIN")
-				.requestMatchers("/api/accounts/**").hasAnyRole("ADMIN", "USER")
-
-				// Product/Image admin endpoints
-				.requestMatchers(HttpMethod.POST, "/api/products/**", "/api/images/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.PUT, "/api/products/**", "/api/images/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.DELETE, "/api/products/**", "/api/images/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole("ADMIN")
-
-				// Catch-all
-				.anyRequest().authenticated()
+//				// H2 Console access
+//				.requestMatchers("/h2-console/**").permitAll()
+//
+//				// Allow preflight requests
+//				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+//
+//				// Public endpoints
+//				.requestMatchers(HttpMethod.GET,
+//					"/api",
+//					"/api/status",
+//					"/api/images/**",
+//					"/api/products",
+//					"/api/products/**",
+//					"/api/recommender/**").permitAll()
+//
+//				// Auth endpoints (all public)
+//				.requestMatchers(HttpMethod.POST,
+//					"/api/auth/register",
+//					"/api/auth/login",
+//					"/api/auth/revoke",
+//					"/api/auth/refresh",
+//					"/api/auth/otp/request",
+//					"/api/auth/otp/verify").permitAll()
+//
+//				// Simulator endpoints
+//				.requestMatchers("/api/sim/**").permitAll()
+//
+//				// Account endpoints
+//				.requestMatchers(HttpMethod.GET, "/api/accounts").hasRole("ADMIN")
+//				.requestMatchers(HttpMethod.POST, "/api/accounts").hasRole("ADMIN")
+//				.requestMatchers(HttpMethod.PATCH, "/api/accounts/{accountId:\\d+}/privilege").hasRole("ADMIN")
+//				.requestMatchers("/api/accounts/**").hasAnyRole("ADMIN", "USER")
+//
+//				// Product/Image admin endpoints
+//				.requestMatchers(HttpMethod.POST, "/api/products/**", "/api/images/**").hasRole("ADMIN")
+//				.requestMatchers(HttpMethod.PUT, "/api/products/**", "/api/images/**").hasRole("ADMIN")
+//				.requestMatchers(HttpMethod.DELETE, "/api/products/**", "/api/images/**").hasRole("ADMIN")
+//				.requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole("ADMIN")
+//
+//				// Catch-all
+//				.anyRequest().authenticated()
+					.anyRequest().permitAll()
 			)
 			.headers(hs -> hs.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
 			.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

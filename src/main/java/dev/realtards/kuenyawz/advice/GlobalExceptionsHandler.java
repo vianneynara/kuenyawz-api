@@ -2,6 +2,7 @@ package dev.realtards.kuenyawz.advice;
 
 import dev.realtards.kuenyawz.advice.responses.ErrorResponse;
 import dev.realtards.kuenyawz.advice.responses.ListedErrors;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.TransactionalException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +64,11 @@ public class GlobalExceptionsHandler {
 	@ExceptionHandler(NoResourceFoundException.class)
 	public ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of("Resource might not exist"));
+	}
+
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of(ex.getMessage()));
 	}
 
 	@ExceptionHandler(TransactionSystemException.class)

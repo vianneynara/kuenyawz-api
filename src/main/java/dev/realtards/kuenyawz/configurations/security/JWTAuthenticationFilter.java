@@ -1,6 +1,6 @@
 package dev.realtards.kuenyawz.configurations.security;
 
-import dev.realtards.kuenyawz.services.JWTService;
+import dev.realtards.kuenyawz.services.logic.JWTService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
