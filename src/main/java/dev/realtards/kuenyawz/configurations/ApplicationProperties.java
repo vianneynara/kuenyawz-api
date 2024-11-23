@@ -1,5 +1,6 @@
 package dev.realtards.kuenyawz.configurations;
 
+import dev.realtards.kuenyawz.services.entity.OTPService;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,6 +30,9 @@ public class ApplicationProperties {
 	private Integer maxVariantQuantity = 250;
 	private String publicIp = "localhost";
 	private String httpProtocol = "http";
+
+	@Value("${application.otp-format:NUMERIC}")
+	private OTPService.OTPType otpFormat = OTPService.OTPType.NUMERIC;
 
 	@Value("${server.port:8081}")
 	private String serverPort;
