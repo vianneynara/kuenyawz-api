@@ -25,7 +25,7 @@ public class ClosedDate extends Auditables {
 	@Enumerated(EnumType.STRING)
 	private ClosureType closureType = ClosureType.CLOSED;
 
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	@Temporal(TemporalType.DATE)
 	private Date date;
 
