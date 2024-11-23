@@ -57,7 +57,9 @@ public class SecurityConfig {
 					"/api/images/**",
 					"/api/products",
 					"/api/products/**",
-					"/api/recommender/**").permitAll()
+					"/api/recommender/**",
+					"/api/closure",
+					"/api/closure/**").permitAll()
 
 				// Auth endpoints (all public)
 				.requestMatchers(HttpMethod.POST,
@@ -77,11 +79,18 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.PATCH, "/api/accounts/{accountId:\\d+}/privilege").hasRole("ADMIN")
 				.requestMatchers("/api/accounts/**").hasAnyRole("ADMIN", "USER")
 
+				// Closure endpoints
+				.requestMatchers(HttpMethod.POST, "/api/closure").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.DELETE, "/api/closure").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.PATCH, "/api/closure").hasRole("ADMIN")
+
 				// Product/Image admin endpoints
 				.requestMatchers(HttpMethod.POST, "/api/products/**", "/api/images/**").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.PUT, "/api/products/**", "/api/images/**").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.DELETE, "/api/products/**", "/api/images/**").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole("ADMIN")
+
+				// Closure endpoints
 
 				// Catch-all
 				.anyRequest().authenticated()
