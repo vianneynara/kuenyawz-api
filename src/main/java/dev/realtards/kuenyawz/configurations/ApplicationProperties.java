@@ -29,6 +29,7 @@ public class ApplicationProperties {
 	private Integer maxVariantQuantity = 250;
 	private String publicIp = "localhost";
 	private String httpProtocol = "http";
+	private String timezone = "Asia/Jakarta";
 
 	@Value("${server.port:8081}")
 	private String serverPort;
