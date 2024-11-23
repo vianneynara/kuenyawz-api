@@ -112,6 +112,7 @@ public class ClosedDateController {
 		@ApiResponse(responseCode = "204", description = "Successfully deleted closed dates"),
 		@ApiResponse(responseCode = "400", description = "Invalid request parameters")
 	})
+	@SecurityRequirement(name = "cookieAuth")
 	@DeleteMapping
 	public ResponseEntity<?> deleteClosedDates(
 		@NotNull @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
