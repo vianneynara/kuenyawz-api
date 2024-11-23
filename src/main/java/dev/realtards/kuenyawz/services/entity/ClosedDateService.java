@@ -4,9 +4,10 @@ import dev.realtards.kuenyawz.dtos.closeddate.ClosedDateDto;
 import dev.realtards.kuenyawz.dtos.closeddate.ClosedDatePatchDto;
 import dev.realtards.kuenyawz.dtos.closeddate.ClosedDatePostDto;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ClosedDateService {
@@ -15,19 +16,19 @@ public interface ClosedDateService {
 	List<ClosedDateDto> getAll();
 
 	@Transactional(readOnly = true)
-	Page<ClosedDateDto> getAll(Integer page, Integer pageSize);
+	Page<ClosedDateDto> getAll(Pageable pageable);
 
 	@Transactional(readOnly = true)
-	List<ClosedDateDto> getAllBetween(Date from, Date to);
+	List<ClosedDateDto> getAllBetween(LocalDate from, LocalDate to);
 
 	@Transactional(readOnly = true)
-	Page<ClosedDateDto> getAllBetween(Date from, Date to, Integer page, Integer pageSize);
+	Page<ClosedDateDto> getAllBetween(LocalDate from, LocalDate to, Pageable pageable);
 
 	@Transactional(readOnly = true)
 	ClosedDateDto getById(Long closedDateId);
 
 	@Transactional(readOnly = true)
-	ClosedDateDto getByDate(Date date);
+	ClosedDateDto getByDate(LocalDate date);
 
 	@Transactional
 	ClosedDateDto create(Iterable<ClosedDatePostDto> closedDatePostDto);
@@ -39,8 +40,8 @@ public interface ClosedDateService {
 	void deleteById(Long closedDateId);
 
 	@Transactional
-	void deleteBetween(Date from, Date to);
+	void deleteBetween(LocalDate from, LocalDate to);
 
 	@Transactional(readOnly = true)
-	boolean isDateAvailable(Date date);
+	boolean isDateAvailable(LocalDate date);
 }
