@@ -1,5 +1,7 @@
 package dev.realtards.kuenyawz.entities;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,7 +23,7 @@ public class ClosedDate extends Auditables {
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	private ClosureType type = ClosureType.CLOSED;
+	private ClosureType closureType = ClosureType.CLOSED;
 
 	@Column(nullable = false)
 	@Temporal(TemporalType.DATE)
@@ -34,15 +36,22 @@ public class ClosedDate extends Auditables {
 		CLOSED("CLOSED"),
 		RESERVED("RESERVED");
 
-		String value;
+		String closureType;
 
 		ClosureType(String name) {
-			this.value = name;
+			this.closureType = name;
 		}
 
-		ClosureType fromString(String name) {
+		@JsonValue
+		public String getClosureType() {
+			return closureType;
+		}
+
+		@JsonCreator
+		public static ClosureType fromString(String name) {
+			if (name == null) return null;
 			for (ClosureType type : ClosureType.values()) {
-				if (type.value.equals(name)) {
+				if (type.closureType.equalsIgnoreCase(name) || type.name().equalsIgnoreCase(name)) {
 					return type;
 				}
 			}
