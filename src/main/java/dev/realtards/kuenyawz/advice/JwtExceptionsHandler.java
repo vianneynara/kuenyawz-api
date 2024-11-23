@@ -1,6 +1,7 @@
 package dev.realtards.kuenyawz.advice;
 
 import dev.realtards.kuenyawz.advice.responses.ErrorResponse;
+import dev.realtards.kuenyawz.exceptions.InvalidRefreshTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -44,5 +45,10 @@ public class JwtExceptionsHandler {
 	@ExceptionHandler(SignatureException.class)
 	public ResponseEntity<Object> handleSignatureException(SignatureException ex) {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse.of("Invalid signature"));
+	}
+
+	@ExceptionHandler(InvalidRefreshTokenException.class)
+	public ResponseEntity<Object> handleInvalidRefreshTokenException(InvalidRefreshTokenException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse.of(ex.getMessage()));
 	}
 }

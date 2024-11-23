@@ -44,7 +44,7 @@ public class ProductImageController extends BaseController {
 		@ApiResponse(responseCode = "400", description = "Invalid image file"),
 		@ApiResponse(responseCode = "404", description = "Product not found"),
 	})
-	@SecurityRequirement(name = "bearerAuth")
+	@SecurityRequirement(name = "cookieAuth")
 	@PostMapping("{productId}")
 	public ResponseEntity<Object> uploadImage(
 		@PathVariable Long productId,
@@ -61,7 +61,7 @@ public class ProductImageController extends BaseController {
 		@ApiResponse(responseCode = "400", description = "Invalid image file"),
 		@ApiResponse(responseCode = "404", description = "Product not found"),
 	})
-	@SecurityRequirement(name = "bearerAuth")
+	@SecurityRequirement(name = "cookieAuth")
 	@PostMapping("{productId}/batch")
 	public ResponseEntity<Object> batchUploadImage(
 		@PathVariable Long productId,
@@ -100,7 +100,7 @@ public class ProductImageController extends BaseController {
 		@ApiResponse(responseCode = "204", description = "Image deleted successfully"),
 		@ApiResponse(responseCode = "404", description = "Product or image not found"),
 	})
-	@SecurityRequirement(name = "bearerAuth")
+	@SecurityRequirement(name = "cookieAuth")
 	@DeleteMapping("{productId}/{resourceUri}")
 	public ResponseEntity<Object> deleteImage(
 		@PathVariable Long productId,
@@ -115,7 +115,7 @@ public class ProductImageController extends BaseController {
 		@ApiResponse(responseCode = "204", description = "Images deleted successfully"),
 		@ApiResponse(responseCode = "404", description = "Product not found"),
 	})
-	@SecurityRequirement(name = "bearerAuth")
+	@SecurityRequirement(name = "cookieAuth")
 	@DeleteMapping("{productId}")
 	public ResponseEntity<Object> deleteAllImagesOfProduct(
 		@PathVariable Long productId
@@ -128,7 +128,7 @@ public class ProductImageController extends BaseController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "204", description = "Images deleted successfully"),
 	})
-	@SecurityRequirement(name = "bearerAuth")
+	@SecurityRequirement(name = "cookieAuth")
 	@DeleteMapping("all")
 	public ResponseEntity<Object> deleteAllImages() {
 		imageStorageService.deleteAll();

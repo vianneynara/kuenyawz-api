@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,11 +17,18 @@ public class OpenAPIConfig {
 	public OpenAPI customOpenAPI() {
 		return new OpenAPI()
 			.components(new Components()
-				.addSecuritySchemes("bearerAuth",
+				.addSecuritySchemes("cookieAuth",
 					new SecurityScheme()
-						.type(SecurityScheme.Type.HTTP)
-						.scheme("bearer")
-						.bearerFormat("JWT")))
+						.type(SecurityScheme.Type.APIKEY)
+						.in(SecurityScheme.In.COOKIE)
+						.name("accessToken")
+						.description("HTTP-only cookie authentication"))
+				.addSecuritySchemes("refreshCookie",
+					new SecurityScheme()
+						.type(SecurityScheme.Type.APIKEY)
+						.in(SecurityScheme.In.COOKIE)
+						.name("refreshToken")
+						.description("HTTP-only refresh token cookie")))
 			.info(new Info()
 				.title("KuenyaWZ API")
 				.version("1.0.0")
@@ -32,6 +40,8 @@ public class OpenAPIConfig {
 				.license(new License()
 					.name("MIT")
 					.url("https://github.com/vianneynara/kuenyawz-api/blob/main/LICENSE"))
-			);
+			)
+			.addSecurityItem(new SecurityRequirement().addList("cookieAuth"))
+			.addSecurityItem(new SecurityRequirement().addList("refreshCookie"));
 	}
 }

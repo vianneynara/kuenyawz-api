@@ -53,7 +53,7 @@ public class ApplicationProperties {
 		this.security.jwtTokenExpSeconds = Long.parseLong(dotenv.get("JWT_ACCESS_EXP_SECONDS", "3600"));
 		this.security.jwtRefreshDays = Long.parseLong(dotenv.get("REFRESH_TOKEN_EXP_DAYS", "7"));
 		this.security.otpPhoneNumber = dotenv.get("OTP_PHONE_NUMBER", null);
-		this.security.otpWaApiKey = dotenv.get("OTP_WA_API_KEY", null);
+		this.security.fonnteApiToken = dotenv.get("FONNTE_API_TOKEN", null);
 		this.security.otpExpireSeconds = Long.parseLong(dotenv.get("OTP_EXPIRE_SECONDS", "300"));
 		this.security.otpLength = Integer.parseInt(dotenv.get("OTP_LENGTH", "6"));
 	}
@@ -85,7 +85,7 @@ public class ApplicationProperties {
 		private long jwtTokenExpSeconds;
 		private long jwtRefreshDays;
 		private String otpPhoneNumber;
-		private String otpWaApiKey;
+		private String fonnteApiToken;
 		private long otpExpireSeconds;
 		private int otpLength;
 	}
