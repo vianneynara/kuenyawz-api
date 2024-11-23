@@ -18,10 +18,8 @@ public interface ClosedDateMapper {
     @Mapping(target = "closureType", expression = "java(parseClosureType(dto.getType()))")
     ClosedDate toEntity(ClosedDatePostDto dto);
 
-    default Date parseDate(String dateStr) {
-        return Date.from(LocalDate.parse(dateStr, DateTimeFormatter.ISO_DATE)
-            .atStartOfDay()
-            .toInstant(ZoneOffset.UTC));
+    default LocalDate parseDate(String dateStr) {
+        return LocalDate.parse(dateStr, DateTimeFormatter.ISO_DATE);
     }
 
     default ClosedDate.ClosureType parseClosureType(String type) {

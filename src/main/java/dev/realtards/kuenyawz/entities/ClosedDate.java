@@ -6,7 +6,7 @@ import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -27,7 +27,7 @@ public class ClosedDate extends Auditables {
 
 	@Column(nullable = false, unique = true)
 	@Temporal(TemporalType.DATE)
-	private Date date;
+	private LocalDate date;
 
 	@Column
 	private String reason;
