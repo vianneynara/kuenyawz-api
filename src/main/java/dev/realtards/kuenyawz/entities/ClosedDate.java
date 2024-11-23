@@ -16,8 +16,8 @@ public class ClosedDate extends Auditables {
 
 	@Id
 	@SnowFlakeIdValue(name = "custom_schedule_id")
-	@Column(name = "custom_schedule_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
-	private Long customScheduleId;
+	@Column(name = "closed_date_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
+	private Long closedDateId;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
