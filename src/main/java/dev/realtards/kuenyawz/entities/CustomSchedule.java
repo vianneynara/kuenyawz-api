@@ -32,8 +32,7 @@ public class CustomSchedule extends Auditables {
 
 	public enum ScheduleType {
 		CLOSED("CLOSED"),
-		ONE_TIME("ONE_TIME"),
-		RECURRING("RECURRING");
+		RESERVED("RESERVED");
 
 		String value;
 
