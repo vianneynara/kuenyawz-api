@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderItems {
+public class OrderItem {
     @Id
     @SnowFlakeIdValue(name = "transaction_id")
     @Column(name = "order_item_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
@@ -20,7 +20,7 @@ public class OrderItems {
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
-    private Orders orderId;
+    private Order orderId;
 
     @Column
     private String note;
