@@ -26,6 +26,9 @@ public class Orders extends Auditables {
     private LocalDateTime orderDate;
 
     @Column
+    private String address;
+
+    @Column
     private Long coordinates;
 
     @ManyToOne(fetch = FetchType.LAZY)
