@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface OrderItemsService {
+
     @Transactional(readOnly = true)
     List<OrderItemDto> getAllOrderItems();
 
