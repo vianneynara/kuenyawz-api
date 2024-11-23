@@ -16,7 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class Product extends DeletableAuditables {
+public class Product extends SoftDeleteAuditables {
 
 	@Id
 	@SnowFlakeIdValue(name = "product_id")

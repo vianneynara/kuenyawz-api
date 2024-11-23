@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @MappedSuperclass
 @NoArgsConstructor @AllArgsConstructor @SuperBuilder
 @Setter @Getter
-public abstract class DeletableAuditables extends Auditables {
+public abstract class SoftDeleteAuditables extends Auditables {
 
 	@Column(name = "deleted", nullable = false)
 	private Boolean deleted = false;
