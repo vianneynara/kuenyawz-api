@@ -36,10 +36,10 @@ public class ClosedDate extends Auditables {
 		CLOSED("CLOSED"),
 		RESERVED("RESERVED");
 
-		String closureType;
+		final String closureType;
 
-		ClosureType(String name) {
-			this.closureType = name;
+		ClosureType(String closureType) {
+			this.closureType = closureType;
 		}
 
 		@JsonValue
