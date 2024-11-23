@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class CartItemDto {
 
     @Schema(description = "Cart Item Id")
-    private Long CartItemId;
+    private Long cartItemId;
 
     @Schema(description = "Product in Cart Item")
     private ProductDto product;

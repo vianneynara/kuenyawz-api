@@ -83,20 +83,20 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public AccountSecureDto getUserInfo(Authentication authentication) {
-		AccountSecureDto accountSecureDto = accountMapper.fromEntity(
-			(Account) authentication.getPrincipal()
-		);
-		return accountSecureDto;
+	public AccountSecureDto getUserInfo(Authentication auth) {
+		try {
+			Account account = (Account) auth.getPrincipal();
+			AccountSecureDto accountSecureDto = accountMapper.fromEntity(account);
+			return accountSecureDto;
+		} catch (ClassCastException e) {
+			throw new UnauthorizedException();
+		}
 	}
 
 	@Override
 	public AccountSecureDto getCurrentUserInfo() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		AccountSecureDto accountSecureDto = accountMapper.fromEntity(
-			(Account) auth.getPrincipal()
-		);
-		return accountSecureDto;
+		return getUserInfo(auth);
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class AuthServiceImpl implements AuthService {
 		String accessToken = jwtService.generateAccessToken(account);
 		RefreshToken refreshToken = refreshTokenService.createRefreshToken(account);
 
-		AuthResponseDto authResponseDto =  AuthResponseDto.builder()
+		AuthResponseDto authResponseDto = AuthResponseDto.builder()
 			.accessToken(accessToken)
 			.refreshToken(refreshToken.getToken())
 			.iat(jwtService.getIssuedAt(accessToken))

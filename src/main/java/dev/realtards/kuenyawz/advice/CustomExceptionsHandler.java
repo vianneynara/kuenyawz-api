@@ -68,4 +68,9 @@ public class CustomExceptionsHandler {
 	public ResponseEntity<Object> handleResourceUploadException(ResourceUploadException ex) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponse.of(ex.getMessage()));
 	}
+
+	@ExceptionHandler(SpecificationException.class)
+	public ResponseEntity<Object> handleSpecificationException(SpecificationException ex) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponse.of(ex.getMessage()));
+	}
 }
