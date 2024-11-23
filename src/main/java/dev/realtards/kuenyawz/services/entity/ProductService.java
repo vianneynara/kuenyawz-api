@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.services;
+package dev.realtards.kuenyawz.services.entity;
 
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
 import dev.realtards.kuenyawz.dtos.product.ProductPatchDto;

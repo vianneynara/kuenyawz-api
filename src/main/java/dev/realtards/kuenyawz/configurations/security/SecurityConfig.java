@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -38,6 +37,13 @@ public class SecurityConfig {
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**"))
 			.authorizeHttpRequests(auth -> auth
+				// Docs/Swagger access
+				.requestMatchers(
+					"/api/docs/**",
+					"/swagger-ui/**",
+					"/swagger-ui.html",
+					"/favicon.ico").permitAll()
+
 				// H2 Console access
 				.requestMatchers("/h2-console/**").permitAll()
 
@@ -101,17 +107,6 @@ public class SecurityConfig {
 			);
 
 		return httpSec.build();
-	}
-
-	@Bean
-	public WebSecurityCustomizer webSecurityCustomizer() {
-		return (web) -> web.ignoring()
-			.requestMatchers(
-				"/api/docs/**",
-				"/swagger-ui/**",
-				"/swagger-ui.html",
-				"/favicon.ico"
-			);
 	}
 
 	@Bean

@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.services;
+package dev.realtards.kuenyawz.services.entity;
 
 import dev.realtards.kuenyawz.configurations.ApplicationProperties;
 import dev.realtards.kuenyawz.dtos.auth.OtpRequestDto;
@@ -6,6 +6,7 @@ import dev.realtards.kuenyawz.dtos.auth.OtpVerifyDto;
 import dev.realtards.kuenyawz.entities.OTP;
 import dev.realtards.kuenyawz.exceptions.InvalidCredentialsException;
 import dev.realtards.kuenyawz.repositories.OTPRepository;
+import dev.realtards.kuenyawz.services.logic.WhatsappApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static dev.realtards.kuenyawz.services.OTPService.OTPGenerator.generateNumeric;
+import static dev.realtards.kuenyawz.services.entity.OTPService.OTPGenerator.generateNumeric;
 
 @Service
 @RequiredArgsConstructor

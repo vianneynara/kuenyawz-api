@@ -1,11 +1,9 @@
-package dev.realtards.kuenyawz.services;
+package dev.realtards.kuenyawz.services.logic;
 
-import dev.realtards.kuenyawz.dtos.csv.ProductCsvRecord;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 public interface ProductCsvService {
 

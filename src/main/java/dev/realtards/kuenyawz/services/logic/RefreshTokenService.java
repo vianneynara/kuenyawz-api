@@ -1,4 +1,4 @@
-package dev.realtards.kuenyawz.services;
+package dev.realtards.kuenyawz.services.logic;
 
 import dev.realtards.kuenyawz.entities.RefreshToken;
 import org.springframework.security.core.userdetails.UserDetails;

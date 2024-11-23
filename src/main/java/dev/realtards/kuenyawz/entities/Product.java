@@ -8,12 +8,14 @@ import lombok.experimental.SuperBuilder;
 import java.util.HashSet;
 import java.util.Set;
 
-// TODO: Remove sql restriction and use a custom repository to filter out deleted products
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@AllArgsConstructor @NoArgsConstructor @SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
 public class Product extends DeletableAuditables {
 
 	@Id

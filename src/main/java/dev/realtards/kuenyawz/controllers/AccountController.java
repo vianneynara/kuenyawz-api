@@ -4,7 +4,7 @@ import dev.realtards.kuenyawz.dtos.account.*;
 import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.mapper.AccountMapper;
 import dev.realtards.kuenyawz.dtos.account.ListOfAccountDto;
-import dev.realtards.kuenyawz.services.AccountService;
+import dev.realtards.kuenyawz.services.entity.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
