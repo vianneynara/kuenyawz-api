@@ -47,7 +47,10 @@ public class OTPServiceImpl implements OTPService {
 			properties.getSecurity().getOtpExpireSeconds() / 60
 		);
 
+
 		whatsappApiService.send(otpRequestDto.getPhone(), otpMessage, "62");
+//		String response = whatsappApiService.send(otpRequestDto.getPhone(), otpMessage, "62");
+//		log.warn("Response from WhatsApp API: {}", response);
 	}
 
 	@Override
