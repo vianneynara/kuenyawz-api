@@ -1,9 +1,7 @@
 package dev.realtards.kuenyawz.entities;
 
 import dev.realtards.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
@@ -22,9 +20,11 @@ public class ClosedDate extends Auditables {
 	private Long customScheduleId;
 
 	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
 	private ClosureType closureType = ClosureType.CLOSED;
 
 	@Column(nullable = false)
+	@Temporal(TemporalType.DATE)
 	private Date date;
 
 	@Column
