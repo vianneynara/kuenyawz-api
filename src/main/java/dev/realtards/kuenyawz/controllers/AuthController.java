@@ -159,9 +159,8 @@ public class AuthController {
 		refreshTokenCookie.setPath("/");
 		refreshTokenCookie.setMaxAge(60 * 60 * 24 * 7);
 
-		// TODO: Remove this after development
-//		authResponseDto.setAccessToken(null);
-//		authResponseDto.setRefreshToken(null);
+		authResponseDto.setAccessToken(null);
+		authResponseDto.setRefreshToken(null);
 
 		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 		assert requestAttributes != null : "Request attributes must not be null";
