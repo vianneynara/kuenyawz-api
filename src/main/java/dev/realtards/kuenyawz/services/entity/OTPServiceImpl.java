@@ -6,6 +6,7 @@ import dev.realtards.kuenyawz.dtos.auth.OtpVerifyDto;
 import dev.realtards.kuenyawz.entities.OTP;
 import dev.realtards.kuenyawz.exceptions.InvalidCredentialsException;
 import dev.realtards.kuenyawz.repositories.OTPRepository;
+import dev.realtards.kuenyawz.services.logic.WhatsappApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
