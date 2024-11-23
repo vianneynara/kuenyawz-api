@@ -2,6 +2,7 @@ package dev.realtards.kuenyawz.configurations;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.io.File;
 
@@ -11,6 +12,7 @@ import java.io.File;
  * this can be set by the secure secrets' management.
  * */
 @Configuration
+@Profile("dev")
 public class DevConfig {
     
     @PostConstruct
