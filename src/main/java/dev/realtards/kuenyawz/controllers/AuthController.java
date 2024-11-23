@@ -96,6 +96,7 @@ public class AuthController {
 				schema = @Schema(implementation = AuthResponseDto.class)
 			))
 	})
+	@SecurityRequirement(name = "refreshCookie")
 	@PostMapping("/refresh")
 	public ResponseEntity<Object> refresh(
 		@Valid @RequestBody(required = false) AuthRefreshTokenDto tokenDto
@@ -115,7 +116,7 @@ public class AuthController {
 			)),
 		@ApiResponse(responseCode = "404", description = "User not found")
 	})
-	@SecurityRequirement(name = "bearerAuth", scopes = {"USER", "ADMIN"})
+	@SecurityRequirement(name = "cookieAuth", scopes = {"USER", "ADMIN"})
 	@GetMapping("/me")
 	public ResponseEntity<Object> me() {
 		AccountSecureDto accountSecureDto = authService.getCurrentUserInfo();
@@ -158,8 +159,9 @@ public class AuthController {
 		refreshTokenCookie.setPath("/");
 		refreshTokenCookie.setMaxAge(60 * 60 * 24 * 7);
 
-		authResponseDto.setAccessToken(null);
-		authResponseDto.setRefreshToken(null);
+		// TODO: Remove this after development
+//		authResponseDto.setAccessToken(null);
+//		authResponseDto.setRefreshToken(null);
 
 		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 		assert requestAttributes != null : "Request attributes must not be null";
