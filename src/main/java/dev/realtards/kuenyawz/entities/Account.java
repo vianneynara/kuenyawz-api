@@ -55,6 +55,12 @@ public class Account extends Auditables implements UserDetails {
 	@Version
 	private Long version;
 
+	@OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<CartItem> cartItems;
+
+	@OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<Transactions> transactions;
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return List.of(privilege);
@@ -84,9 +90,6 @@ public class Account extends Auditables implements UserDetails {
 	public boolean isEnabled() {
 		return UserDetails.super.isEnabled();
 	}
-
-	@OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<Transactions> transactions;
 
 	/**
 	 * Type of privilege of an account.

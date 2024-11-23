@@ -4,8 +4,8 @@ import dev.realtards.kuenyawz.dtos.cartItem.CartItemDto;
 import dev.realtards.kuenyawz.dtos.cartItem.CartItemPatchDto;
 import dev.realtards.kuenyawz.dtos.cartItem.CartItemPostDto;
 import dev.realtards.kuenyawz.entities.Account;
-import dev.realtards.kuenyawz.exceptions.UnauthorizedException;
 import dev.realtards.kuenyawz.services.entity.CartItemService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +24,7 @@ public class CartServiceImpl implements CartService {
 	public List<CartItemDto> getCartItems() {
 		Account account = getAccountOrThrow();
 
-		return cartItemService.getCartItemsOfUser(account.getAccountId());
+		return cartItemService.getCartItemsOfAccount(account.getAccountId());
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class CartServiceImpl implements CartService {
 		Account account = getAccountOrThrow();
 		PageRequest pageRequest = PageRequest.of(page, pageSize);
 
-		return cartItemService.getCartItemsOfUser(account.getAccountId(), pageRequest);
+		return cartItemService.getCartItemsOfAccount(account.getAccountId(), pageRequest);
 	}
 
 	@Override
@@ -56,14 +56,14 @@ public class CartServiceImpl implements CartService {
 	public boolean deleteCartItem(Long cartItemId) {
 		Account account = getAccountOrThrow();
 
-		return cartItemService.deleteCartItemOfUser(cartItemId, account.getAccountId());
+		return cartItemService.deleteCartItemOfAccount(cartItemId, account.getAccountId());
 	}
 
 	@Override
 	public boolean deleteCartItems() {
 		Account account = getAccountOrThrow();
 
-		return cartItemService.deleteCartItemsOfUser(account.getAccountId());
+		return cartItemService.deleteCartItemsOfAccount(account.getAccountId());
 	}
 
 	Account getAccountOrThrow() {
@@ -71,6 +71,6 @@ public class CartServiceImpl implements CartService {
 		if (principal instanceof Account) {
 			return (Account) principal;
 		}
-		throw new UnauthorizedException("Account could not be authenticated");
+		throw new EntityNotFoundException("Account not found");
 	}
 }

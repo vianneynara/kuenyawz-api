@@ -4,23 +4,24 @@ import dev.realtards.kuenyawz.dtos.cartItem.CartItemDto;
 import dev.realtards.kuenyawz.dtos.cartItem.CartItemPatchDto;
 import dev.realtards.kuenyawz.dtos.cartItem.CartItemPostDto;
 import dev.realtards.kuenyawz.dtos.product.ProductDto;
+import dev.realtards.kuenyawz.entities.Account;
 import dev.realtards.kuenyawz.entities.CartItem;
-import dev.realtards.kuenyawz.entities.Product;
 import dev.realtards.kuenyawz.entities.Variant;
-import dev.realtards.kuenyawz.exceptions.InvalidRequestBodyValue;
+import dev.realtards.kuenyawz.exceptions.IllegalOperationException;
+import dev.realtards.kuenyawz.exceptions.ResourceExistsException;
 import dev.realtards.kuenyawz.mapper.CartItemMapper;
 import dev.realtards.kuenyawz.mapper.ProductMapper;
 import dev.realtards.kuenyawz.repositories.CartItemRepository;
+import dev.realtards.kuenyawz.repositories.CartItemSpec;
 import dev.realtards.kuenyawz.repositories.VariantRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +35,8 @@ public class CartItemServiceImpl implements CartItemService {
 	public List<CartItemDto> getAllCartItems() {
 		List<CartItem> cartItems = cartItemRepository.findAll();
 		return cartItems.stream()
-				.map(this::convertToDto)
-				.toList();
+			.map(this::convertToDto)
+			.toList();
 	}
 
 	@Override
@@ -48,33 +49,33 @@ public class CartItemServiceImpl implements CartItemService {
 	@Override
 	public CartItemDto getCartItem(Long cartItemId) {
 		CartItem cartItem = cartItemRepository.findById(cartItemId)
-				.orElseThrow(()
-						-> new EntityNotFoundException("Cart Item Not Found By Id: " + cartItemId));
+			.orElseThrow(() -> new EntityNotFoundException("Cart Item Not Found By Id: " + cartItemId));
 
 		return convertToDto(cartItem);
 	}
 
 	@Override
 	public List<CartItemDto> getCartItemsOfAccount(Long accountId) {
-		List<CartItem> cartItems = cartItemRepository.findAllByAccountId(accountId);
+		List<CartItem> cartItems = cartItemRepository.findAllByAccount_AccountId(accountId);
 
 		return cartItems.stream()
-				.map(this::convertToDto)
-				.toList();
+			.map(this::convertToDto)
+			.toList();
 	}
 
 	@Override
 	public Page<CartItemDto> getCartItemsOfAccount(Long accountId, PageRequest pageRequest) {
-		Page<CartItem> cartItems = cartItemRepository.findAll(accountId, pageRequest);
+		Page<CartItem> cartItems = cartItemRepository.findAllByAccount_AccountId(accountId, pageRequest);
 
 		return cartItems.map(this::convertToDto);
 	}
 
 	@Override
 	public CartItemDto createCartItem(Long accountId, CartItemPostDto cartItemPostDto) {
-		validateCartItemDto(cartItemPostDto);
+		validateVariantExists(cartItemPostDto.getVariantId());
+		validateNoSameProductInAccountCart(cartItemPostDto.getVariantId());
 
-		CartItem cartItem = buildCartItem(cartItemPostDto);
+		CartItem cartItem = toEntity(cartItemPostDto);
 
 		CartItem savedCartItem = cartItemRepository.save(cartItem);
 		CartItemDto cartItemDto = convertToDto(savedCartItem);
@@ -83,81 +84,93 @@ public class CartItemServiceImpl implements CartItemService {
 	}
 
 	@Override
-	public CartItemDto patchCartItem(Long cartItemId, CartItemPatchDto cartItemPatchDto) {
+	public CartItemDto patchCartItem(Long cartItemId, CartItemPatchDto cartItemPatchDto, Long accountId) {
 		CartItem cartItem = cartItemRepository.findById(cartItemId)
-				.orElseThrow(() -> new EntityNotFoundException("CartItem not found for ID: " + cartItemId));
+			.orElseThrow(() -> new EntityNotFoundException("CartItem not found for ID: " + cartItemId));
+		Variant newVariant = cartItem.getVariant();
 
-		CartItem updatedCartItem = cartItemMapper.updateCartItemFromPatch(cartItem, cartItemPatchDto);
-		CartItem savedCartItem = cartItemRepository.save(updatedCartItem);
+		// Prevent necessary validation when the variant id is changed (skipped if the variant id is unchanged)
+		if (cartItemPatchDto.getVariantId() != null
+			&& !cartItemPatchDto.getVariantId().equals(cartItem.getVariant().getVariantId())
+		) {
+			newVariant = variantRepository.findById(cartItemPatchDto.getVariantId())
+				.orElseThrow(() -> new EntityNotFoundException("Variant not found with ID: " + cartItemPatchDto.getVariantId()));
+
+			// Compares whether the variant's of the same product as the cart item's variant's product
+			if (!newVariant.getProduct().getProductId().equals(cartItem.getVariant().getProduct().getProductId())) {
+				throw new IllegalOperationException("Variant not found for the product in this cart item");
+			}
+		}
+		if (cartItemPatchDto.getQuantity() != null
+			&& cartItemPatchDto.getQuantity() >= newVariant.getMinQuantity()
+			&& cartItemPatchDto.getQuantity() <= newVariant.getMaxQuantity()
+		) {
+			throw new IllegalOperationException("Quantity must be between " + newVariant.getMinQuantity() + " and " + newVariant.getMaxQuantity());
+		}
+
+		cartItem.patchFromDto(cartItemPatchDto, newVariant);
+		CartItem savedCartItem = cartItemRepository.save(cartItem);
 
 		return convertToDto(savedCartItem);
 	}
 
 	@Override
-	public boolean deleteCartItem(Long cartItemId) {
-		Optional<CartItem> cartItemOptional = cartItemRepository.findById(cartItemId);
+	public void deleteCartItem(Long cartItemId) {
+		CartItem cartItem = cartItemRepository.findById(cartItemId)
+			.orElseThrow(() -> new EntityNotFoundException("CartItem not found for ID: " + cartItemId));
 
-		if (cartItemOptional.isPresent()) {
-			cartItemRepository.delete(cartItemOptional.get());
-			return true;
-		}
-		return false;
+		cartItemRepository.deleteById(cartItem.getCartItemId());
 	}
-
 
 	@Override
 	public boolean deleteCartItemsOfAccount(Long accountId) {
-		int count = cartItemRepository.countCartItemByAccountId(accountId);
-		if (count == 0) {
-			return false;
-		}
-
-		cartItemRepository.deleteByAccount_AccountId(accountId);
-		return true;
+		int affected = cartItemRepository.deleteByAccount_AccountId(accountId);
+		return affected > 0;
 	}
 
-
-	private void validateCartItemDto(CartItemPostDto cartItemPostDto) {
-		if (cartItemPostDto == null) {
-			throw new InvalidRequestBodyValue("CartItemPostDto cannot be null");
-		}
-		if (variantRepository.findById(cartItemPostDto.getVariantId()).orElse(null) == null) {
-			throw new EntityNotFoundException("Cart Item not found for ID: " + cartItemPostDto.getVariantId());
-		}
+	@Override
+	public boolean deleteCartItemOfAccount(Long cartItemId, Long accountId) {
+		int affected = cartItemRepository.deleteByCartItemIdAndAccount_AccountId(cartItemId, accountId);
+		return affected > 0;
 	}
 
-	private CartItem buildCartItem(CartItemPostDto cartItemPostDto) {
-		Variant variant = variantRepository.findById(cartItemPostDto.getVariantId()).orElse(null);
+	public CartItemDto convertToDto(CartItem cartItem) {
+		ProductDto productDto = productMapper.fromEntity(cartItem.getVariant().getProduct());
 
-		variant.getProduct().getProductId();
+		CartItemDto cartItemDto = cartItemMapper.fromEntity(cartItem, productDto, cartItem.getVariant().getVariantId());
+		return cartItemDto;
+	}
+
+	private CartItem toEntity(CartItemPostDto cartItemPostDto) {
+		Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		Variant variant = variantRepository.findById(cartItemPostDto.getVariantId())
+			.orElseThrow(() -> new EntityNotFoundException("Variant not found with ID: " + cartItemPostDto.getVariantId()));
 
 		CartItem cartItem = CartItem.builder()
-				.variant(variant)
-				.note(cartItemPostDto.getNote())
-				.quantity(cartItemPostDto.getQuantity())
-				.build();
+			.variant(variant)
+			.note(cartItemPostDto.getNote())
+			.quantity(cartItemPostDto.getQuantity())
+			.account(account)
+			.build();
 
 		return cartItem;
 	}
 
-	private ProductDto getProductDto(CartItem cartItem) {
-		Variant variant = variantRepository.findById(cartItem.getVariant().getVariantId()).orElse(null);
-
-		Product productFinded = variant.getProduct();
-		ProductDto productDto = productMapper.fromEntity(productFinded);
-
-		return productDto;
+	private void validateVariantExists(Long variantId) {
+		variantRepository.findById(variantId)
+			.orElseThrow(() -> new EntityNotFoundException("Variant not found with ID: " + variantId));
 	}
 
-	public CartItemDto convertToDto(CartItem cartItem) {
-		ProductDto productDto = getProductDto(cartItem);
-		CartItemDto cartItemDto = cartItemMapper.fromEntity(cartItem, productDto);
+	private void validateNoSameProductInAccountCart(Long variantId) {
+		Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-		return cartItemDto;
-	}
-
-	@Override
-	public boolean deleteCartItemOfUser(Long cartItemId, Long accountId) {
-		return false;
+		// Scalable approach using JPA Specification
+		boolean exists = cartItemRepository.exists(
+			CartItemSpec.withSameProductAsVariantIdAndAccountId(variantId, account.getAccountId())
+		);
+		if (exists) {
+			throw new ResourceExistsException("Cart Item with the same product as the variant ID already exists");
+		}
 	}
 }
