@@ -154,4 +154,11 @@ public class AccountServiceImpl implements AccountService {
 	public boolean passwordMatches(String password, Account account) {
 		return passwordEncoder.matches(password, account.getPassword());
 	}
+
+	@Override
+	public void validatePhoneNoDuplicate(String phone) throws AccountExistsException {
+		if (accountRepository.existsByPhone(phone)) {
+			throw new AccountExistsException("Account with phone number '" + phone + "' exists");
+		}
+	}
 }

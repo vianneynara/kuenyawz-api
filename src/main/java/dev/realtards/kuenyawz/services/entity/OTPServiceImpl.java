@@ -26,6 +26,7 @@ public class OTPServiceImpl implements OTPService {
 	private final WhatsappApiService whatsappApiService;
 
 	public static final OTPType DEFAULT_OTP_TYPE = OTPType.ALPHA_NUMERIC;
+	private final AccountService accountService;
 
 	@Override
 	public void sendOTP(OtpRequestDto otpRequestDto) {
@@ -52,6 +53,8 @@ public class OTPServiceImpl implements OTPService {
 
 	@Override
 	public boolean verifyOTP(OtpVerifyDto otpVerifyDto) {
+		accountService.validatePhoneNoDuplicate(otpVerifyDto.getPhone());
+
 		return matchStoredOTP(otpVerifyDto.getPhone(), otpVerifyDto.getOtp());
 	}
 
