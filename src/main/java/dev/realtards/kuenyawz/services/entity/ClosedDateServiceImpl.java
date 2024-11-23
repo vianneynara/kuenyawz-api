@@ -4,8 +4,9 @@ import dev.realtards.kuenyawz.dtos.closeddate.ClosedDateDto;
 import dev.realtards.kuenyawz.dtos.closeddate.ClosedDatePatchDto;
 import dev.realtards.kuenyawz.dtos.closeddate.ClosedDatePostDto;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public class ClosedDateServiceImpl implements ClosedDateService {
@@ -15,17 +16,17 @@ public class ClosedDateServiceImpl implements ClosedDateService {
 	}
 
 	@Override
-	public Page<ClosedDateDto> getAll(Integer page, Integer pageSize) {
+	public Page<ClosedDateDto> getAll(Pageable pageable) {
 		return null;
 	}
 
 	@Override
-	public List<ClosedDateDto> getAllBetween(Date from, Date to) {
+	public List<ClosedDateDto> getAllBetween(LocalDate from, LocalDate to) {
 		return List.of();
 	}
 
 	@Override
-	public Page<ClosedDateDto> getAllBetween(Date from, Date to, Integer page, Integer pageSize) {
+	public Page<ClosedDateDto> getAllBetween(LocalDate from, LocalDate to, Pageable pageable) {
 		return null;
 	}
 
@@ -35,7 +36,7 @@ public class ClosedDateServiceImpl implements ClosedDateService {
 	}
 
 	@Override
-	public ClosedDateDto getByDate(Date date) {
+	public ClosedDateDto getByDate(LocalDate date) {
 		return null;
 	}
 
@@ -55,12 +56,12 @@ public class ClosedDateServiceImpl implements ClosedDateService {
 	}
 
 	@Override
-	public void deleteBetween(Date from, Date to) {
+	public void deleteBetween(LocalDate from, LocalDate to) {
 
 	}
 
 	@Override
-	public boolean isDateAvailable(Date date) {
+	public boolean isDateAvailable(LocalDate date) {
 		return false;
 	}
 }
