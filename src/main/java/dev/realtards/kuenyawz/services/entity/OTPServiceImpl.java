@@ -30,6 +30,8 @@ public class OTPServiceImpl implements OTPService {
 
 	@Override
 	public void sendOTP(OtpRequestDto otpRequestDto) {
+		accountService.validatePhoneNoDuplicate(otpRequestDto.getPhone());
+
 		String newOtp = generateOTP(DEFAULT_OTP_TYPE);
 		otpRepository.findByPhone(otpRequestDto.getPhone())
 			.ifPresent(otpRepository::delete);
