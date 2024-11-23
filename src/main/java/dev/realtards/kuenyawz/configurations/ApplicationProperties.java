@@ -30,6 +30,7 @@ public class ApplicationProperties {
 	private Integer maxVariantQuantity = 250;
 	private String publicIp = "localhost";
 	private String httpProtocol = "http";
+	private String timezone = "Asia/Jakarta";
 
 	@Value("${application.otp-format:NUMERIC}")
 	private OTPService.OTPType otpFormat = OTPService.OTPType.NUMERIC;

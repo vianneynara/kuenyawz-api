@@ -2,7 +2,7 @@ package dev.realtards.kuenyawz.exceptions;
 
 public class InvalidPasswordException extends RuntimeException {
 	public InvalidPasswordException() {
-		super("Password incorrect");
+		super("Invalid Credentials");
 	}
 
 	public InvalidPasswordException(String message) {

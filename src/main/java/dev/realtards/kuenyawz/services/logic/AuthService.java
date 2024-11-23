@@ -4,7 +4,10 @@ import dev.realtards.kuenyawz.dtos.account.AccountRegistrationDto;
 import dev.realtards.kuenyawz.dtos.account.AccountSecureDto;
 import dev.realtards.kuenyawz.dtos.auth.AuthRequestDto;
 import dev.realtards.kuenyawz.dtos.auth.AuthResponseDto;
+import dev.realtards.kuenyawz.entities.Account;
+import dev.realtards.kuenyawz.exceptions.UnauthorizedException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public interface AuthService {
 	/**
@@ -77,4 +80,11 @@ public interface AuthService {
 	 * @return {@code true} if the token is valid, {@code false} otherwise
 	 */
 	boolean validateToken(String token);
+
+	static void validateIsAdmin() {
+		Account account = ((Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		if (account.getPrivilege() != Account.Privilege.ADMIN) {
+			throw new UnauthorizedException("You are not authorized to perform this action");
+		}
+	}
 }
