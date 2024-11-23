@@ -14,7 +14,7 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomSchedule extends Auditables {
+public class ClosedDate extends Auditables {
 
 	@Id
 	@SnowFlakeIdValue(name = "custom_schedule_id")
@@ -22,31 +22,31 @@ public class CustomSchedule extends Auditables {
 	private Long customScheduleId;
 
 	@Column(nullable = false)
-	private ScheduleType scheduleType = ScheduleType.CLOSED;
+	private ClosureType closureType = ClosureType.CLOSED;
 
-	@Column
-	private String scheduleName;
-
-	@Column
+	@Column(nullable = false)
 	private Date date;
 
-	public enum ScheduleType {
+	@Column
+	private String reason;
+
+	public enum ClosureType {
 		CLOSED("CLOSED"),
 		RESERVED("RESERVED");
 
 		String value;
 
-		ScheduleType(String name) {
+		ClosureType(String name) {
 			this.value = name;
 		}
 
-		ScheduleType fromString(String name) {
-			for (ScheduleType type : ScheduleType.values()) {
+		ClosureType fromString(String name) {
+			for (ClosureType type : ClosureType.values()) {
 				if (type.value.equals(name)) {
 					return type;
 				}
 			}
-			return null;
+			throw new IllegalArgumentException(String.format("Invalid closure type: %s", name));
 		}
 	}
 }
