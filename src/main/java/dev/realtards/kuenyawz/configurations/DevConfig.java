@@ -13,7 +13,7 @@ import java.io.File;
  * */
 @Configuration
 @Profile("dev")
-public class DeveloperConfig {
+public class DevConfig {
     
     @PostConstruct
     public void validateEnvFile() {
