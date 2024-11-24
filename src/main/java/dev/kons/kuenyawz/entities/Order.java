@@ -3,6 +3,7 @@ package dev.kons.kuenyawz.entities;
 import dev.kons.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
 
@@ -25,8 +26,8 @@ public class Order extends Auditables {
     @Column
     private LocalDateTime orderDate;
 
-    @Column
-    private Long coordinates;
+    @Column(columnDefinition = "geometry(Point,4326)")
+    private Point coordinate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dp_reference_id", referencedColumnName = "reference_id")
@@ -36,8 +37,6 @@ public class Order extends Auditables {
     @JoinColumn(name = "fp_reference_id", referencedColumnName = "reference_id")
     private Transactions fpReferenceId;
 
-    @Setter
-    @Getter
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private OrderStatus status;
@@ -46,6 +45,7 @@ public class Order extends Auditables {
      * Ongoing status (Process of making the product)
      */
     public enum OrderStatus {
+        PENDING("Waiting for system"),
         WAITING_DOWN_PAYMENT("Waiting for down payment"),
         CONFIRMING("Waiting for confirmation from seller"),
         CONFIRMED("Confirmed by seller"),
