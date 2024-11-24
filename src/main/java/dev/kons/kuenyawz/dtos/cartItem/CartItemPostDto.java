@@ -26,7 +26,7 @@ public class CartItemPostDto {
     private Integer quantity;
 
     @Schema(description = "Note for variant")
-    @Size(min = 1, max = 128, message = "Description must be between 1 and 128 characters")
+    @Size(max = 128, message = "Description must be under 128 characters")
     @CleanString
-    private String note;
+    private String note = "";
 }
