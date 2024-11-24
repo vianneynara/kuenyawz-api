@@ -3,13 +3,14 @@ package dev.kons.kuenyawz.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 public class ProductImage extends Auditables {
 
 	@Id

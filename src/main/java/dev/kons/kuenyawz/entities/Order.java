@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @SuperBuilder
 public class Order extends Auditables {
     @Id

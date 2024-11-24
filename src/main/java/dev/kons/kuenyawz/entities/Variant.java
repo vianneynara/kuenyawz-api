@@ -3,6 +3,7 @@ package dev.kons.kuenyawz.entities;
 import dev.kons.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
@@ -10,9 +11,9 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true, exclude = "product")
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
 public class Variant extends Auditables {
 
 	@Id

@@ -9,9 +9,9 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class OrderItem {
     @Id
     @SnowFlakeIdValue(name = "transaction_id")
