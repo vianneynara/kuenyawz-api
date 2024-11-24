@@ -24,7 +24,7 @@ import java.util.List;
 @SuperBuilder
 @Table(indexes = {
     @Index(name = "idx_purchase_status", columnList = "status"),
-    @Index(name = "idx_purchase_orderdate", columnList = "order_date")
+    @Index(name = "idx_purchase_purchasedate", columnList = "purchase_date")
 })
 public class Purchase extends Auditables {
     @Id
