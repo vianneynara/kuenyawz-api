@@ -20,6 +20,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@Table(indexes = {
+    @Index(name = "idx_transaction_status", columnList = "status"),
+    @Index(name = "idx_transaction_invoiceid", columnList = "invoice_id")
+})
 public class Transaction extends Auditables {
 	@Id
 //	@SnowFlakeIdValue(name = "transaction_id")

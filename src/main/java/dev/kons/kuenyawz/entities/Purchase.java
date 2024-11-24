@@ -17,6 +17,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@Table(indexes = {
+    @Index(name = "idx_purchase_status", columnList = "status"),
+    @Index(name = "idx_purchase_orderdate", columnList = "order_date")
+})
 public class Purchase extends Auditables {
     @Id
     @SnowFlakeIdValue(name = "purchase_id")
