@@ -135,11 +135,6 @@
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-spatial</artifactId>
-            <version>6.5.1.Final</version>
-        </dependency>
     </dependencies>
 
     <build>
