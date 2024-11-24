@@ -31,11 +31,11 @@ public class Order extends Auditables {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dp_reference_id", referencedColumnName = "reference_id")
-    private Transactions dpReferenceId;
+    private Transaction dpReferenceId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fp_reference_id", referencedColumnName = "reference_id")
-    private Transactions fpReferenceId;
+    private Transaction fpReferenceId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)

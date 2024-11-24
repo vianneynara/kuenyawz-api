@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Transactions extends Auditables {
+public class Transaction extends Auditables {
     @Id
     @SnowFlakeIdValue(name = "transaction_id")
     @Column(name = "transaction_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
@@ -28,13 +28,9 @@ public class Transactions extends Auditables {
     @Column
     private BigDecimal amount;
 
-    @Setter
-    @Getter
     @Column(name = "invoice_link")
     private String invoiceLink;
 
-    @Setter
-    @Getter
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private TransactionStatus status;

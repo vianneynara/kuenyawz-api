@@ -59,7 +59,7 @@ public class Account extends Auditables implements UserDetails {
 	private Set<CartItem> cartItems;
 
 	@OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<Transactions> transactions;
+	private Set<Transaction> transactions;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
