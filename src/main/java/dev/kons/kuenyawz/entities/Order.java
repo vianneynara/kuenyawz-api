@@ -3,16 +3,16 @@ package dev.kons.kuenyawz.entities;
 import dev.kons.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
-import org.locationtech.jts.geom.Point;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 public class Order extends Auditables {
     @Id
     @SnowFlakeIdValue(name = "order_id")
@@ -26,8 +26,8 @@ public class Order extends Auditables {
     @Column
     private LocalDateTime orderDate;
 
-    @Column(columnDefinition = "geometry(Point,4326)")
-    private Point coordinate;
+    @Embedded
+    private Coordinate coordinate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dp_reference_id", referencedColumnName = "reference_id")
