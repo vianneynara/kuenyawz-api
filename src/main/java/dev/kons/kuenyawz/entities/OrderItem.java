@@ -16,7 +16,7 @@ public class OrderItem {
     @Id
     @SnowFlakeIdValue(name = "transaction_id")
     @Column(name = "order_item_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
-    private Long OrderItemId;
+    private Long orderItemId;
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
@@ -26,7 +26,7 @@ public class OrderItem {
     private String note;
 
     @Column
-    private Long quantity;
+    private Integer quantity;
 
     @Column(name = "bought_price")
     private BigDecimal boughtPrice;
