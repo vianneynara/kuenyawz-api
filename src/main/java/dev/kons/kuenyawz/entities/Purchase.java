@@ -2,10 +2,14 @@ package dev.kons.kuenyawz.entities;
 
 import dev.kons.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -15,9 +19,9 @@ import java.time.LocalDateTime;
 @SuperBuilder
 public class Purchase extends Auditables {
     @Id
-    @SnowFlakeIdValue(name = "order_id")
-    @Column(name = "order_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
-    private Long orderId;
+    @SnowFlakeIdValue(name = "purchase_id")
+    @Column(name = "purchase_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
+    private Long purchaseId;
 
     @SnowFlakeIdValue(name = "invoice_id")
     @Column(name = "invoice_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
@@ -29,17 +33,20 @@ public class Purchase extends Auditables {
     @Embedded
     private Coordinate coordinate;
 
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dp_transaction_id", referencedColumnName = "transaction_id")
-    private Transaction dpTransactionId;
+    private Transaction dpTransaction;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fp_transaction_id", referencedColumnName = "transaction_id")
-    private Transaction fpTransactionId;
+    private Transaction fpTransaction;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private OrderStatus status;
+    @OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PurchaseItem> purchaseItems;
 
     /**
      * Ongoing status (Process of making the product)

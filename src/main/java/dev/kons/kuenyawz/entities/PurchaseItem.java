@@ -2,6 +2,7 @@ package dev.kons.kuenyawz.entities;
 
 import dev.kons.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -14,24 +15,25 @@ import java.math.BigDecimal;
 @Builder
 public class PurchaseItem {
     @Id
-    @SnowFlakeIdValue(name = "order_item_id")
-    @Column(name = "order_item_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
-    private Long orderItemId;
-
-    @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
-    private Purchase purchaseId;
+    @SnowFlakeIdValue(name = "purchase_item_id")
+    @Column(name = "purchase_item_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
+    private Long purchaseItemId;
 
     @Column
     private String note;
 
-    @Column
+    @Column(nullable = false)
+    @Min(1)
     private Integer quantity;
 
-    @Column(name = "bought_price")
+    @Column(nullable = false)
     private BigDecimal boughtPrice;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "variant_id", nullable = false)
-    private Variant variantId;
+    private Variant variant;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "purchase_id", nullable = false)
+    private Purchase purchase;
 }
