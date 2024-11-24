@@ -38,8 +38,8 @@ public class Transaction extends Auditables {
 	@Column(name = "invoice_link")
 	private String invoiceLink;
 
-	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
+	@Enumerated(EnumType.STRING)
 	private TransactionStatus status;
 
 	@Column(name = "expires_at")
