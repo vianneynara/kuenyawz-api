@@ -1,5 +1,9 @@
 package dev.kons.kuenyawz.entities;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import dev.kons.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,7 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -27,19 +31,18 @@ public class Purchase extends Auditables {
     @Column(name = "purchase_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
     private Long purchaseId;
 
-    @SnowFlakeIdValue(name = "invoice_id")
-    @Column(name = "invoice_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
-    private Long invoiceId;
+    @Column
+    private String fullAddress;
 
     @Column
-    private LocalDateTime orderDate;
+    private LocalDate purchaseDate;
 
     @Embedded
     private Coordinate coordinate;
 
-    @Column(name = "status", nullable = false)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private PurchaseStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dp_transaction_id", referencedColumnName = "transaction_id")
@@ -53,27 +56,50 @@ public class Purchase extends Auditables {
     private List<PurchaseItem> purchaseItems;
 
     /**
-     * Ongoing status (Process of making the product)
+     * Ongoing status.
      */
-    public enum OrderStatus {
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @Getter
+    public enum PurchaseStatus {
+        @JsonProperty("PENDING")
         PENDING("Waiting for system"),
+
+        @JsonProperty("WAITING_DOWN_PAYMENT")
         WAITING_DOWN_PAYMENT("Waiting for down payment"),
+
+        @JsonProperty("CONFIRMING")
         CONFIRMING("Waiting for confirmation from seller"),
+
+        @JsonProperty("CONFIRMED")
         CONFIRMED("Confirmed by seller"),
+
+        @JsonProperty("WAITING_SETTLEMENT")
         WAITING_SETTLEMENT("Waiting for settlement"),
+
+        @JsonProperty("PROCESSING")
         PROCESSING("Being processed"),
-        DELIVERED("Order delivered"),
-        CANCELLED("Order cancelled");
 
-        private final String value;
+        @JsonProperty("DELIVERED")
+        DELIVERED("Purchase delivered"),
 
-        OrderStatus(String value) {
-            this.value = value;
+        @JsonProperty("CANCELLED")
+        CANCELLED("Purchase cancelled");
+
+        private final String description;
+
+        PurchaseStatus(String description) {
+            this.description = description;
         }
 
-        public static OrderStatus fromString(String value) {
-            for (OrderStatus status : OrderStatus.values()) {
-                if (status.value.equalsIgnoreCase(value)) {
+        @JsonValue
+        public String getStatus() {
+            return name();
+        }
+
+        @JsonCreator
+        public static PurchaseStatus fromString(String value) {
+            for (PurchaseStatus status : PurchaseStatus.values()) {
+                if (status.name().equalsIgnoreCase(value)) {
                     return status;
                 }
             }
