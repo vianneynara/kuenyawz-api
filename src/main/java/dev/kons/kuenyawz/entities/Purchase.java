@@ -30,12 +30,12 @@ public class Purchase extends Auditables {
     private Coordinate coordinate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dp_reference_id", referencedColumnName = "reference_id")
-    private Transaction dpReferenceId;
+    @JoinColumn(name = "dp_transaction_id", referencedColumnName = "transaction_id")
+    private Transaction dpTransactionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fp_reference_id", referencedColumnName = "reference_id")
-    private Transaction fpReferenceId;
+    @JoinColumn(name = "fp_transaction_id", referencedColumnName = "transaction_id")
+    private Transaction fpTransactionId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
