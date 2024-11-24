@@ -19,6 +19,12 @@ public class Coordinate {
 	@Column(name = "longitude", nullable = false)
 	private Double longitude;
 
+	/**
+	 * Calculates the distance between another {@link Coordinate} object.
+	 *
+	 * @param that {@link Coordinate} object to calculate the distance from
+	 * @return distance in kilometers
+	 */
 	public double calculateDistance(Coordinate that) {
 		double R = 6371;
 
