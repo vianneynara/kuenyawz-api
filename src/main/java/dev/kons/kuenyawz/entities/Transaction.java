@@ -21,8 +21,6 @@ public class Transaction extends Auditables {
 	@Column(name = "transaction_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
 	private Long transactionId;
 
-	@Setter
-	@Getter
 	@Column(name = "reference_id", unique = true, nullable = false)
 	private UUID referenceId;
 

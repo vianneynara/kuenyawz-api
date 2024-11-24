@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class Order extends Auditables {
+public class Purchase extends Auditables {
     @Id
     @SnowFlakeIdValue(name = "order_id")
     @Column(name = "order_id", columnDefinition = "BIGINT", updatable = false, nullable = false)

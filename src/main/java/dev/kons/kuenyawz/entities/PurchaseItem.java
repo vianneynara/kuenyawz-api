@@ -12,15 +12,15 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OrderItem {
+public class PurchaseItem {
     @Id
-    @SnowFlakeIdValue(name = "transaction_id")
+    @SnowFlakeIdValue(name = "order_item_id")
     @Column(name = "order_item_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
     private Long orderItemId;
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
-    private Order orderId;
+    private Purchase purchaseId;
 
     @Column
     private String note;
