@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -43,6 +44,9 @@ public class Purchase extends Auditables {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PurchaseStatus status;
+
+    @Column
+    private BigDecimal fee;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dp_transaction_id", referencedColumnName = "transaction_id")

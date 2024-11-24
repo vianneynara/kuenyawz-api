@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,6 +36,9 @@ public class PurchaseDto {
 
 	@Schema(description = "Purchase status", example = "PENDING")
 	private Purchase.PurchaseStatus status;
+
+	@Schema(description = "Fee of the purchase", example = "10000.00")
+	private BigDecimal fee;
 
 	@Schema(description = "Items of the purchase")
 	private List<PurchaseItemDto> purchaseItems;
