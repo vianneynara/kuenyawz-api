@@ -1,5 +1,6 @@
 package dev.kons.kuenyawz.services.entity;
 
+import dev.kons.kuenyawz.constants.PaymentType;
 import dev.kons.kuenyawz.dtos.purchase.PurchaseDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePatchDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
@@ -117,13 +118,13 @@ public interface PurchaseService {
 
 		private Boolean isAscending;
 		private Purchase.PurchaseStatus status;
-		private Purchase.PaymentType paymentType;
+		private PaymentType paymentType;
 		private LocalDate from;
 		private LocalDate to;
 		private Integer page;
 		private Integer pageSize;
 
-		static PurchaseSearchCriteria of(Boolean isAscending, Purchase.PurchaseStatus status, Purchase.PaymentType paymentType, LocalDate from, LocalDate to, Integer page, Integer pageSize) {
+		static PurchaseSearchCriteria of(Boolean isAscending, Purchase.PurchaseStatus status, PaymentType paymentType, LocalDate from, LocalDate to, Integer page, Integer pageSize) {
 			return PurchaseSearchCriteria.builder()
 				.isAscending(isAscending)
 				.status(status)

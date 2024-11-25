@@ -1,6 +1,6 @@
 package dev.kons.kuenyawz.dtos.purchase;
 
-import dev.kons.kuenyawz.entities.Purchase;
+import dev.kons.kuenyawz.constants.PaymentType;
 import dev.kons.kuenyawz.entities.Transaction;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -31,7 +31,7 @@ public class TransactionDto {
 	private Transaction.TransactionStatus status;
 
 	@Schema(description = "Payment type of the transaction", example = "DOWN_PAYMENT")
-	private Purchase.PaymentType paymentType;
+	private PaymentType paymentType;
 
 	@Schema(description = "Time of expiration")
 	private LocalDateTime expiresAt;

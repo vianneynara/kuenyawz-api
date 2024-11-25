@@ -3,6 +3,7 @@ package dev.kons.kuenyawz.entities;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import dev.kons.kuenyawz.constants.PaymentType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,7 +51,7 @@ public class Transaction extends Auditables {
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	private Purchase.PaymentType paymentType;
+	private PaymentType paymentType;
 
 	@Column
 	private LocalDateTime expiresAt;

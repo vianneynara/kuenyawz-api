@@ -1,5 +1,6 @@
 package dev.kons.kuenyawz.dtos.purchase;
 
+import dev.kons.kuenyawz.constants.PaymentType;
 import dev.kons.kuenyawz.entities.Purchase;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -38,7 +39,7 @@ public class PurchaseDto {
 	private Purchase.PurchaseStatus status;
 
 	@Schema(description = "Payment type of the purchase", example = "DOWN_PAYMENT")
-	private Purchase.PaymentType paymentType;
+	private PaymentType paymentType;
 
 	@Schema(description = "Fee of the purchase", example = "10000.00")
 	private BigDecimal fee;
