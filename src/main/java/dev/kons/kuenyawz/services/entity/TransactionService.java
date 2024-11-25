@@ -1,7 +1,7 @@
 package dev.kons.kuenyawz.services.entity;
 
 import dev.kons.kuenyawz.constants.PaymentType;
-import dev.kons.kuenyawz.dtos.purchase.TransactionCreationDto;
+import dev.kons.kuenyawz.dtos.purchase.TransactionPostDto;
 import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
 import dev.kons.kuenyawz.dtos.purchase.TransactionEditDto;
 import dev.kons.kuenyawz.entities.Transaction;
@@ -66,11 +66,11 @@ public interface TransactionService {
 	/**
 	 * Creates a new transaction. This operation must be done inside a transaction.
 	 *
-	 * @param transactionCreationDto {@link TransactionCreationDto}
+	 * @param transactionPostDto {@link TransactionPostDto}
 	 * @return {@link TransactionDto}
 	 */
 	@Transactional
-	TransactionDto create(TransactionCreationDto transactionCreationDto);
+	TransactionDto create(TransactionPostDto transactionPostDto);
 
 	/**
 	 * Patches a transaction. This operation must be done inside a transaction.
