@@ -114,6 +114,7 @@ public interface PurchaseService {
 	@Setter
 	@Builder
 	class PurchaseSearchCriteria {
+
 		private Boolean isAscending;
 		private Purchase.PurchaseStatus status;
 		private Purchase.PaymentType paymentType;
