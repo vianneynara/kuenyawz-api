@@ -48,6 +48,10 @@ public class Transaction extends Auditables {
 	@Enumerated(EnumType.STRING)
 	private TransactionStatus status;
 
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private Purchase.PaymentType paymentType;
+
 	@Column
 	private LocalDateTime expiresAt;
 
@@ -57,6 +61,10 @@ public class Transaction extends Auditables {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "account_id", nullable = false)
 	private Account account;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "purchase_id", nullable = false)
+	private Purchase purchase;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @Getter

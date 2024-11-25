@@ -116,15 +116,17 @@ public interface PurchaseService {
 	class PurchaseSearchCriteria {
 		private Boolean isAscending;
 		private Purchase.PurchaseStatus status;
+		private Purchase.PaymentType paymentType;
 		private LocalDate from;
 		private LocalDate to;
-		private Integer page = 0;
-		private Integer pageSize = 10;
+		private Integer page;
+		private Integer pageSize;
 
-		static PurchaseSearchCriteria of(Boolean isAscending, Purchase.PurchaseStatus status, LocalDate from, LocalDate to, Integer page, Integer pageSize) {
+		static PurchaseSearchCriteria of(Boolean isAscending, Purchase.PurchaseStatus status, Purchase.PaymentType paymentType, LocalDate from, LocalDate to, Integer page, Integer pageSize) {
 			return PurchaseSearchCriteria.builder()
 				.isAscending(isAscending)
 				.status(status)
+				.paymentType(paymentType)
 				.from(from)
 				.to(to)
 				.page(page)

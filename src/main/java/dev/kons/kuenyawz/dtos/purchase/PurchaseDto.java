@@ -37,6 +37,9 @@ public class PurchaseDto {
 	@Schema(description = "Purchase status", example = "PENDING")
 	private Purchase.PurchaseStatus status;
 
+	@Schema(description = "Payment type of the purchase", example = "DOWN_PAYMENT")
+	private Purchase.PaymentType paymentType;
+
 	@Schema(description = "Fee of the purchase", example = "10000.00")
 	private BigDecimal fee;
 

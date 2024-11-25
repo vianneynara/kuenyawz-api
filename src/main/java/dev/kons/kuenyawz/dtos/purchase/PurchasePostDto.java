@@ -1,5 +1,6 @@
 package dev.kons.kuenyawz.dtos.purchase;
 
+import dev.kons.kuenyawz.entities.Purchase;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +28,9 @@ public class PurchasePostDto {
 
 	@Schema(description = "Longitude for the purchase place", example = "106.8205983")
 	private Double longitude;
+
+	@Schema(description = "Payment type of the purchase", example = "DOWN_PAYMENT")
+	private Purchase.PaymentType paymentType;
 
 	@Schema(description = "Purchase items of the purchase", example = "[{...}, {...}]")
 	@NotNull(message = "Purchase items must not be filled")

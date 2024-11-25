@@ -15,6 +15,7 @@ import lombok.experimental.SuperBuilder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -23,91 +24,158 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 @Table(indexes = {
-    @Index(name = "idx_purchase_status", columnList = "status"),
-    @Index(name = "idx_purchase_purchasedate", columnList = "purchase_date")
+	@Index(name = "idx_purchase_status", columnList = "status"),
+	@Index(name = "idx_purchase_purchasedate", columnList = "purchase_date")
 })
 public class Purchase extends Auditables {
-    @Id
-    @SnowFlakeIdValue(name = "purchase_id")
-    @Column(name = "purchase_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
-    private Long purchaseId;
+	@Id
+	@SnowFlakeIdValue(name = "purchase_id")
+	@Column(name = "purchase_id", columnDefinition = "BIGINT", updatable = false, nullable = false)
+	private Long purchaseId;
 
-    @Column
-    private String fullAddress;
+	@Column
+	private String fullAddress;
 
-    @Column
-    private LocalDate purchaseDate;
+	@Column
+	private LocalDate purchaseDate;
 
-    @Embedded
-    private Coordinate coordinate;
+	@Embedded
+	private Coordinate coordinate;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private PurchaseStatus status;
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private PurchaseStatus status;
 
-    @Column
-    private BigDecimal fee;
+	@Column
+	private BigDecimal fee;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dp_transaction_id", referencedColumnName = "transaction_id")
-    private Transaction dpTransaction;
+	@Column
+	private PaymentType paymentType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fp_transaction_id", referencedColumnName = "transaction_id")
-    private Transaction fpTransaction;
+	@OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY)
+	private List<Transaction> transactions;
 
-    @OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PurchaseItem> purchaseItems;
+	@OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PurchaseItem> purchaseItems;
 
-    /**
-     * Ongoing status.
-     */
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    @Getter
-    public enum PurchaseStatus {
-        @JsonProperty("PENDING")
-        PENDING("Waiting for system"),
+	// Helper methods to see payment status:
 
-        @JsonProperty("WAITING_DOWN_PAYMENT")
-        WAITING_DOWN_PAYMENT("Waiting for down payment"),
+	public Optional<Transaction> getDownPayment() {
+		return transactions.stream()
+			.filter(t -> t.getPaymentType() == PaymentType.DOWN_PAYMENT)
+			.findFirst();
+	}
 
-        @JsonProperty("CONFIRMING")
-        CONFIRMING("Waiting for confirmation from seller"),
+	public Optional<Transaction> getFulfillmentPayment() {
+		return transactions.stream()
+			.filter(t -> t.getPaymentType() == PaymentType.FULL_PAYMENT)
+			.findFirst();
+	}
 
-        @JsonProperty("CONFIRMED")
-        CONFIRMED("Confirmed by seller"),
+	public boolean isFullyPaid() {
+		if (paymentType == PaymentType.FULL_PAYMENT) {
+			return transactions.stream()
+				.anyMatch(t -> t.getPaymentType() == PaymentType.FULL_PAYMENT
+					&& t.getStatus() == Transaction.TransactionStatus.PAID);
+		} else {
+			return getDownPayment()
+				.filter(dp -> dp.getStatus() == Transaction.TransactionStatus.PAID)
+				.isPresent()
+				&& getFulfillmentPayment()
+				.filter(fp -> fp.getStatus() == Transaction.TransactionStatus.PAID)
+				.isPresent();
+		}
+	}
 
-        @JsonProperty("WAITING_SETTLEMENT")
-        WAITING_SETTLEMENT("Waiting for settlement"),
+	public boolean requiresCancellation() {
+		return paymentType == PaymentType.DOWN_PAYMENT && getDownPayment()
+			.filter(dp -> dp.getStatus() == Transaction.TransactionStatus.EXPIRED)
+			.isPresent();
+	}
 
-        @JsonProperty("PROCESSING")
-        PROCESSING("Being processed"),
 
-        @JsonProperty("DELIVERED")
-        DELIVERED("Purchase delivered"),
+	/**
+	 * Ongoing status.
+	 */
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
+	@Getter
+	public enum PurchaseStatus {
+		@JsonProperty("PENDING")
+		PENDING("Waiting for system"),
 
-        @JsonProperty("CANCELLED")
-        CANCELLED("Purchase cancelled");
+		@JsonProperty("WAITING_DOWN_PAYMENT")
+		WAITING_DOWN_PAYMENT("Waiting for down payment"),
 
-        private final String description;
+		@JsonProperty("CONFIRMING")
+		CONFIRMING("Waiting for confirmation from seller"),
 
-        PurchaseStatus(String description) {
-            this.description = description;
-        }
+		@JsonProperty("CONFIRMED")
+		CONFIRMED("Confirmed by seller"),
 
-        @JsonValue
-        public String getStatus() {
-            return name();
-        }
+		@JsonProperty("WAITING_SETTLEMENT")
+		WAITING_SETTLEMENT("Waiting for settlement"),
 
-        @JsonCreator
-        public static PurchaseStatus fromString(String value) {
-            for (PurchaseStatus status : PurchaseStatus.values()) {
-                if (status.name().equalsIgnoreCase(value)) {
-                    return status;
-                }
-            }
-            throw new IllegalArgumentException("Invalid status: " + value);
-        }
-    }
+		@JsonProperty("PROCESSING")
+		PROCESSING("Being processed"),
+
+		@JsonProperty("DELIVERED")
+		DELIVERED("Purchase delivered"),
+
+		@JsonProperty("CANCELLED")
+		CANCELLED("Purchase cancelled");
+
+		private final String description;
+
+		PurchaseStatus(String description) {
+			this.description = description;
+		}
+
+		@JsonValue
+		public String getStatus() {
+			return name();
+		}
+
+		@JsonCreator
+		public static PurchaseStatus fromString(String value) {
+			for (PurchaseStatus status : PurchaseStatus.values()) {
+				if (status.name().equalsIgnoreCase(value)) {
+					return status;
+				}
+			}
+			throw new IllegalArgumentException("Invalid status: " + value);
+		}
+	}
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
+	@Getter
+	public enum PaymentType {
+		@JsonProperty("DOWN_PAYMENT")
+		DOWN_PAYMENT("Down Payment", "DP"),
+
+		@JsonProperty("FULL_PAYMENT")
+		FULL_PAYMENT("Full Payment", "FP");
+
+		private final String description;
+		private final String alias;
+
+		PaymentType(String description, String alias) {
+			this.description = description;
+			this.alias = alias;
+		}
+
+		@JsonValue
+		public String getType() {
+			return name();
+		}
+
+		@JsonCreator
+		public static PaymentType fromString(String value) {
+			for (PaymentType type : PaymentType.values()) {
+				if (type.name().equalsIgnoreCase(value) || type.alias.equalsIgnoreCase(value)) {
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("Invalid payment type: " + value);
+		}
+	}
 }
