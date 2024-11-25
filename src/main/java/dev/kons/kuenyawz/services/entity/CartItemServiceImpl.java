@@ -6,6 +6,7 @@ import dev.kons.kuenyawz.dtos.cartItem.CartItemPostDto;
 import dev.kons.kuenyawz.dtos.product.ProductDto;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.entities.CartItem;
+import dev.kons.kuenyawz.entities.Product;
 import dev.kons.kuenyawz.entities.Variant;
 import dev.kons.kuenyawz.exceptions.IllegalOperationException;
 import dev.kons.kuenyawz.exceptions.ResourceExistsException;
@@ -14,6 +15,7 @@ import dev.kons.kuenyawz.mapper.ProductMapper;
 import dev.kons.kuenyawz.repositories.CartItemRepository;
 import dev.kons.kuenyawz.repositories.CartItemSpec;
 import dev.kons.kuenyawz.repositories.VariantRepository;
+import dev.kons.kuenyawz.services.logic.ImageStorageService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,6 +32,7 @@ public class CartItemServiceImpl implements CartItemService {
 	private final CartItemRepository cartItemRepository;
 	private final CartItemMapper cartItemMapper;
 	private final ProductMapper productMapper;
+	private final ImageStorageService imageStorageService;
 
 	@Override
 	public List<CartItemDto> getAllCartItems() {
@@ -135,7 +138,9 @@ public class CartItemServiceImpl implements CartItemService {
 	}
 
 	public CartItemDto convertToDto(CartItem cartItem) {
-		ProductDto productDto = productMapper.fromEntity(cartItem.getVariant().getProduct());
+		Product product = cartItem.getVariant().getProduct();
+		ProductDto productDto = productMapper.fromEntity(product);
+		productDto.setImages(imageStorageService.getImageUrls(product));
 
 		CartItemDto cartItemDto = cartItemMapper.fromEntity(cartItem, productDto, cartItem.getVariant().getVariantId());
 		return cartItemDto;
