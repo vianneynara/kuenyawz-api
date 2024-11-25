@@ -1,5 +1,6 @@
 package dev.kons.kuenyawz.entities;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -95,5 +96,15 @@ public class Transaction extends Auditables {
         public String getValue() {
             return name();
         }
+
+		@JsonCreator
+		public static TransactionStatus fromValue(String value) {
+			for (TransactionStatus status : TransactionStatus.values()) {
+				if (status.name().equalsIgnoreCase(value)) {
+					return status;
+				}
+			}
+			throw new IllegalArgumentException("Invalid transaction status: " + value);
+		}
     }
 }
