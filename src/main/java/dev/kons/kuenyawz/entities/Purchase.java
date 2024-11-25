@@ -52,7 +52,7 @@ public class Purchase extends Auditables {
 	@Column
 	private PaymentType paymentType;
 
-	@OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY)
 	private List<Transaction> transactions;
 
 	@OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
