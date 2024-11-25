@@ -39,5 +39,5 @@ public interface AprioriService {
      * @param topN Number of frequent item that going to be show
      * @return
      */
-    public Set<Map<Long, Set<Long>>> getTopN(Set<Map<Long, Set<Long>>> orders, int topN);
+    public Map<Long, Set<Long>> getTopN(Set<Map<Long, Set<Long>>> orders, int topN);
 }
