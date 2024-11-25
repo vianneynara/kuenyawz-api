@@ -63,7 +63,7 @@ public class GlobalExceptionsHandler {
 
 	@ExceptionHandler(NoResourceFoundException.class)
 	public ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of("Resource might not exist"));
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse.of("Resource or endpoint might not exist"));
 	}
 
 	@ExceptionHandler(EntityNotFoundException.class)

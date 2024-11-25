@@ -5,15 +5,16 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import dev.kons.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 public class ClosedDate extends Auditables {
 
 	@Id

@@ -4,13 +4,14 @@ import dev.kons.kuenyawz.dtos.cartItem.CartItemPatchDto;
 import dev.kons.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
 public class CartItem {
     @Id
     @SnowFlakeIdValue(name = "cart_item_id")

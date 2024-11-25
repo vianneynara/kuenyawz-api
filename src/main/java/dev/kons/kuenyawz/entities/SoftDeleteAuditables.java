@@ -13,8 +13,11 @@ import lombok.experimental.SuperBuilder;
  * attribute for deleted checking.
  */
 @MappedSuperclass
-@NoArgsConstructor @AllArgsConstructor @SuperBuilder
-@Setter @Getter
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
 public abstract class SoftDeleteAuditables extends Auditables {
 
 	@Column(name = "deleted", nullable = false)

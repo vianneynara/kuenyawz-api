@@ -59,7 +59,7 @@ public class Account extends Auditables implements UserDetails {
 	private Set<CartItem> cartItems;
 
 	@OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<Transactions> transactions;
+	private Set<Transaction> transactions;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -118,9 +118,7 @@ public class Account extends Auditables implements UserDetails {
 		@JsonCreator
 		public static Privilege fromString(String value) {
 			for (Privilege p : Privilege.values()) {
-				// If the string matches the current iterated Enum
-				if (p.privilege.equalsIgnoreCase(value) ||
-					p.name().equalsIgnoreCase(value)) {
+				if (p.privilege.equalsIgnoreCase(value) ||	p.name().equalsIgnoreCase(value)) {
 					return p;
 				}
 			}

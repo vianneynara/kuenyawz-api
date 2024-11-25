@@ -20,9 +20,12 @@ import java.time.LocalDateTime;
  * to log the auditing time.
  */
 @MappedSuperclass
-@NoArgsConstructor @AllArgsConstructor @SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 @EntityListeners(AuditingEntityListener.class)
-@Setter @Getter
+@Setter
+@Getter
 public abstract class Auditables {
 
 	@CreatedDate

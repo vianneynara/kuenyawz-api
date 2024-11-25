@@ -34,7 +34,7 @@ public class CartController {
 		@ApiResponse(responseCode = "400", description = "Invalid request parameters"),
 		@ApiResponse(responseCode = "403", description = "Unauthorized access"),
 	})
-	@SecurityRequirement(name = "bearerAuth")
+	@SecurityRequirement(name = "cookieAuth")
 	@GetMapping
 	public ResponseEntity<?> getCartItems(
 		@Valid @RequestParam(required = false) Boolean paginate,
@@ -55,7 +55,7 @@ public class CartController {
 		@ApiResponse(responseCode = "400", description = "Invalid request parameters"),
 		@ApiResponse(responseCode = "403", description = "Unauthorized access"),
 	})
-	@SecurityRequirement(name = "bearerAuth")
+	@SecurityRequirement(name = "cookieAuth")
 	@PostMapping
 	public ResponseEntity<?> addCartItem(
 		@Valid @RequestBody CartItemPostDto cartItemPostDto
@@ -71,7 +71,7 @@ public class CartController {
 		@ApiResponse(responseCode = "403", description = "Unauthorized access"),
 		@ApiResponse(responseCode = "404", description = "Cart item not found"),
 	})
-	@SecurityRequirement(name = "bearerAuth")
+	@SecurityRequirement(name = "cookieAuth")
 	@PatchMapping("/{cartItemId}")
 	public ResponseEntity<?> editCartItem(
 		@PathVariable Long cartItemId,
@@ -87,7 +87,7 @@ public class CartController {
 		@ApiResponse(responseCode = "403", description = "Unauthorized access"),
 		@ApiResponse(responseCode = "404", description = "Cart item not found"),
 	})
-	@SecurityRequirement(name = "bearerAuth")
+	@SecurityRequirement(name = "cookieAuth")
 	@DeleteMapping("/{cartItemId}")
 	public ResponseEntity<?> deleteCartItem(
 		@PathVariable Long cartItemId
@@ -102,7 +102,7 @@ public class CartController {
 		@ApiResponse(responseCode = "403", description = "Unauthorized access"),
 		@ApiResponse(responseCode = "404", description = "Cart items not found"),
 	})
-	@SecurityRequirement(name = "bearerAuth")
+	@SecurityRequirement(name = "cookieAuth")
 	@DeleteMapping("/all")
 	public ResponseEntity<?> deleteCartItems() {
 		boolean deleted = cartService.deleteCartItems();
