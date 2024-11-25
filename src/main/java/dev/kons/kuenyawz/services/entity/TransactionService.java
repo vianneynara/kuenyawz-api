@@ -3,7 +3,7 @@ package dev.kons.kuenyawz.services.entity;
 import dev.kons.kuenyawz.constants.PaymentType;
 import dev.kons.kuenyawz.dtos.purchase.TransactionPostDto;
 import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
-import dev.kons.kuenyawz.dtos.purchase.TransactionEditDto;
+import dev.kons.kuenyawz.dtos.purchase.TransactionPatchDto;
 import dev.kons.kuenyawz.entities.Transaction;
 import lombok.Builder;
 import lombok.Getter;
@@ -77,11 +77,11 @@ public interface TransactionService {
 	 * Used by payment gateway webhooks.
 	 *
 	 * @param transactionId {@link Long}
-	 * @param transactionEditDto {@link TransactionEditDto}
+	 * @param transactionPatchDto {@link TransactionPatchDto}
 	 * @return {@link TransactionDto}
 	 */
 	@Transactional
-	TransactionDto patch(Long transactionId, TransactionEditDto transactionEditDto);
+	TransactionDto patch(Long transactionId, TransactionPatchDto transactionPatchDto);
 
 	@Getter
 	@Setter
