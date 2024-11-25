@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -142,6 +145,15 @@ public interface PurchaseService {
 
 		private Integer getPageSize() {
 			return (pageSize == null || pageSize < 1 || pageSize > 1000) ? 10 : pageSize;
+		}
+		
+		public Pageable getPageable() {
+			return PageRequest.of(
+				getPage(),
+				getPageSize(), 
+				isAscending ? Sort.Direction.ASC : Sort.Direction.DESC, 
+				"purchaseDate"
+			);
 		}
 	}
 }
