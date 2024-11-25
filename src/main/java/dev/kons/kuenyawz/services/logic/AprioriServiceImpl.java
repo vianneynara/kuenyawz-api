@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class AprioriServiceImpl implements AprioriService{
     private final double MIN_SUPPORT;
     private final double MIN_CONFIDENCE;
