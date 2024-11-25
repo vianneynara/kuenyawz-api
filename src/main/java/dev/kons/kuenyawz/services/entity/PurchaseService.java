@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ public interface PurchaseService {
 	 * @param criteria {@link PurchaseSearchCriteria} search criteria
 	 * @return Paginated list of {@link PurchaseDto}
 	 */
+	@Transactional(readOnly = true)
 	Page<PurchaseDto> findAll(PurchaseSearchCriteria criteria);
 
 	/**
@@ -32,6 +34,7 @@ public interface PurchaseService {
 	 * @param criteria  {@link PurchaseSearchCriteria} search criteria
 	 * @return Paginated list of {@link PurchaseDto}
 	 */
+	@Transactional(readOnly = true)
 	Page<PurchaseDto> findAll(Long accountId, PurchaseSearchCriteria criteria);
 
 	/**
@@ -40,6 +43,7 @@ public interface PurchaseService {
 	 * @param purchaseId {@link Long}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional(readOnly = true)
 	PurchaseDto findById(Long purchaseId);
 
 	/**
@@ -48,15 +52,8 @@ public interface PurchaseService {
 	 * @param transactionId {@link Long}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional(readOnly = true)
 	PurchaseDto findByTransactionId(Long transactionId);
-
-	/**
-	 * Finds a purchase by its Xendit's invoice id.
-	 *
-	 * @param invoiceId {@link String}
-	 * @return {@link PurchaseDto}
-	 */
-	PurchaseDto findByInvoiceId(String invoiceId);
 
 	/**
 	 * Creates a new purchase.
@@ -64,6 +61,7 @@ public interface PurchaseService {
 	 * @param purchasePostDto {@link PurchasePostDto}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional
 	PurchaseDto create(PurchasePostDto purchasePostDto);
 
 	/**
@@ -73,6 +71,7 @@ public interface PurchaseService {
 	 * @param purchasePatchDto {@link PurchasePatchDto}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional
 	PurchaseDto patch(Long purchaseId, PurchasePatchDto purchasePatchDto);
 
 	// Other business logic
@@ -84,6 +83,7 @@ public interface PurchaseService {
 	 * @param purchaseId {@link Long}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional
 	PurchaseDto cancel(Long purchaseId);
 
 	/**
@@ -93,6 +93,7 @@ public interface PurchaseService {
 	 * @param purchaseId {@link Long}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional
 	PurchaseDto confirm(Long purchaseId);
 
 	/**
@@ -103,6 +104,7 @@ public interface PurchaseService {
 	 * @param fee        {@link BigDecimal} delivery fee
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional
 	PurchaseDto changeFee(Long purchaseId, BigDecimal fee);
 
 	/**
@@ -112,6 +114,7 @@ public interface PurchaseService {
 	 * @param status     {@link Purchase.PurchaseStatus}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional
 	PurchaseDto changeStatus(Long purchaseId, Purchase.PurchaseStatus status);
 
 	@Getter
