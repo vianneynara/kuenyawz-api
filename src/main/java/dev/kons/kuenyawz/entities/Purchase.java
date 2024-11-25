@@ -60,18 +60,31 @@ public class Purchase extends Auditables {
 
 	// Helper methods to see payment status:
 
+	/**
+	 * Gets a down payment transaction.
+	 *
+	 * @return {@link Optional} of {@link Transaction}
+	 */
 	public Optional<Transaction> getDownPayment() {
 		return transactions.stream()
 			.filter(t -> t.getPaymentType() == PaymentType.DOWN_PAYMENT)
 			.findFirst();
 	}
 
+	/**
+	 * Gets a fulfillment payment transaction.
+	 *
+	 * @return {@link Optional} of {@link Transaction}
+	 */
 	public Optional<Transaction> getFulfillmentPayment() {
 		return transactions.stream()
 			.filter(t -> t.getPaymentType() == PaymentType.FULL_PAYMENT)
 			.findFirst();
 	}
 
+	/**
+	 * Checks if the purchase is fully paid.
+	 */
 	public boolean isFullyPaid() {
 		if (paymentType == PaymentType.FULL_PAYMENT) {
 			return transactions.stream()
@@ -87,12 +100,14 @@ public class Purchase extends Auditables {
 		}
 	}
 
+	/**
+	 * Checks if the purchase requires cancellation.
+	 */
 	public boolean requiresCancellation() {
 		return paymentType == PaymentType.DOWN_PAYMENT && getDownPayment()
 			.filter(dp -> dp.getStatus() == Transaction.TransactionStatus.EXPIRED)
 			.isPresent();
 	}
-
 
 	/**
 	 * Ongoing status.
