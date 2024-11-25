@@ -4,6 +4,7 @@ import dev.kons.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -36,4 +37,7 @@ public class RefreshToken extends Auditables {
 
 	@Column
 	private boolean isRevoked;
+
+	@Version
+	private Long version;
 }

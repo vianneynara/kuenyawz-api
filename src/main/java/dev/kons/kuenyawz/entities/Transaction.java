@@ -58,6 +58,9 @@ public class Transaction extends Auditables {
 	@Column
 	private LocalDateTime finalizedAt;
 
+	@Version
+	private Long version;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "account_id", nullable = false)
 	private Account account;

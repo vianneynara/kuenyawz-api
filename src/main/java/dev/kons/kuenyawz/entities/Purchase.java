@@ -52,6 +52,9 @@ public class Purchase extends Auditables {
 	@Column
 	private PaymentType paymentType;
 
+	@Version
+	private Long version;
+
 	@OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY)
 	private List<Transaction> transactions;
 

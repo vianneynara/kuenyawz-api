@@ -4,6 +4,7 @@ import dev.kons.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -33,4 +34,7 @@ public class OTP extends Auditables {
 
 	@Column
 	private String ipAddress;
+
+	@Version
+	private Long version;
 }

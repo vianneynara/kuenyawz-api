@@ -29,6 +29,9 @@ public class PurchaseItem {
     @Column(nullable = false)
     private BigDecimal boughtPrice;
 
+	@Version
+	private Long version;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "variant_id", nullable = false)
     private Variant variant;
