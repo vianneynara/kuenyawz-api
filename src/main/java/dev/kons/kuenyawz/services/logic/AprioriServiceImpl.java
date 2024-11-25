@@ -1,17 +1,33 @@
 package dev.kons.kuenyawz.services.logic;
 
+import dev.kons.kuenyawz.repositories.ProductRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class AprioriServiceImpl implements AprioriService{
     private final double MIN_SUPPORT;
     private final double MIN_CONFIDENCE;
+    private final ProductRepository productRepository;
 
     @Override
-    public Set<Map<Long, Set<Long>>> findFrequentSetItemWith(Set<Map<Long, Set<Long>>> orders, Long productId) {
+    public Set<Map<Long, Set<Long>>> findAllFrequentSetOfItems(Set<Map<Long, Set<Long>>> orders) {
+        int topN = 3;
+        Map<Long, Set<Long>> frequentSetOfItems = getTopN(orders, topN);
+        List<Long> productIds = productRepository.findAllIds();
+
+//        for
+
+
+        return Set.of();
+    }
+
+    @Override
+    public Map<Long, Set<Long>> findFrequentSetItemWith(Set<Map<Long, Set<Long>>> orders, Long productId) {
         Map<Set<Long>, Integer> itemCountMap = new HashMap<>();
         int totalOrders = orders.size();
         int productIdCount = 0;
@@ -26,50 +42,42 @@ public class AprioriServiceImpl implements AprioriService{
                     Set<Long> filteredSet = new HashSet<>(productSet);
                     filteredSet.remove(productId);
 
-                    for (Long otherProduct : filteredSet) {
-                        Set<Long> itemSet = new HashSet<>();
-                        itemSet.add(otherProduct);
-
-                        itemCountMap.merge(itemSet, 1, Integer::sum);
+                    if (!filteredSet.isEmpty()) {
+                        itemCountMap.merge(filteredSet, 1, Integer::sum);
                     }
                 }
             }
         }
 
-        Map<Set<Long>, Double> itemConfidenceMap = new HashMap<>();
+        Map<Long, Double> confidenceMap = new HashMap<>();
         for (Map.Entry<Set<Long>, Integer> entry : itemCountMap.entrySet()) {
             double support = (double) entry.getValue() / totalOrders;
 
-            double confidence = productIdCount > 0 ?
-                    (double) entry.getValue() / productIdCount : 0;
+            if (support >= MIN_SUPPORT) {
+                for (Long item : entry.getKey()) {
+                    double confidence = productIdCount > 0 ?
+                            (double) entry.getValue() / productIdCount : 0;
 
-            if (support >= MIN_SUPPORT && confidence >= MIN_CONFIDENCE) {
-                itemConfidenceMap.put(entry.getKey(), confidence);
+                    if (confidence >= MIN_CONFIDENCE) {
+                        confidenceMap.merge(item, confidence, Math::max);
+                    }
+                }
             }
         }
 
-        Map<Set<Long>, Double> sortedItemConfidenceMap = itemConfidenceMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
+        Set<Long> topItems = confidenceMap.entrySet().stream()
+                .sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        // Convert to required return format
-        Set<Map<Long, Set<Long>>> result = new LinkedHashSet<>();
+        Map<Long, Set<Long>> result = new HashMap<>();
+        result.put(productId, topItems);
 
-        for (Map.Entry<Set<Long>, Double> entry : sortedItemConfidenceMap.entrySet()) {
-            Map<Long, Set<Long>> frequentItemMap = new HashMap<>();
-            frequentItemMap.put(productId, entry.getKey());
-            result.add(frequentItemMap);
-        }
         return result;
     }
 
     @Override
-    public Set<Map<Long, Set<Long>>> findFrequentSetItemWith(Set<Map<Long, Set<Long>>> orders, Long productId, int topN) {
+    public Map<Long, Set<Long>> findFrequentSetItemWith(Set<Map<Long, Set<Long>>> orders, Long productId, int topN) {
         Map<Set<Long>, Integer> itemCountMap = new HashMap<>();
         int totalOrders = orders.size();
         int productIdCount = 0;
@@ -84,69 +92,64 @@ public class AprioriServiceImpl implements AprioriService{
                     Set<Long> filteredSet = new HashSet<>(productSet);
                     filteredSet.remove(productId);
 
-                    for (Long otherProduct : filteredSet) {
-                        Set<Long> itemSet = new HashSet<>();
-                        itemSet.add(otherProduct);
-
-                        itemCountMap.merge(itemSet, 1, Integer::sum);
+                    if (!filteredSet.isEmpty()) {
+                        itemCountMap.merge(filteredSet, 1, Integer::sum);
                     }
                 }
             }
         }
 
-        Map<Set<Long>, Double> itemConfidenceMap = new HashMap<>();
+        Map<Long, Double> confidenceMap = new HashMap<>();
         for (Map.Entry<Set<Long>, Integer> entry : itemCountMap.entrySet()) {
             double support = (double) entry.getValue() / totalOrders;
 
-            double confidence = productIdCount > 0 ?
-                    (double) entry.getValue() / productIdCount : 0;
+            if (support >= MIN_SUPPORT) {
+                for (Long item : entry.getKey()) {
+                    double confidence = productIdCount > 0 ?
+                            (double) entry.getValue() / productIdCount : 0;
 
-            if (support >= MIN_SUPPORT && confidence >= MIN_CONFIDENCE) {
-                itemConfidenceMap.put(entry.getKey(), confidence);
+                    if (confidence >= MIN_CONFIDENCE) {
+                        confidenceMap.merge(item, confidence, Math::max);
+                    }
+                }
             }
         }
 
-        Map<Set<Long>, Double> sortedItemConfidenceMap = itemConfidenceMap.entrySet()
-                .stream()
-                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+        Set<Long> topItems = confidenceMap.entrySet().stream()
+                .sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()))
+                .map(Map.Entry::getKey)
                 .limit(topN)
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        Set<Map<Long, Set<Long>>> result = new LinkedHashSet<>();
-
-        for (Map.Entry<Set<Long>, Double> entry : sortedItemConfidenceMap.entrySet()) {
-            Map<Long, Set<Long>> frequentItemMap = new HashMap<>();
-            frequentItemMap.put(productId, entry.getKey());
-            result.add(frequentItemMap);
-        }
+        Map<Long, Set<Long>> result = new HashMap<>();
+        result.put(productId, topItems);
 
         return result;
     }
 
+
+
     @Override
-    public Set<Map<Long, Set<Long>>> getTopN(Set<Map<Long, Set<Long>>> orders, int topN) {
-        Map<Set<Long>, Integer> itemFrequencyMap = new HashMap<>();
+    public Map<Long, Set<Long>> getTopN(Set<Map<Long, Set<Long>>> orders, int topN) {
+        Map<Long, Integer> itemFrequencyMap = new HashMap<>();
 
         for (Map<Long, Set<Long>> order : orders) {
             for (Set<Long> products : order.values()) {
-                itemFrequencyMap.merge(products, 1, Integer::sum);
+                for (Long product : products) {
+                    itemFrequencyMap.merge(product, 1, Integer::sum);
+                }
             }
         }
 
-        return itemFrequencyMap.entrySet()
-                .stream()
-                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+        Set<Long> topItems = itemFrequencyMap.entrySet().stream()
+                .sorted(Map.Entry.<Long, Integer>comparingByValue().reversed())
                 .limit(topN)
-                .map(e -> {
-                    Map<Long, Set<Long>> result = new HashMap<>();
-                    result.put(null, e.getKey());
-                    return result;
-                })
+                .map(Map.Entry::getKey)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        Map<Long, Set<Long>> result = new HashMap<>();
+        result.put(0L, topItems);
+
+        return result;
     }
 }
