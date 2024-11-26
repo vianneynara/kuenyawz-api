@@ -6,6 +6,7 @@ import dev.kons.kuenyawz.dtos.auth.AuthRequestDto;
 import dev.kons.kuenyawz.dtos.auth.AuthResponseDto;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.exceptions.UnauthorizedException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -81,32 +82,42 @@ public interface AuthService {
 	 */
 	boolean validateToken(String token);
 
+	// Static authentication methods
+
+	static Account getAuthenticatedAccount() {
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (principal instanceof Account) {
+			return (Account) principal;
+		}
+		throw new EntityNotFoundException("Account not found");
+	}
+
 	static void validateIsAdmin() {
-		Account account = ((Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		Account account = getAuthenticatedAccount();
 		if (account.getPrivilege() != Account.Privilege.ADMIN) {
 			throw new UnauthorizedException("You are not authorized to perform this action");
 		}
 	}
 
 	static void validateMatchesId(Long accountId) {
-		Account account = ((Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		Account account = getAuthenticatedAccount();
 		if (!accountId.equals(account.getAccountId())) {
 			throw new UnauthorizedException("You are not allowed to access this resource");
 		}
 	}
 
-	static boolean authenticatedAdmin() {
-		Account account = ((Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+	static boolean isAuthenticatedAdmin() {
+		Account account = getAuthenticatedAccount();
 		return account.getPrivilege() == Account.Privilege.ADMIN;
 	}
 
-	static boolean authenticatedUser() {
-		Account account = ((Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+	static boolean isAuthenticatedUser() {
+		Account account = getAuthenticatedAccount();
 		return account.getPrivilege() == Account.Privilege.USER;
 	}
 
-	static boolean authenticatedUserIs(Long accountId) {
-		Account account = ((Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+	static boolean authenticatedAccountEquals(Long accountId) {
+		Account account = getAuthenticatedAccount();
 		return account.getAccountId().equals(accountId);
 	}
 }
