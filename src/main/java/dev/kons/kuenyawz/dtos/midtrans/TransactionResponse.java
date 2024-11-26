@@ -20,8 +20,31 @@ public class TransactionResponse {
     @JsonProperty("transaction_id")
     private String transactionId;
 
+    /// Transaction details from transaction status
+
+    @JsonProperty("payment_type")
+    private String paymentType;
+
+    @JsonProperty("transaction_time")
+    private String transactionTime;
+
     @JsonProperty("transaction_status")
     private String transactionStatus;
+
+    @JsonProperty("fraud_status")
+    private String fraudStatus;
+
+    @JsonProperty("signature_key")
+    private String signatureKey;
+
+    @JsonProperty("bank")
+    private String bank;
+
+    @JsonProperty("gross_amount")
+    private String grossAmount;
+
+    @JsonProperty("reference_id")
+    private String referenceId;
 
     /// Error messages from Midtrans API
 
