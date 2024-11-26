@@ -61,6 +61,14 @@ public class Account extends Auditables implements UserDetails {
 	@OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Transaction> transactions;
 
+	public String getFirstName() {
+		return fullName.split(" ")[0];
+	}
+
+	public String getLastName() {
+		return fullName.split(" ", 1)[1];
+	}
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return List.of(privilege);
