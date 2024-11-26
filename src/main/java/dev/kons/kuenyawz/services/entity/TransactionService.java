@@ -46,7 +46,7 @@ public interface TransactionService {
 	TransactionDto findById(Long transactionId);
 
 	/**
-	 * Finds a transaction by its Xendit's invoice id.
+	 * Finds a transaction by its Midtrans's invoice id.
 	 *
 	 * @param invoiceId {@link String}
 	 * @return {@link TransactionDto}

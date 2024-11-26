@@ -21,7 +21,7 @@ public class TransactionDto {
 	@Schema(description = "Transaction id", example = "12345678")
 	private Long transactionId;
 
-	@Schema(description = "Xendit invoice id", example = "jsDAj9768ASdy7")
+	@Schema(description = "Midtrans invoice id", example = "jsDAj9768ASdy7")
 	private String invoiceId;
 
 	@Schema(description = "Amount of the transaction", example = "10000.00")
