@@ -1,28 +1,62 @@
 package dev.kons.kuenyawz.services.logic;
 
 import dev.kons.kuenyawz.repositories.ProductRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
-public class AprioriServiceImpl implements AprioriService{
-    private final double MIN_SUPPORT;
-    private final double MIN_CONFIDENCE;
+@RequiredArgsConstructor
+public class AprioriServiceImpl implements AprioriService {
+
+    private final double MIN_SUPPORT = 0.05;
+    private final double MIN_CONFIDENCE = 0.6;
     private final ProductRepository productRepository;
 
     @Override
     public Set<Map<Long, Set<Long>>> findAllFrequentSetOfItems(Set<Map<Long, Set<Long>>> orders) {
-        int topN = 3;
-        Map<Long, Set<Long>> frequentSetOfItems = getTopN(orders, topN);
+        int targetSetSize = 3;
+        Set<Map<Long, Set<Long>>> result = new HashSet<>();
+        Map<Long, Set<Long>> frequentSetOfItems = getTopN(orders, targetSetSize);
         List<Long> productIds = productRepository.findAllIds();
 
-//        for
+        result.add(frequentSetOfItems);
 
+        for (Long id : productIds) {
+            Map<Long, Set<Long>> returnValue = findFrequentSetItemWith(orders, id, targetSetSize);
 
-        return Set.of();
+            int currentSetSize = returnValue.values().stream()
+                    .mapToInt(Set::size)
+                    .sum();
+
+            if (currentSetSize < targetSetSize) {
+                for (Map.Entry<Long, Set<Long>> entry : frequentSetOfItems.entrySet()) {
+                    Long key = entry.getKey();
+                    Set<Long> values = entry.getValue();
+
+                    for (Long value : values) {
+                        boolean valueExists = returnValue.values().stream()
+                                .anyMatch(existingSet -> existingSet.contains(value));
+
+                        if (!valueExists) {
+                            returnValue.computeIfAbsent(key, k -> new HashSet<>())
+                                    .add(value);
+
+                            currentSetSize++;
+
+                            if (currentSetSize >= targetSetSize) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (currentSetSize >= targetSetSize) {
+                    break;
+                }
+            }
+            result.add(returnValue);
+        }
+        return result;
     }
 
     @Override
@@ -125,7 +159,6 @@ public class AprioriServiceImpl implements AprioriService{
 
         return result;
     }
-
 
 
     @Override
