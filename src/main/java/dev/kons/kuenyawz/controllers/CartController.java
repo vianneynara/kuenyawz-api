@@ -5,6 +5,8 @@ import dev.kons.kuenyawz.dtos.cartItem.CartItemPatchDto;
 import dev.kons.kuenyawz.dtos.cartItem.CartItemPostDto;
 import dev.kons.kuenyawz.services.logic.CartService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -30,7 +33,9 @@ public class CartController {
 
 	@Operation(summary = "Get cart items of a user (account)")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Cart items retrieved successfully"),
+		@ApiResponse(responseCode = "200", description = "Cart items retrieved successfully",
+			content = @Content(mediaType = "application/json",
+				schema = @Schema(implementation = PagedModel.class))),
 		@ApiResponse(responseCode = "400", description = "Invalid request parameters"),
 		@ApiResponse(responseCode = "403", description = "Unauthorized access"),
 	})
@@ -51,7 +56,9 @@ public class CartController {
 
 	@Operation(summary = "Add a new item to the user cart")
 	@ApiResponses({
-		@ApiResponse(responseCode = "201", description = "Item added to cart successfully"),
+		@ApiResponse(responseCode = "201", description = "Item added to cart successfully",
+			content = @Content(mediaType = "application/json",
+				schema = @Schema(implementation = PagedModel.class))),
 		@ApiResponse(responseCode = "400", description = "Invalid request parameters"),
 		@ApiResponse(responseCode = "403", description = "Unauthorized access"),
 	})
@@ -66,7 +73,9 @@ public class CartController {
 
 	@Operation(summary = "Edit a cart item of a user")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Cart item edited successfully"),
+		@ApiResponse(responseCode = "200", description = "Cart item edited successfully",
+			content = @Content(mediaType = "application/json",
+				schema = @Schema(implementation = CartItemDto.class))),
 		@ApiResponse(responseCode = "400", description = "Invalid request parameters"),
 		@ApiResponse(responseCode = "403", description = "Unauthorized access"),
 		@ApiResponse(responseCode = "404", description = "Cart item not found"),
