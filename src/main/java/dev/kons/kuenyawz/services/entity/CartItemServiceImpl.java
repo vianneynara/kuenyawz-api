@@ -14,6 +14,7 @@ import dev.kons.kuenyawz.mapper.ProductMapper;
 import dev.kons.kuenyawz.repositories.CartItemRepository;
 import dev.kons.kuenyawz.repositories.CartItemSpec;
 import dev.kons.kuenyawz.repositories.VariantRepository;
+import dev.kons.kuenyawz.services.logic.ImageStorageService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ public class CartItemServiceImpl implements CartItemService {
 	private final CartItemRepository cartItemRepository;
 	private final CartItemMapper cartItemMapper;
 	private final ProductMapper productMapper;
+	private final ImageStorageService imageStorageService;
 
 	@Override
 	public List<CartItemDto> getAllCartItems() {
@@ -102,10 +104,10 @@ public class CartItemServiceImpl implements CartItemService {
 			}
 		}
 		if (cartItemPatchDto.getQuantity() != null
-			&& cartItemPatchDto.getQuantity() >= newVariant.getMinQuantity()
-			&& cartItemPatchDto.getQuantity() <= newVariant.getMaxQuantity()
+			&& (cartItemPatchDto.getQuantity() < newVariant.getMinQuantity()
+			|| cartItemPatchDto.getQuantity() > newVariant.getMaxQuantity())
 		) {
-			throw new IllegalOperationException("Quantity must be between " + newVariant.getMinQuantity() + " and " + newVariant.getMaxQuantity());
+			cartItemPatchDto.setQuantity(newVariant.getMinQuantity());
 		}
 
 		cartItem.patchFromDto(cartItemPatchDto, newVariant);
@@ -136,6 +138,7 @@ public class CartItemServiceImpl implements CartItemService {
 
 	public CartItemDto convertToDto(CartItem cartItem) {
 		ProductDto productDto = productMapper.fromEntity(cartItem.getVariant().getProduct());
+		productDto.setImages(imageStorageService.getImageUrls(cartItem.getVariant().getProduct()));
 
 		CartItemDto cartItemDto = cartItemMapper.fromEntity(cartItem, productDto, cartItem.getVariant().getVariantId());
 		return cartItemDto;
