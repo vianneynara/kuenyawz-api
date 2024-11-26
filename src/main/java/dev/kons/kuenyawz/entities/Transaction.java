@@ -78,6 +78,26 @@ public class Transaction extends Auditables {
 		@JsonProperty("authorize")
 		AUTHORIZE("Transaction has been authorized"),
 
+		@JsonProperty("capture")
+		CAPTURE("Transaction has been captured, may move to settlement"),
+
+		@JsonProperty("refund")
+		REFUND("Transaction has been refunded"),
+
+		@JsonProperty("partial_refund")
+		PARTIAL_REFUND("Transaction has been partially refunded"),
+
+		@JsonProperty("chargeback")
+		CHARGEBACK("Transaction has been charged back"),
+
+		@JsonProperty("partiial_chargeback")
+		PARTIAL_CHARGEBACK("Transaction has been partially charged back"),
+
+		@JsonProperty("failure")
+		FAILURE("Transaction has failed due to unexpected errors"),
+
+		/// Main transaction status ~ flow
+
 		@JsonProperty("pending")
         PENDING("Payment yet to be paid"),
 
