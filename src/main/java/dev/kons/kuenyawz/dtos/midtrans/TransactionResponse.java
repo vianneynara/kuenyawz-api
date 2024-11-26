@@ -17,6 +17,17 @@ public class TransactionResponse {
     @JsonProperty("redirect_url")
     private String redirectUrl;
 
+    @JsonProperty("transaction_id")
+    private String transactionId;
+
+    /// Error messages from Midtrans API
+
     @JsonProperty("error_messages")
     private List<String> errorMessages;
+
+    @JsonProperty("status_code")
+    private String statusCode;
+
+    @JsonProperty("status_message")
+    private String statusMessage;
 }
