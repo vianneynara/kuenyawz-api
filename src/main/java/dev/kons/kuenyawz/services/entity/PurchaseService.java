@@ -56,6 +56,15 @@ public interface PurchaseService {
 	PurchaseDto findByTransactionId(Long transactionId);
 
 	/**
+	 * Finds a purchase by its invoice id.
+	 *
+	 * @param invoiceId {@link String}
+	 * @return {@link PurchaseDto}
+	 */
+	@Transactional(readOnly = true)
+	PurchaseDto findByInvoiceId(String invoiceId);
+
+	/**
 	 * Creates a new purchase.
 	 *
 	 * @param purchasePostDto {@link PurchasePostDto}
@@ -117,6 +126,14 @@ public interface PurchaseService {
 	@Transactional
 	PurchaseDto changeStatus(Long purchaseId, Purchase.PurchaseStatus status);
 
+	/**
+	 * Converts a purchase entity to a purchase dto.
+	 *
+	 * @param purchase {@link Purchase}
+	 * @return {@link PurchaseDto}
+	 */
+	PurchaseDto convertToDto(Purchase purchase);
+
 	@Getter
 	@Setter
 	@Builder
@@ -127,35 +144,53 @@ public interface PurchaseService {
 		private PaymentType paymentType;
 		private LocalDate from;
 		private LocalDate to;
+		private Long accountId;
+		private String orderBy;
 		private Integer page;
 		private Integer pageSize;
 
-		static PurchaseSearchCriteria of(Boolean isAscending, Purchase.PurchaseStatus status, PaymentType paymentType, LocalDate from, LocalDate to, Integer page, Integer pageSize) {
+		static PurchaseSearchCriteria of(Boolean isAscending, Purchase.PurchaseStatus status, PaymentType paymentType, LocalDate from, LocalDate to, Long accountId, String sortBy, Integer page, Integer pageSize) {
+			isAscending = (isAscending != null && isAscending);
 			return PurchaseSearchCriteria.builder()
 				.isAscending(isAscending)
 				.status(status)
 				.paymentType(paymentType)
 				.from(from)
 				.to(to)
+				.accountId(accountId)
+				.orderBy(sortBy)
 				.page(page)
 				.pageSize(pageSize)
 				.build();
 		}
 
-		private Integer getPage() {
+		public Integer getPage() {
 			return (page == null || page < 0) ? 0 : page;
 		}
 
-		private Integer getPageSize() {
+		public Integer getPageSize() {
 			return (pageSize == null || pageSize < 1 || pageSize > 1000) ? 10 : pageSize;
 		}
-		
+
 		public Pageable getPageable() {
 			return PageRequest.of(
 				getPage(),
-				getPageSize(), 
-				isAscending ? Sort.Direction.ASC : Sort.Direction.DESC, 
-				"purchaseDate"
+				getPageSize()
+			);
+		}
+
+		public Pageable getPageable(Sort sorter) {
+			if (sorter == null) {
+				sorter = Sort.by((isAscending != null && isAscending)
+					? Sort.Order.asc(orderBy != null ? orderBy : "purchaseId")
+					: Sort.Order.desc(orderBy != null ? orderBy : "purchaseId")
+				);
+			}
+
+			return PageRequest.of(
+				getPage(),
+				getPageSize(),
+				sorter
 			);
 		}
 	}
