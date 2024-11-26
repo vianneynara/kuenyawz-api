@@ -101,9 +101,11 @@ public class CartItemServiceImpl implements CartItemService {
 				throw new IllegalOperationException("Variant not found for the product in this cart item");
 			}
 		}
+		System.out.println(cartItemPatchDto);
+		System.out.println(newVariant);
 		if (cartItemPatchDto.getQuantity() != null
-			&& cartItemPatchDto.getQuantity() >= newVariant.getMinQuantity()
-			&& cartItemPatchDto.getQuantity() <= newVariant.getMaxQuantity()
+			&& (cartItemPatchDto.getQuantity() <= newVariant.getMinQuantity()
+			|| cartItemPatchDto.getQuantity() >= newVariant.getMaxQuantity())
 		) {
 			throw new IllegalOperationException("Quantity must be between " + newVariant.getMinQuantity() + " and " + newVariant.getMaxQuantity());
 		}
