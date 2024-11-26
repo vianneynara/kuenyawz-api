@@ -94,4 +94,19 @@ public interface AuthService {
 			throw new UnauthorizedException("You are not allowed to access this resource");
 		}
 	}
+
+	static boolean authenticatedAdmin() {
+		Account account = ((Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		return account.getPrivilege() == Account.Privilege.ADMIN;
+	}
+
+	static boolean authenticatedUser() {
+		Account account = ((Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		return account.getPrivilege() == Account.Privilege.USER;
+	}
+
+	static boolean authenticatedUserIs(Long accountId) {
+		Account account = ((Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		return account.getAccountId().equals(accountId);
+	}
 }
