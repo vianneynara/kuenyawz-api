@@ -104,13 +104,13 @@ public class Purchase extends Auditables {
 		if (paymentType == PaymentType.FULL_PAYMENT) {
 			return transactions.stream()
 				.anyMatch(t -> t.getPaymentType() == PaymentType.FULL_PAYMENT
-					&& t.getStatus() == Transaction.TransactionStatus.PAID);
+					&& t.getStatus() == Transaction.TransactionStatus.SETTLEMENT);
 		} else {
 			return getDownPayment()
-				.filter(dp -> dp.getStatus() == Transaction.TransactionStatus.PAID)
+				.filter(dp -> dp.getStatus() == Transaction.TransactionStatus.SETTLEMENT)
 				.isPresent()
 				&& getFulfillmentPayment()
-				.filter(fp -> fp.getStatus() == Transaction.TransactionStatus.PAID)
+				.filter(fp -> fp.getStatus() == Transaction.TransactionStatus.SETTLEMENT)
 				.isPresent();
 		}
 	}
@@ -120,7 +120,7 @@ public class Purchase extends Auditables {
 	 */
 	public boolean requiresCancellation() {
 		return paymentType == PaymentType.DOWN_PAYMENT && getDownPayment()
-			.filter(dp -> dp.getStatus() == Transaction.TransactionStatus.EXPIRED)
+			.filter(dp -> dp.getStatus() == Transaction.TransactionStatus.EXPIRE)
 			.isPresent();
 	}
 

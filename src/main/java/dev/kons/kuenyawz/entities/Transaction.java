@@ -71,20 +71,27 @@ public class Transaction extends Auditables {
 	@JoinColumn(name = "purchase_id", nullable = false)
 	private Purchase purchase;
 
+	/// Refer to [Midtrans Transaction Status](https://docs.midtrans.com/reference/transaction-status)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @Getter
     public enum TransactionStatus {
-		@JsonProperty("PENDING")
+		@JsonProperty("authorize")
+		AUTHORIZE("Transaction has been authorized"),
+
+		@JsonProperty("pending")
         PENDING("Payment yet to be paid"),
 
-		@JsonProperty("PAID")
-        PAID("Payment has been paid"),
+		@JsonProperty("settlement")
+        SETTLEMENT("Transaction has been completed"),
 
-		@JsonProperty("SETTLED")
-        SETTLED("Transaction has been settled to cash"),
+		@JsonProperty("deny")
+		DENY("Transaction has been denied"),
 
-		@JsonProperty("EXPIRED")
-        EXPIRED("Transaction has expired");
+		@JsonProperty("cancel")
+		CANCEL("Transaction has been canceled"),
+
+		@JsonProperty("expire")
+        EXPIRE("Transaction has expired");
 
         private final String description;
 
