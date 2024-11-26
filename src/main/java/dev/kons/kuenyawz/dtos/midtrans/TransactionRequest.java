@@ -187,7 +187,7 @@ public class TransactionRequest {
 
 	@Data
 	@Builder
-	public class Expiry {
+	public static class Expiry {
 
 		private Integer duration;
 		private String unit;
