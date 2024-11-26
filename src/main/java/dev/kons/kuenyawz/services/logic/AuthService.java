@@ -87,4 +87,11 @@ public interface AuthService {
 			throw new UnauthorizedException("You are not authorized to perform this action");
 		}
 	}
+
+	static void validateMatchesId(Long accountId) {
+		Account account = ((Account) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+		if (!accountId.equals(account.getAccountId())) {
+			throw new UnauthorizedException("You are not allowed to access this resource");
+		}
+	}
 }
