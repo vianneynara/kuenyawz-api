@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.entities.Purchase;
 import dev.kons.kuenyawz.entities.PurchaseItem;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.util.StringUtils;
@@ -64,14 +65,22 @@ import java.util.List;
 @Data
 @Builder
 public class TransactionRequest {
+
+	@NotNull
     @JsonProperty("transaction_details")
     private TransactionDetails transactionDetails;
 
+	@NotNull
     @JsonProperty("item_details")
     private List<ItemDetail> itemDetails;
 
+	@NotNull
     @JsonProperty("customer_details")
     private CustomerDetails customerDetails;
+
+	@NotNull
+	@JsonProperty("expiry")
+	private Expiry expiry;
 
     @Data
     @Builder
@@ -175,4 +184,19 @@ public class TransactionRequest {
 			return address;
 		}
     }
+
+	@Data
+	@Builder
+	public class Expiry {
+
+		private Integer duration;
+		private String unit;
+
+		public static Expiry defaultExpiry() {
+			return Expiry.builder()
+				.duration(1)
+				.unit("day")
+				.build();
+		}
+	}
 }
