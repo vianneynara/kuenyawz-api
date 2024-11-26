@@ -6,7 +6,6 @@ import dev.kons.kuenyawz.dtos.cartItem.CartItemPostDto;
 import dev.kons.kuenyawz.dtos.product.ProductDto;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.entities.CartItem;
-import dev.kons.kuenyawz.entities.Product;
 import dev.kons.kuenyawz.entities.Variant;
 import dev.kons.kuenyawz.exceptions.IllegalOperationException;
 import dev.kons.kuenyawz.exceptions.ResourceExistsException;
@@ -105,8 +104,8 @@ public class CartItemServiceImpl implements CartItemService {
 			}
 		}
 		if (cartItemPatchDto.getQuantity() != null
-			&& cartItemPatchDto.getQuantity() >= newVariant.getMinQuantity()
-			&& cartItemPatchDto.getQuantity() <= newVariant.getMaxQuantity()
+			&& (cartItemPatchDto.getQuantity() <= newVariant.getMinQuantity()
+			|| cartItemPatchDto.getQuantity() >= newVariant.getMaxQuantity())
 		) {
 			throw new IllegalOperationException("Quantity must be between " + newVariant.getMinQuantity() + " and " + newVariant.getMaxQuantity());
 		}
@@ -138,9 +137,8 @@ public class CartItemServiceImpl implements CartItemService {
 	}
 
 	public CartItemDto convertToDto(CartItem cartItem) {
-		Product product = cartItem.getVariant().getProduct();
-		ProductDto productDto = productMapper.fromEntity(product);
-		productDto.setImages(imageStorageService.getImageUrls(product));
+		ProductDto productDto = productMapper.fromEntity(cartItem.getVariant().getProduct());
+		productDto.setImages(imageStorageService.getImageUrls(cartItem.getVariant().getProduct()));
 
 		CartItemDto cartItemDto = cartItemMapper.fromEntity(cartItem, productDto, cartItem.getVariant().getVariantId());
 		return cartItemDto;
