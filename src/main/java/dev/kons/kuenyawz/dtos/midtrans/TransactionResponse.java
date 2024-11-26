@@ -20,6 +20,9 @@ public class TransactionResponse {
     @JsonProperty("transaction_id")
     private String transactionId;
 
+    @JsonProperty("transaction_status")
+    private String transactionStatus;
+
     /// Error messages from Midtrans API
 
     @JsonProperty("error_messages")
