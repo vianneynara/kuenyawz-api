@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Schema(name = "Purchase Post", description = "Purchase creation request")
@@ -36,4 +37,10 @@ public class PurchasePostDto {
 	@NotNull(message = "Purchase items must not be filled")
     @Size(min = 1, message = "At least one item is required")
 	private List<PurchaseItemPostDto> purchaseItems;
+
+	public BigDecimal getTotalPrice() {
+		return purchaseItems.stream()
+			.map(PurchaseItemPostDto::getBoughtPrice)
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+	}
 }

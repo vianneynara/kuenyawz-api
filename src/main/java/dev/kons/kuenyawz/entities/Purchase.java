@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import dev.kons.kuenyawz.constants.PaymentType;
+import dev.kons.kuenyawz.exceptions.IllegalOperationException;
 import dev.kons.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -64,6 +65,16 @@ public class Purchase extends Auditables {
 
 	// Helper methods to see payment status:
 
+	public BigDecimal getTotalPrice() {
+		return purchaseItems.stream()
+			.map(PurchaseItem::getBoughtPrice)
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+	}
+
+	public BigDecimal getTotalPriceWithFee() {
+		return getTotalPrice().add(fee);
+	}
+
 	/**
 	 * Gets a down payment transaction.
 	 *
@@ -111,6 +122,14 @@ public class Purchase extends Auditables {
 		return paymentType == PaymentType.DOWN_PAYMENT && getDownPayment()
 			.filter(dp -> dp.getStatus() == Transaction.TransactionStatus.EXPIRED)
 			.isPresent();
+	}
+
+	public boolean isConfirmed() {
+		return (this.status.ordinal() >= PurchaseStatus.CONFIRMED.ordinal());
+	}
+
+	public boolean isFinished() {
+		return (this.status == PurchaseStatus.DELIVERED || this.status == PurchaseStatus.CANCELLED);
 	}
 
 	/**
@@ -162,6 +181,22 @@ public class Purchase extends Auditables {
 				}
 			}
 			throw new IllegalArgumentException("Invalid status: " + value);
+		}
+
+		/**
+		 * Returns the next status of the current ordinal.
+		 *
+		 * @return {@link PurchaseStatus}
+		 */
+		public PurchaseStatus next() {
+			PurchaseStatus[] statuses = values();
+			int currentIndex = ordinal();
+
+			if (currentIndex >= statuses.length - 1 || this == CANCELLED) {
+				throw new IllegalOperationException("Cannot progress beyond finished status: " + this);
+			}
+
+			return statuses[currentIndex + 1];
 		}
 	}
 }
