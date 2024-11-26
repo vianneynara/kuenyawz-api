@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CartItemPatchDto {
 
-    @Schema(description = "Variant Id", example = "12345")
+    @Schema(description = "New variant Id, used to switch variants", example = "12345")
     private Long variantId;
 
     @Schema(description = "Variant quantity", example = "10")
