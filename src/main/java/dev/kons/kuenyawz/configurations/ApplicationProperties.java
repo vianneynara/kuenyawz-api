@@ -43,6 +43,7 @@ public class ApplicationProperties {
 
 	private Database database = new Database();
 	private Security security = new Security();
+	private Midtrans midtrans = new Midtrans();
 
 	// Initializing through dotenv
 	@Autowired
@@ -61,6 +62,13 @@ public class ApplicationProperties {
 		this.security.fonnteApiToken = dotenv.get("FONNTE_API_TOKEN", null);
 		this.security.otpExpireSeconds = Long.parseLong(dotenv.get("OTP_EXPIRE_SECONDS", "300"));
 		this.security.otpLength = Integer.parseInt(dotenv.get("OTP_LENGTH", "6"));
+
+		this.midtrans.serverKey = dotenv.get("MIDTRANS_SERVER_KEY", null);
+		this.midtrans.baseUrl = dotenv.get("MIDTRANS_BASE_URL", "https://api.sandbox.midtrans.com");
+		this.midtrans.notificationUrl = dotenv.get("MIDTRANS_NOTIFICATION_URL", null);
+		this.midtrans.finishUrl = dotenv.get("MIDTRANS_FINISH_URL", null);
+		this.midtrans.unfinishUrl = dotenv.get("MIDTRANS_UNFINISH_URL", null);
+		this.midtrans.errorUrl = dotenv.get("MIDTRANS_ERROR_URL, null");
 	}
 
 	public String getFullBaseUrl() {
@@ -73,6 +81,10 @@ public class ApplicationProperties {
 
 	public Security security() {
 		return security;
+	}
+
+	public Midtrans midtrans() {
+		return midtrans;
 	}
 
 	@Getter
@@ -93,5 +105,18 @@ public class ApplicationProperties {
 		private String fonnteApiToken;
 		private long otpExpireSeconds;
 		private int otpLength;
+	}
+
+	@Getter
+	@Setter
+	public static class Midtrans {
+		private String serverKey;
+		private String baseUrl;
+		private String notificationUrl;
+
+		// Redirect URLs
+		private String finishUrl;
+		private String unfinishUrl;
+		private String errorUrl;
 	}
 }
