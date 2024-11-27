@@ -19,6 +19,13 @@ public class Coordinate {
 	@Column(name = "longitude", nullable = false)
 	private Double longitude;
 
+	public static Coordinate of(Double latitude, Double longitude) {
+		return Coordinate.builder()
+			.latitude(latitude)
+			.longitude(longitude)
+			.build();
+	}
+
 	/**
 	 * Calculates the distance between another {@link Coordinate} object.
 	 *
@@ -26,12 +33,16 @@ public class Coordinate {
 	 * @return distance in kilometers
 	 */
 	public double calculateDistance(Coordinate that) {
+		return calculateDistance(that.getLatitude(), that.getLongitude());
+	}
+
+	public double calculateDistance(Double lat, Double lon) {
 		double R = 6371;
 
 		double lat1 = Math.toRadians(this.latitude);
 		double lon1 = Math.toRadians(this.longitude);
-		double lat2 = Math.toRadians(that.latitude);
-		double lon2 = Math.toRadians(that.longitude);
+		double lat2 = Math.toRadians(lat);
+		double lon2 = Math.toRadians(lon);
 
 		double dlon = lon2 - lon1;
 		double dlat = lat2 - lat1;
