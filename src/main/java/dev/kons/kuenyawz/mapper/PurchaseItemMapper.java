@@ -9,5 +9,6 @@ import org.mapstruct.Mapping;
 public interface PurchaseItemMapper {
 
 	@Mapping(target = "variant", source = "variant")
+	@Mapping(target = "product", ignore = true)
 	PurchaseItemDto toDto(PurchaseItem entity);
 }
