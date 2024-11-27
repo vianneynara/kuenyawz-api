@@ -73,4 +73,9 @@ public class CustomExceptionsHandler {
 	public ResponseEntity<Object> handleSpecificationException(SpecificationException ex) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponse.of(ex.getMessage()));
 	}
+
+	@ExceptionHandler(MidtransTransactionException.class)
+	public ResponseEntity<Object> handleMidtransTransactionException(MidtransTransactionException ex) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponse.of(ex.getMessage()));
+	}
 }
