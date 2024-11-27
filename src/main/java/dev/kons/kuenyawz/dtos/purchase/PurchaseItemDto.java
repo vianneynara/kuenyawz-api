@@ -1,5 +1,6 @@
 package dev.kons.kuenyawz.dtos.purchase;
 
+import dev.kons.kuenyawz.dtos.product.ProductDto;
 import dev.kons.kuenyawz.dtos.product.VariantDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,9 @@ public class PurchaseItemDto {
 	@Schema(description = "Bought price of the purchase item at the time of creation", example = "10000.00")
 	private BigDecimal boughtPrice;
 
-	@Schema(description = "Variant id of the purchase item")
-	private VariantDto variantDto;
+	@Schema(description = "Variant of the purchase item")
+	private VariantDto variant;
+
+	@Schema(description = "Product of the purchase item")
+	private ProductDto product;
 }
