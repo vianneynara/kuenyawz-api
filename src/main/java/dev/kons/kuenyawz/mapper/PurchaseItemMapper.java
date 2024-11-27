@@ -8,6 +8,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = {VariantMapper.class})
 public interface PurchaseItemMapper {
 
-	@Mapping(target = "variantDto", source = "variant")
+	@Mapping(target = "variant", source = "variant")
 	PurchaseItemDto toDto(PurchaseItem entity);
 }
