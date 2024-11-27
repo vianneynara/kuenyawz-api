@@ -1,6 +1,7 @@
 package dev.kons.kuenyawz.dtos.midtrans;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.kons.kuenyawz.configurations.ApplicationProperties;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.entities.Purchase;
 import dev.kons.kuenyawz.entities.PurchaseItem;
@@ -17,20 +18,20 @@ import java.util.List;
 ///
 /// The structure is as follows:
 /// ```
-/// {
+///{
 ///   "transaction_details": {
 ///     "order_id": "ORDER-102-{{$timestamp}}",
 ///     "gross_amount": 10000
-///   },
+///},
 ///   "credit_card": {
 ///     "secure": true
-///   },
+///},
 ///   "item_details": [{
 ///     "id": "ITEM1",
 ///     "price": 10000,
 ///     "quantity": 1,
 ///     "name": "Midtrans Bear"
-///   }],
+///}],
 ///   "customer_details": {
 ///     "first_name": "TEST",
 ///     "last_name": "MIDTRANSER",
@@ -45,7 +46,7 @@ import java.util.List;
 ///       "city": "Jakarta",
 ///       "postal_code": "12190",
 ///       "country_code": "IDN"
-///    },
+///},
 ///     "shipping_address": {
 ///       "first_name": "TEST",
 ///       "last_name": "MIDTRANSER",
@@ -55,10 +56,10 @@ import java.util.List;
 ///       "city": "Jakarta",
 ///       "postal_code": "12190",
 ///       "country_codeDN"
-///     }
-///   }
-/// }
-/// ```
+///}
+///}
+///}
+///```
 ///
 /// Refer to https://docs.midtrans.com/reference/request-body-json-parameter for the
 /// full information request body parameters. Many optional fields are removed.
@@ -67,45 +68,49 @@ import java.util.List;
 public class TransactionRequest {
 
 	@NotNull
-    @JsonProperty("transaction_details")
-    private TransactionDetails transactionDetails;
+	@JsonProperty("transaction_details")
+	private TransactionDetails transactionDetails;
 
 	@NotNull
-    @JsonProperty("item_details")
-    private List<ItemDetail> itemDetails;
+	@JsonProperty("item_details")
+	private List<ItemDetail> itemDetails;
 
 	@NotNull
-    @JsonProperty("customer_details")
-    private CustomerDetails customerDetails;
+	@JsonProperty("customer_details")
+	private CustomerDetails customerDetails;
 
 	@NotNull
 	@JsonProperty("expiry")
 	private Expiry expiry;
 
-    @Data
-    @Builder
-    public static class TransactionDetails {
-        @JsonProperty("order_id")
-        private String orderId;
+	@Data
+	@Builder
+	public static class TransactionDetails {
+		@JsonProperty("order_id")
+		private String orderId;
 
-        @JsonProperty("gross_amount")
-        private BigDecimal grossAmount;
+		@JsonProperty("gross_amount")
+		private BigDecimal grossAmount;
 
 		public static TransactionDetails of(Purchase purchase) {
+			var properties = new ApplicationProperties();
+
 			return TransactionDetails.builder()
 				.orderId(purchase.getPurchaseId().toString())
-				.grossAmount(purchase.getTotalPriceWithFee())
+				.grossAmount(purchase.getTotalPrice()
+					.add(purchase.getDeliveryFee())
+					.add(properties.vendor().getPaymentFee()))
 				.build();
 		}
-    }
+	}
 
-    @Data
-    @Builder
-    public static class ItemDetail {
-        private String id;
-        private BigDecimal price;
-        private Integer quantity;
-        private String name;
+	@Data
+	@Builder
+	public static class ItemDetail {
+		private String id;
+		private BigDecimal price;
+		private Integer quantity;
+		private String name;
 
 		public static ItemDetail of(PurchaseItem purchaseItem) {
 			return ItemDetail.builder()
@@ -121,22 +126,22 @@ public class TransactionRequest {
 				.map(ItemDetail::of)
 				.toList();
 		}
-    }
+	}
 
-    @Data
-    @Builder
-    public static class CustomerDetails {
-        @JsonProperty("first_name")
-        private String firstName;
+	@Data
+	@Builder
+	public static class CustomerDetails {
+		@JsonProperty("first_name")
+		private String firstName;
 
-        @JsonProperty("last_name")
-        private String lastName;
+		@JsonProperty("last_name")
+		private String lastName;
 
-        private String email;
-        private String phone;
+		private String email;
+		private String phone;
 
-        @JsonProperty("shipping_address")
-        private Address shippingAddress;
+		@JsonProperty("shipping_address")
+		private Address shippingAddress;
 
 		public static CustomerDetails of(Purchase purchase, Account account) {
 			return CustomerDetails.builder()
@@ -145,23 +150,23 @@ public class TransactionRequest {
 				.shippingAddress(Address.of(purchase, account))
 				.build();
 		}
-    }
+	}
 
-    @Data
-    @Builder
-    public static class Address {
-        @JsonProperty("first_name")
-        private String firstName;
+	@Data
+	@Builder
+	public static class Address {
+		@JsonProperty("first_name")
+		private String firstName;
 
-        @JsonProperty("last_name")
-        private String lastName;
+		@JsonProperty("last_name")
+		private String lastName;
 
-        private String email;
-        private String phone;
-        private String address;
+		private String email;
+		private String phone;
+		private String address;
 
-        @JsonProperty("country_code")
-        private String countryCode;
+		@JsonProperty("country_code")
+		private String countryCode;
 
 		public static Address of(Purchase purchase, Account account) {
 			Address address = Address.builder()
@@ -183,7 +188,7 @@ public class TransactionRequest {
 
 			return address;
 		}
-    }
+	}
 
 	@Data
 	@Builder
