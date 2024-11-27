@@ -1,9 +1,10 @@
 package dev.kons.kuenyawz.services.entity;
 
 import dev.kons.kuenyawz.constants.PaymentType;
-import dev.kons.kuenyawz.dtos.purchase.TransactionPostDto;
 import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
 import dev.kons.kuenyawz.dtos.purchase.TransactionPatchDto;
+import dev.kons.kuenyawz.entities.Account;
+import dev.kons.kuenyawz.entities.Purchase;
 import dev.kons.kuenyawz.entities.Transaction;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,6 +47,15 @@ public interface TransactionService {
 	TransactionDto findById(Long transactionId);
 
 	/**
+	 * Gets a transaction by its id.
+	 *
+	 * @param transactionId {@link Long}
+	 * @return {@link Transaction} entity
+	 */
+	@Transactional(readOnly = true)
+	Transaction getById(Long transactionId);
+
+	/**
 	 * Finds a transaction by its Midtrans's invoice id.
 	 *
 	 * @param invoiceId {@link String}
@@ -53,6 +63,15 @@ public interface TransactionService {
 	 */
 	@Transactional(readOnly = true)
 	TransactionDto findByInvoiceId(String invoiceId);
+
+	/**
+	 * Gets a transaction by its Midtrans's invoice id.
+	 *
+	 * @param invoiceId {@link String}
+	 * @return {@link Transaction} entity
+	 */
+	@Transactional(readOnly = true)
+	Transaction getByInvoiceId(String invoiceId);
 
 	/**
 	 * Finds all transactions of a purchase with pagination.
@@ -66,11 +85,12 @@ public interface TransactionService {
 	/**
 	 * Creates a new transaction. This operation must be done inside a transaction.
 	 *
-	 * @param transactionPostDto {@link TransactionPostDto}
+	 * @param purchase
+	 * @param account
 	 * @return {@link TransactionDto}
 	 */
 	@Transactional
-	TransactionDto create(TransactionPostDto transactionPostDto);
+	Transaction create(Purchase purchase, Account account);
 
 	/**
 	 * Patches a transaction. This operation must be done inside a transaction.
@@ -82,6 +102,22 @@ public interface TransactionService {
 	 */
 	@Transactional
 	TransactionDto patch(Long transactionId, TransactionPatchDto transactionPatchDto);
+
+	/**
+	 * Converts a transaction entity to DTO.
+	 *
+	 * @param transaction {@link Transaction}
+	 * @return {@link TransactionDto}
+	 */
+	TransactionDto convertToDto(Transaction transaction);
+
+	/**
+	 * Calls the payment gateway to cancel all transactions of a purchase.
+	 *
+	 * @param purchaseId {@link Long} purchase id
+	 */
+	@Transactional
+	void cancelAllOf(Long purchaseId);
 
 	@Getter
 	@Setter
