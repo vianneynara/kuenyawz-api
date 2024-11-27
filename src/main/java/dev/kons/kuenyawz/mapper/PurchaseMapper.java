@@ -8,8 +8,6 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {PurchaseItemMapper.class, TransactionMapper.class})
 public interface PurchaseMapper {
 
-    @Mapping(target = "latitude", source = "coordinate.latitude")
-    @Mapping(target = "longitude", source = "coordinate.longitude")
 	PurchaseDto toDto(Purchase entity);
 
     @Mapping(target = "version", ignore = true)
