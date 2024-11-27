@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -41,6 +42,7 @@ public class ApplicationProperties {
 	@Value("#{'${application.accepted-image-extensions}'.split(',')}")
 	private List<String> acceptedImageExtensions;
 
+	private Vendor vendor = new Vendor();
 	private Database database = new Database();
 	private Security security = new Security();
 	private Midtrans midtrans = new Midtrans();
@@ -50,6 +52,15 @@ public class ApplicationProperties {
 	public void initialize(Dotenv dotenv) {
 		this.version = dotenv.get("APP_VERSION", "0.0");
 		this.repositoryUrl = dotenv.get("APP_REPOSITORY_URL", "https://github.com/vianneynara/*");
+
+		this.vendor.instagram = dotenv.get("VENDOR_INSTAGRAM", null);
+		this.vendor.email = dotenv.get("VENDOR_EMAIL", null);
+		this.vendor.phone = dotenv.get("VENDOR_PHONE", null);
+		this.vendor.address = dotenv.get("VENDOR_ADDRESS", null);
+		this.vendor.latitude = Double.parseDouble(dotenv.get("VENDOR_LATITUDE", "0"));
+		this.vendor.longitude = Double.parseDouble(dotenv.get("VENDOR_LONGITUDE", "0"));
+		this.vendor.paymentFee = new BigDecimal(dotenv.get("VENDOR_PAYMENT_FEE", "4000"));
+		this.vendor.feePerKm = new BigDecimal(dotenv.get("VENDOR_FEE_PER_KM", "3500"));
 
 		this.database.url = dotenv.get("DB_URL", "jdbc:postgresql://localhost:5432/kuenyawz");
 		this.database.username = dotenv.get("DB_USERNAME", "kuenyawz");
@@ -75,6 +86,10 @@ public class ApplicationProperties {
 		return httpProtocol + "://" + publicIp + ":" + serverPort;
 	}
 
+	public Vendor vendor() {
+		return vendor;
+	}
+
 	public Database database() {
 		return database;
 	}
@@ -85,6 +100,19 @@ public class ApplicationProperties {
 
 	public Midtrans midtrans() {
 		return midtrans;
+	}
+
+	@Getter
+	@Setter
+	public static class Vendor {
+		private String instagram;
+		private String email;
+		private String phone;
+		private String address;
+		private Double latitude;
+		private Double longitude;
+		private BigDecimal paymentFee;
+		private BigDecimal feePerKm;
 	}
 
 	@Getter
