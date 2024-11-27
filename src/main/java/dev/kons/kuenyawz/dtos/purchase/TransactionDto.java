@@ -22,19 +22,19 @@ public class TransactionDto {
 	private Long transactionId;
 
 	@Schema(description = "Midtrans invoice id", example = "jsDAj9768ASdy7")
-	private String invoiceId;
+	private String mTransactionId;
 
 	@Schema(description = "Amount of the transaction", example = "10000.00")
 	private BigDecimal amount;
 
-	@Schema(description = "Transaction status", example = "PENDING")
-	private Transaction.TransactionStatus status;
+	@Schema(description = "Payment url", example = "https://sandbox.midtrans.com/oAJid-js8uKJ9u-9uesF")
+	private String paymentUrl;
 
 	@Schema(description = "Payment type of the transaction", example = "DOWN_PAYMENT")
 	private PaymentType paymentType;
 
-	@Schema(description = "Payment url", example = "https://sandbox.midtrans.com/oAJid-js8uKJ9u-9uesF")
-	private String paymentUrl;
+	@Schema(description = "Transaction status", example = "PENDING")
+	private Transaction.TransactionStatus status;
 
 	@Schema(description = "Time of expiration")
 	private LocalDateTime expiresAt;
@@ -48,7 +48,7 @@ public class TransactionDto {
     public static TransactionDto fromEntity(Transaction transaction) {
         return TransactionDto.builder()
             .transactionId(transaction.getTransactionId())
-            .invoiceId(transaction.getMTransactionId())
+            .mTransactionId(transaction.getMTransactionId())
             .amount(transaction.getAmount())
             .status(transaction.getStatus())
             .expiresAt(transaction.getExpiresAt())
