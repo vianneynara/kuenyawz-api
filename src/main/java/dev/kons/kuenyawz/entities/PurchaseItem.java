@@ -32,7 +32,7 @@ public class PurchaseItem {
 	@Version
 	private Long version;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "variant_id", nullable = false)
     private Variant variant;
 
