@@ -27,7 +27,6 @@ import java.util.Optional;
 @SuperBuilder
 @Table(indexes = {
 	@Index(name = "idx_purchase_status", columnList = "status"),
-	@Index(name = "idx_purchase_purchasedate", columnList = "purchase_date")
 })
 public class Purchase extends Auditables {
 	@Id
@@ -38,30 +37,34 @@ public class Purchase extends Auditables {
 	@Column
 	private String fullAddress;
 
-	@Column
-	private LocalDate purchaseDate;
-
 	@Embedded
 	private Coordinate coordinate;
+
+	@Column
+	private LocalDate eventDate;
+
+	@Column
+	private PaymentType paymentType;
+
+	@Column
+	@Enumerated(EnumType.STRING)
+	private DeliveryOption deliveryOption;
+
+	@Column
+	private BigDecimal deliveryFee;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private PurchaseStatus status;
 
-	@Column
-	private BigDecimal fee;
-
-	@Column
-	private PaymentType paymentType;
-
 	@Version
 	private Long version;
 
-	@OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY)
-	private List<Transaction> transactions;
-
 	@OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PurchaseItem> purchaseItems;
+
+	@OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY)
+	private List<Transaction> transactions;
 
 	// Helper methods to see payment status:
 
@@ -69,10 +72,6 @@ public class Purchase extends Auditables {
 		return purchaseItems.stream()
 			.map(PurchaseItem::getBoughtPrice)
 			.reduce(BigDecimal.ZERO, BigDecimal::add);
-	}
-
-	public BigDecimal getTotalPriceWithFee() {
-		return getTotalPrice().add(fee);
 	}
 
 	/**
@@ -130,6 +129,40 @@ public class Purchase extends Auditables {
 
 	public boolean isFinished() {
 		return (this.status == PurchaseStatus.DELIVERED || this.status == PurchaseStatus.CANCELLED);
+	}
+
+	/**
+	 * Delivery option.
+	 */
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
+	@Getter
+	public enum DeliveryOption {
+		@JsonProperty("PICK_UP")
+		PICK_UP("Pick up"),
+
+		@JsonProperty("DELIVERY")
+		DELIVERY("Delivery");
+
+		private final String description;
+
+		DeliveryOption(String description) {
+			this.description = description;
+		}
+
+		@JsonValue
+		public String getValue() {
+			return name();
+		}
+
+		@JsonCreator
+		public static DeliveryOption fromString(String value) {
+			for (DeliveryOption option : DeliveryOption.values()) {
+				if (option.name().equalsIgnoreCase(value)) {
+					return option;
+				}
+			}
+			throw new IllegalArgumentException("Invalid delivery option: " + value);
+		}
 	}
 
 	/**
