@@ -45,6 +45,12 @@ public class TransactionDto {
 	@Schema(description = "Time of creation")
 	private LocalDateTime createdAt;
 
+	@Schema(description = "Account id", example = "12345678")
+	private Long accountId;
+
+	@Schema(description = "Purchase id", example = "12345678")
+	private Long purchaseId;
+
     public static TransactionDto fromEntity(Transaction transaction) {
         return TransactionDto.builder()
             .transactionId(transaction.getTransactionId())
