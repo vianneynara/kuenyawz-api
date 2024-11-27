@@ -75,6 +75,16 @@ public class Transaction extends Auditables {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @Getter
     public enum TransactionStatus {
+		// Base status (custom)
+		/**
+		 * Transaction may have been created, but not yet authorized. This state indicates that
+		 * the customer has not yet chosen a payment method or has not yet paid.
+		 */
+		@JsonProperty("created")
+		CREATED("Transaction has been created"),
+
+		/// Sub transaction status ~ flow
+
 		@JsonProperty("authorize")
 		AUTHORIZE("Transaction has been authorized"),
 
