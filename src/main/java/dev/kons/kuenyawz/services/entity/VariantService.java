@@ -98,7 +98,7 @@ public interface VariantService {
 		}
 		if (!(quantity >= variant.getMinQuantity() && quantity <= variant.getMaxQuantity())) {
 			throw new IllegalArgumentException(String.format("Quantity for id %s must be between %d and %d",
-				variant.getVariantId(), variant.getMaxQuantity(), variant.getMaxQuantity()));
+				variant.getVariantId(), variant.getMinQuantity(), variant.getMaxQuantity()));
 		}
 	}
 }
