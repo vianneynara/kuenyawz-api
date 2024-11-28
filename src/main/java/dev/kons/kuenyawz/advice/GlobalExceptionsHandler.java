@@ -41,6 +41,11 @@ public class GlobalExceptionsHandler {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponse.of("An error occurred internally"));
 	}
 
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse.of(ex.getMessage()));
+	}
+
 	@ExceptionHandler(MultipartException.class)
 	public ResponseEntity<Object> handleMultipartException(MultipartException ex) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse.of(ex.getMessage()));
