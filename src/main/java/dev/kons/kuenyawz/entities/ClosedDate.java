@@ -1,6 +1,7 @@
 package dev.kons.kuenyawz.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import dev.kons.kuenyawz.utils.idgenerator.SnowFlakeIdValue;
 import jakarta.persistence.*;
@@ -34,8 +35,14 @@ public class ClosedDate extends Auditables {
 	private String reason;
 
 	public enum ClosureType {
+		@JsonProperty("CLOSED")
 		CLOSED("CLOSED"),
-		RESERVED("RESERVED");
+
+		@JsonProperty("RESERVED")
+		RESERVED("RESERVED"),
+
+		@JsonProperty("PREP")
+		PREP("PREP");
 
 		final String closureType;
 
