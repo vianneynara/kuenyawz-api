@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -59,8 +58,8 @@ public class ApplicationProperties {
 		this.vendor.address = dotenv.get("VENDOR_ADDRESS", null);
 		this.vendor.latitude = Double.parseDouble(dotenv.get("VENDOR_LATITUDE", "0"));
 		this.vendor.longitude = Double.parseDouble(dotenv.get("VENDOR_LONGITUDE", "0"));
-		this.vendor.paymentFee = new BigDecimal(dotenv.get("VENDOR_PAYMENT_FEE", "4000"));
-		this.vendor.feePerKm = new BigDecimal(dotenv.get("VENDOR_FEE_PER_KM", "3500"));
+		this.vendor.paymentFee = Double.parseDouble(dotenv.get("VENDOR_PAYMENT_FEE", "4000"));
+		this.vendor.feePerKm = Double.parseDouble(dotenv.get("VENDOR_FEE_PER_KM", "3500"));
 
 		this.database.url = dotenv.get("DB_URL", "jdbc:postgresql://localhost:5432/kuenyawz");
 		this.database.username = dotenv.get("DB_USERNAME", "kuenyawz");
@@ -111,8 +110,8 @@ public class ApplicationProperties {
 		private String address;
 		private Double latitude;
 		private Double longitude;
-		private BigDecimal paymentFee;
-		private BigDecimal feePerKm;
+		private Double paymentFee;
+		private Double feePerKm;
 	}
 
 	@Getter
