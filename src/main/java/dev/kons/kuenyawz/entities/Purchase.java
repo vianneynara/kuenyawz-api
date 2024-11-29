@@ -60,17 +60,21 @@ public class Purchase extends Auditables {
 	@Version
 	private Long version;
 
-	@OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "purchase", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PurchaseItem> purchaseItems;
 
-	@OneToMany(mappedBy = "purchase", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "purchase", fetch = FetchType.EAGER)
 	private List<Transaction> transactions;
 
 	// Helper methods to see payment status:
 
 	public BigDecimal getTotalPrice() {
 		return purchaseItems.stream()
-			.map(PurchaseItem::getBoughtPrice)
+			.map(pi -> {
+				BigDecimal price = pi.getBoughtPrice();
+				int quantity = pi.getQuantity();
+				return price.multiply(BigDecimal.valueOf(quantity));
+			})
 			.reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
