@@ -89,12 +89,12 @@ public class PurchaseSpec {
 		};
 	}
 
-	public static Specification<Purchase> withDateBetween(LocalDate after, LocalDate before) {
+	public static Specification<Purchase> withDateBetween(LocalDate from, LocalDate to) {
 		return (root, query, cb) -> {
-			if (after == null || before == null)
+			if (from == null || to == null)
 				return null;
 
-			return cb.between(root.get("createdAt"), after, before);
+			return cb.between(root.get("createdAt"), from, to);
 		};
 	}
 }
