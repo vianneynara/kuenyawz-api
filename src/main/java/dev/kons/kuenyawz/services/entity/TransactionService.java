@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface TransactionService {
 	/**
@@ -58,20 +59,20 @@ public interface TransactionService {
 	/**
 	 * Finds a transaction by its Midtrans's invoice id.
 	 *
-	 * @param invoiceId {@link String}
+	 * @param referenceId {@link String}
 	 * @return {@link TransactionDto}
 	 */
 	@Transactional(readOnly = true)
-	TransactionDto findByInvoiceId(String invoiceId);
+	TransactionDto findByInvoiceId(String referenceId);
 
 	/**
 	 * Gets a transaction by its Midtrans's invoice id.
 	 *
-	 * @param invoiceId {@link String}
+	 * @param referenceId {@link String}
 	 * @return {@link Transaction} entity
 	 */
 	@Transactional(readOnly = true)
-	Transaction getByInvoiceId(String invoiceId);
+	Transaction getByInvoiceId(String referenceId);
 
 	/**
 	 * Finds all transactions of a purchase with pagination.
@@ -80,17 +81,25 @@ public interface TransactionService {
 	 * @return Paginated list of {@link TransactionDto}
 	 */
 	@Transactional(readOnly = true)
-	Page<TransactionDto> findByPurchaseId(Long purchaseId);
+	List<TransactionDto> findByPurchaseId(Long purchaseId);
+
+	/**
+	 * Builds a new transaction without saving it.
+	 *
+	 * @param purchase
+	 * @param account
+	 * @return {@link Transaction}
+	 */
+	Transaction build(Purchase purchase, Account account);
 
 	/**
 	 * Creates a new transaction. This operation must be done inside a transaction.
 	 *
-	 * @param purchase
-	 * @param account
+	 * @param transaction {@link Transaction}
 	 * @return {@link TransactionDto}
 	 */
 	@Transactional
-	Transaction create(Purchase purchase, Account account);
+	TransactionDto create(Transaction transaction);
 
 	/**
 	 * Patches a transaction. This operation must be done inside a transaction.
@@ -104,6 +113,14 @@ public interface TransactionService {
 	TransactionDto patch(Long transactionId, TransactionPatchDto transactionPatchDto);
 
 	/**
+	 * Calls the payment gateway to cancel all transactions of a purchase.
+	 *
+	 * @param purchaseId {@link Long} purchase id
+	 */
+	@Transactional
+	void cancelAllOf(Long purchaseId);
+
+	/**
 	 * Converts a transaction entity to DTO.
 	 *
 	 * @param transaction {@link Transaction}
@@ -112,12 +129,14 @@ public interface TransactionService {
 	TransactionDto convertToDto(Transaction transaction);
 
 	/**
-	 * Calls the payment gateway to cancel all transactions of a purchase.
+	 * Converts a transaction entity to DTO with account id and purchase id filled.
 	 *
-	 * @param purchaseId {@link Long} purchase id
+	 * @param transaction {@link Transaction}
+	 * @param account {@link Account}
+	 * @param purchase {@link Purchase}
+	 * @return {@link TransactionDto}
 	 */
-	@Transactional
-	void cancelAllOf(Long purchaseId);
+	TransactionDto convertToDto(Transaction transaction, Account account, Purchase purchase);
 
 	@Getter
 	@Setter
@@ -128,6 +147,7 @@ public interface TransactionService {
 		private Transaction.TransactionStatus status;
 		private PaymentType paymentType;
 		private Long purchaseId;
+		private Long accountId;
 		private LocalDate from;
 		private LocalDate to;
 		private Integer page;
@@ -157,8 +177,22 @@ public interface TransactionService {
 		public Pageable getPageable() {
 			return PageRequest.of(
 				getPage(),
+				getPageSize()
+			);
+		}
+
+		public Pageable getPageable(Sort sorter) {
+			if (sorter == null) {
+				sorter = Sort.by((isAscending != null && isAscending)
+					? Sort.Order.asc("createdAt")
+					: Sort.Order.desc("createdAt")
+				);
+			}
+
+			return PageRequest.of(
+				getPage(),
 				getPageSize(),
-				isAscending ? Sort.Direction.ASC : Sort.Direction.DESC
+				sorter
 			);
 		}
 	}
