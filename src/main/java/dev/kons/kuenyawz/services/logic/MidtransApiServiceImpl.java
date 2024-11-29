@@ -5,18 +5,18 @@ import dev.kons.kuenyawz.configurations.ApplicationProperties;
 import dev.kons.kuenyawz.dtos.midtrans.TransactionRequest;
 import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
 import dev.kons.kuenyawz.exceptions.MidtransTransactionException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.util.retry.Retry;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Base64;
 
 @Service
+@Slf4j
 public class MidtransApiServiceImpl implements MidtransApiService {
 
 	private final WebClient webClient;
@@ -38,17 +38,16 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 
 	@Override
 	public TransactionResponse createTransaction(TransactionRequest request) {
-		return webClient.post()
-			.uri("/snap/v1/transactions")
-			.bodyValue(request)
-			.retrieve()
-			.bodyToMono(TransactionResponse.class)
-			.retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
-				.maxBackoff(Duration.ofSeconds(10))
-				.filter(err -> err instanceof WebClientResponseException)
-				.onRetryExhaustedThrow((spec, sig) -> new MidtransTransactionException())
-			)
-			.block();
+		try {
+			return webClient.post()
+				.uri("/snap/v1/transactions")
+				.bodyValue(request)
+				.retrieve()
+				.bodyToMono(TransactionResponse.class)
+				.block();
+		} catch (WebClientResponseException e) {
+			return handleException(e);
+		}
 	}
 
 	@Override
@@ -83,6 +82,7 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 				e.getResponseBodyAsString(),
 				TransactionResponse.class
 			);
+			log.error("Error processing Midtrans transaction: {}", e.getResponseBodyAsString());
 			throw new MidtransTransactionException(null, response);
 		} catch (IOException parseException) {
 			throw new RuntimeException("Error processing Midtrans transaction", e);
