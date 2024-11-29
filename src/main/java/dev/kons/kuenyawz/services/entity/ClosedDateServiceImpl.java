@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static dev.kons.kuenyawz.services.logic.AuthService.validateIsAdmin;
 
@@ -153,6 +154,14 @@ public class ClosedDateServiceImpl implements ClosedDateService {
 		return closedDates.stream()
 			.map(this::toDto)
 			.toList();
+	}
+
+	@Override
+	public Iterable<ClosedDate> save(Set<ClosedDate> closedDatePostDto) {
+		for (ClosedDate dto : closedDatePostDto) {
+			validateNoDuplicateDate(dto.getDate());
+		}
+		return closedDateRepository.saveAll(closedDatePostDto);
 	}
 
 	@Override
