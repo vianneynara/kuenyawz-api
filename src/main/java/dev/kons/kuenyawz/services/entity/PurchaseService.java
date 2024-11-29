@@ -71,7 +71,7 @@ public interface PurchaseService {
 	 * @return {@link PurchaseDto}
 	 */
 	@Transactional
-	PurchaseDto create(PurchasePostDto purchasePostDto);
+	Purchase create(PurchasePostDto purchasePostDto);
 
 	/**
 	 * Patches a purchase.
