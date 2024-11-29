@@ -8,10 +8,13 @@ import dev.kons.kuenyawz.entities.PurchaseItem;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /// The structure follows Midtrans's Postman collection for creating a transaction.
 /// This will be used for `POST https://app.sandbox.midtrans.com/snap/v1/transactions`
@@ -65,8 +68,8 @@ import java.util.List;
 /// full information request body parameters. Many optional fields are removed.
 @Data
 @Builder
+@Slf4j
 public class TransactionRequest {
-
 	@NotNull
 	@JsonProperty("transaction_details")
 	private TransactionDetails transactionDetails;
@@ -92,14 +95,24 @@ public class TransactionRequest {
 		@JsonProperty("gross_amount")
 		private BigDecimal grossAmount;
 
-		public static TransactionDetails of(Purchase purchase) {
-			var properties = new ApplicationProperties();
-
+		public static TransactionDetails of(Purchase purchase, ApplicationProperties properties) {
 			return TransactionDetails.builder()
 				.orderId(purchase.getPurchaseId().toString())
 				.grossAmount(purchase.getTotalPrice()
 					.add(purchase.getDeliveryFee())
-					.add(properties.vendor().getPaymentFee()))
+					.add(BigDecimal.valueOf(properties.vendor().getPaymentFee())))
+				.build();
+		}
+
+		public static TransactionDetails of(Purchase purchase, Long transactionId, ApplicationProperties properties) {
+			log.info("total price: {}", purchase.getTotalPrice());
+			log.info("delivery fee: {}", purchase.getDeliveryFee());
+			log.info("payment fee: {}", properties.vendor().getPaymentFee());
+			return TransactionDetails.builder()
+				.orderId(transactionId.toString())
+				.grossAmount(purchase.getTotalPrice()
+					.add(purchase.getDeliveryFee())
+					.add(BigDecimal.valueOf(properties.vendor().getPaymentFee())))
 				.build();
 		}
 	}
@@ -113,6 +126,7 @@ public class TransactionRequest {
 		private String name;
 
 		public static ItemDetail of(PurchaseItem purchaseItem) {
+			System.out.printf("%s\n", purchaseItem.getVariant().getVariantId());
 			return ItemDetail.builder()
 				.id(purchaseItem.getVariant().getVariantId().toString())
 				.price(purchaseItem.getBoughtPrice())
@@ -124,7 +138,7 @@ public class TransactionRequest {
 		public static List<ItemDetail> of(List<PurchaseItem> purchaseItems) {
 			return purchaseItems.stream()
 				.map(ItemDetail::of)
-				.toList();
+				.collect(Collectors.toCollection(ArrayList::new));
 		}
 	}
 
@@ -137,7 +151,7 @@ public class TransactionRequest {
 		@JsonProperty("last_name")
 		private String lastName;
 
-		private String email;
+//		private String email;
 		private String phone;
 
 		@JsonProperty("shipping_address")
@@ -146,6 +160,8 @@ public class TransactionRequest {
 		public static CustomerDetails of(Purchase purchase, Account account) {
 			return CustomerDetails.builder()
 				.firstName(account.getFirstName())
+				.lastName(account.getLastName())
+//				.email(account.getEmail())
 				.phone(account.getPhone())
 				.shippingAddress(Address.of(purchase, account))
 				.build();
@@ -161,7 +177,7 @@ public class TransactionRequest {
 		@JsonProperty("last_name")
 		private String lastName;
 
-		private String email;
+//		private String email;
 		private String phone;
 		private String address;
 
@@ -171,15 +187,16 @@ public class TransactionRequest {
 		public static Address of(Purchase purchase, Account account) {
 			Address address = Address.builder()
 				.firstName(account.getFirstName())
+				.lastName(account.getLastName())
 				.phone(account.getPhone())
 				.address(purchase.getFullAddress())
 				.countryCode("IDN")
 				.build();
 
-			final String email = account.getEmail();
-			if (StringUtils.hasText(email)) {
-				address.setEmail(email);
-			}
+//			final String email = account.getEmail();
+//			if (StringUtils.hasText(email)) {
+//				address.setEmail(email);
+//			}
 
 			final String lastName = account.getLastName();
 			if (StringUtils.hasText(lastName)) {
