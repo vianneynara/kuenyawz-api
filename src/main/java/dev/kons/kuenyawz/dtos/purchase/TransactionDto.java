@@ -22,7 +22,7 @@ public class TransactionDto {
 	private Long transactionId;
 
 	@Schema(description = "Midtrans invoice id", example = "jsDAj9768ASdy7")
-	private String mTransactionId;
+	private String referenceId;
 
 	@Schema(description = "Amount of the transaction", example = "10000.00")
 	private BigDecimal amount;
@@ -54,7 +54,9 @@ public class TransactionDto {
     public static TransactionDto fromEntity(Transaction transaction) {
         return TransactionDto.builder()
             .transactionId(transaction.getTransactionId())
-            .mTransactionId(transaction.getMTransactionId())
+            .referenceId(transaction.getReferenceId())
+			.paymentUrl(transaction.getPaymentUrl())
+			.paymentType(transaction.getPaymentType())
             .amount(transaction.getAmount())
             .status(transaction.getStatus())
             .expiresAt(transaction.getExpiresAt())
