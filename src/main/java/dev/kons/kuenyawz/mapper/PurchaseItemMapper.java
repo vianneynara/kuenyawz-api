@@ -5,10 +5,10 @@ import dev.kons.kuenyawz.entities.PurchaseItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {VariantMapper.class})
+@Mapper(componentModel = "spring", uses = {VariantMapper.class, ProductMapper.class})
 public interface PurchaseItemMapper {
 
 	@Mapping(target = "variant", source = "variant")
-	@Mapping(target = "product", ignore = true)
+	@Mapping(target = "product", source = "variant.product")
 	PurchaseItemDto toDto(PurchaseItem entity);
 }
