@@ -10,7 +10,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Schema(name = "Purchase Post", description = "Purchase creation request")
@@ -24,11 +23,11 @@ public class PurchasePostDto {
 	@NotBlank(message = "Full address must not be blank")
 	private String fullAddress;
 
-	@Schema(description = "Latitude for the purchase place", example = "-6.1745517")
+	@Schema(description = "Latitude for the purchase place", example = "-6.1751833254326085")
 	@NotNull(message = "Latitude is required")
 	private Double latitude;
 
-	@Schema(description = "Longitude for the purchase place", example = "106.8205983")
+	@Schema(description = "Longitude for the purchase place", example = "106.82710076786921")
 	@NotNull(message = "Longitude is required")
 	private Double longitude;
 
