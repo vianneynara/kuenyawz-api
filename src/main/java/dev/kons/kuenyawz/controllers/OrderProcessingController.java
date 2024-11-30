@@ -36,6 +36,7 @@ public class OrderProcessingController {
 		@ApiResponse(responseCode = "200", description = "Orders fetched successfully"),
 		@ApiResponse(responseCode = "400", description = "Bad request")
 	})
+	@SecurityRequirement(name = "cookieAuth")
 	@GetMapping
 	public ResponseEntity<?> getOrders(
 		@RequestParam(required = false) Boolean isAscending,
