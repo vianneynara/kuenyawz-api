@@ -149,12 +149,14 @@ public interface PurchaseService {
 		private Integer page;
 		private Integer pageSize;
 
-		static PurchaseSearchCriteria of(Boolean isAscending, Purchase.PurchaseStatus status, PaymentType paymentType, LocalDate from, LocalDate to, Long accountId, String sortBy, Integer page, Integer pageSize) {
+		public static PurchaseSearchCriteria of(Boolean isAscending, String status, String paymentType, LocalDate from, LocalDate to, Long accountId, String sortBy, Integer page, Integer pageSize) {
 			isAscending = (isAscending != null && isAscending);
+			Purchase.PurchaseStatus statusEnum = (status != null) ? Purchase.PurchaseStatus.fromString(status) : null;
+			PaymentType enumPaymentType = (paymentType != null) ? PaymentType.fromString(paymentType) : null;
 			return PurchaseSearchCriteria.builder()
 				.isAscending(isAscending)
-				.status(status)
-				.paymentType(paymentType)
+				.status(statusEnum)
+				.paymentType(enumPaymentType)
 				.from(from)
 				.to(to)
 				.accountId(accountId)
@@ -162,6 +164,10 @@ public interface PurchaseService {
 				.page(page)
 				.pageSize(pageSize)
 				.build();
+		}
+
+		public String getOrderBy() {
+			return (orderBy == null) ? "createdAt" : orderBy;
 		}
 
 		public Integer getPage() {
