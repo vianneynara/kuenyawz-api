@@ -107,7 +107,7 @@ public class CartItemServiceImpl implements CartItemService {
 			&& (cartItemPatchDto.getQuantity() <= newVariant.getMinQuantity()
 			|| cartItemPatchDto.getQuantity() >= newVariant.getMaxQuantity())
 		) {
-			throw new IllegalOperationException("Quantity must be between " + newVariant.getMinQuantity() + " and " + newVariant.getMaxQuantity());
+			cartItemPatchDto.setQuantity(newVariant.getMinQuantity());
 		}
 
 		cartItem.patchFromDto(cartItemPatchDto, newVariant);
