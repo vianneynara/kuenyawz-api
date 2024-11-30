@@ -46,6 +46,9 @@ public class PurchasePostDto {
 	@Pattern(regexp = "^(DELIVERY|PICK_UP)$", message = "Invalid delivery option")
 	private String deliveryOption;
 
+	@Schema(description = "Delivery fee of the purchase", example = "9000")
+	private Double deliveryFee;
+
 	@Schema(description = "Purchase items of the purchase")
 	@NotNull(message = "Purchase items must not be filled")
     @Size(min = 1, message = "At least one item is required")
