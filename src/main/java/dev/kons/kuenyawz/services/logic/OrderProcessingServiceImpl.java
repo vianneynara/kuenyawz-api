@@ -13,12 +13,17 @@ import dev.kons.kuenyawz.exceptions.IllegalOperationException;
 import dev.kons.kuenyawz.mapper.PurchaseMapper;
 import dev.kons.kuenyawz.repositories.PurchaseRepository;
 import dev.kons.kuenyawz.repositories.TransactionRepository;
+import dev.kons.kuenyawz.repositories.TransactionSpec;
+import dev.kons.kuenyawz.services.entity.CartItemService;
 import dev.kons.kuenyawz.services.entity.ClosedDateService;
 import dev.kons.kuenyawz.services.entity.PurchaseService;
 import dev.kons.kuenyawz.services.entity.TransactionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -40,6 +45,7 @@ public class OrderProcessingServiceImpl implements OrderProcessingService {
 	private final ApplicationProperties properties;
 	private final ClosedDateService closedDateService;
 	private final WhatsappApiService whatsappApiService;
+	private final CartItemService cartItemService;
 
 	@Override
 	public PurchaseDto processOrder(PurchasePostDto PurchasePostDto) {
@@ -47,14 +53,16 @@ public class OrderProcessingServiceImpl implements OrderProcessingService {
 		Account account = AuthService.getAuthenticatedAccount();
 
 		// Checks for ongoing transaction
-		transactionService.findAll(account.getAccountId(), TransactionService.TransactionSearchCriteria.builder()
-			.status(Transaction.TransactionStatus.PENDING)
-			.build()).stream()
+		Specification<Transaction> spec = TransactionSpec.withAccountId(account.getAccountId());
+		Pageable pageable = Pageable.unpaged();
+		Page<Transaction> transactions = transactionRepository.findAll(spec, pageable);
+		transactions.stream()
 			.filter(t ->
 				t.getStatus() == Transaction.TransactionStatus.CREATED
-				|| t.getStatus() == Transaction.TransactionStatus.PENDING)
+					|| t.getStatus() == Transaction.TransactionStatus.PENDING)
 			.findAny()
 			.ifPresent(t -> {
+				log.warn("Ongoing transaction found: {}", t);
 				throw new IllegalOperationException("There's already an ongoing transaction");
 			});
 
@@ -116,6 +124,8 @@ public class OrderProcessingServiceImpl implements OrderProcessingService {
 			ClosedDate.builder().date(prepDate2).closureType(ClosedDate.ClosureType.PREP).build(),
 			ClosedDate.builder().date(eventDate).closureType(ClosedDate.ClosureType.RESERVED).build()
 		));
+
+		cartItemService.deleteCartItemsOfAccount(account.getAccountId());
 
 		try {
 			final String message = String.format("Pesanan dengan kode pemesanan %s sudah dibuat. Harap menyelesaikan pembayaran anda untuk mengkonfirmasi jadwal %s",
