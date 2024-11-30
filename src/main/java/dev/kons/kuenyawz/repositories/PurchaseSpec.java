@@ -1,6 +1,7 @@
 package dev.kons.kuenyawz.repositories;
 
 import dev.kons.kuenyawz.constants.PaymentType;
+import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.entities.CartItem;
 import dev.kons.kuenyawz.entities.Purchase;
 import dev.kons.kuenyawz.entities.Transaction;
@@ -23,11 +24,13 @@ public class PurchaseSpec {
 	 */
 	public static Specification<Purchase> withAccountId1(Long accountId) {
 		return (root, query, cb) -> {
-			if (accountId == null) return null;
+			if (accountId == null)
+				return null;
 
-			Join<Purchase, Transaction> transactionJoin = root.join("transaction");
+			Join<Purchase, Transaction> transactionJoin = root.join("transactions");
+			Join<Transaction, Account> accountJoin = transactionJoin.join("account");
 
-			return cb.equal(transactionJoin.get("accountId"), accountId);
+			return cb.equal(accountJoin.get("accountId"), accountId);
 		};
 	}
 
