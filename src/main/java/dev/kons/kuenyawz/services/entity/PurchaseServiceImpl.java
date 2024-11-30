@@ -124,10 +124,15 @@ public class PurchaseServiceImpl implements PurchaseService {
 			.status(Purchase.PurchaseStatus.PENDING)
 			.build();
 
-		BigDecimal deliveryFee = purchase.getDeliveryOption() == Purchase.DeliveryOption.DELIVERY
-			? calcDeliveryFee(purchase)
-			: BigDecimal.ZERO;
-		purchase.setDeliveryFee(deliveryFee);
+		// Calculate delivery fee if not provided
+		if (purchasePostDto.getDeliveryFee() != null) {
+			purchase.setDeliveryFee(BigDecimal.valueOf(purchasePostDto.getDeliveryFee()));
+		} else {
+			BigDecimal deliveryFee = purchase.getDeliveryOption() == Purchase.DeliveryOption.DELIVERY
+				? calcDeliveryFee(purchase)
+				: BigDecimal.ZERO;
+			purchase.setDeliveryFee(deliveryFee);
+		}
 
 		List<PurchaseItem> purchaseItems = purchasePostDto.getPurchaseItems().stream()
 			.map(dto -> {
@@ -154,15 +159,15 @@ public class PurchaseServiceImpl implements PurchaseService {
 		return purchase.getTotalPrice().add(calcDeliveryFee(purchase));
 	}
 
-public BigDecimal calcDeliveryFee(Purchase purchase) {
-    final var vendorLat = properties.vendor().getLatitude();
-    final var vendorLong = properties.vendor().getLongitude();
+	public BigDecimal calcDeliveryFee(Purchase purchase) {
+		final var vendorLat = properties.vendor().getLatitude();
+		final var vendorLong = properties.vendor().getLongitude();
 
-    int distanceInKm = (int) Math.floor(purchase.getCoordinate().calculateDistance(vendorLat, vendorLong));
+		int distanceInKm = (int) Math.floor(purchase.getCoordinate().calculateDistance(vendorLat, vendorLong));
 
-    return BigDecimal.valueOf(distanceInKm)
-        .multiply(BigDecimal.valueOf(properties.vendor().getFeePerKm()));
-}
+		return BigDecimal.valueOf(distanceInKm)
+			.multiply(BigDecimal.valueOf(properties.vendor().getFeePerKm()));
+	}
 
 	@Override
 	public PurchaseDto patch(Long purchaseId, PurchasePatchDto purchasePatchDto) {
