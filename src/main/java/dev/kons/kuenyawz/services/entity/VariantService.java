@@ -43,13 +43,22 @@ public interface VariantService {
 	List<VariantDto> createVariants(Long productId, VariantPostDto... variantPostDtos);
 
 	/**
-	 * Gets a variant by its ID.
+	 * Gets a variant by its ID as DTO.
 	 *
 	 * @param variantId {@link Long}
 	 * @return {@link VariantDto}
 	 */
 	@Transactional(readOnly = true)
 	VariantDto getVariant(long variantId);
+
+	/**
+	 * Gets a variant by its ID.
+	 *
+	 * @param variantId {@link Long}
+	 * @return {@link Variant}
+	 */
+	@Transactional(readOnly = true)
+	Variant getVariantById(long variantId);
 
 	/**
 	 * Gets all variants of a product by its ID.
@@ -82,4 +91,14 @@ public interface VariantService {
 	 */
 	@Transactional
 	void deleteVariant(Long productId, Long variantId);
+
+	static void validateQuantityConsistent(Variant variant, int quantity) {
+		if (quantity < 0) {
+			throw new IllegalArgumentException("Quantity cannot be negative");
+		}
+		if (!(quantity >= variant.getMinQuantity() && quantity <= variant.getMaxQuantity())) {
+			throw new IllegalArgumentException(String.format("Quantity for id %s must be between %d and %d",
+				variant.getVariantId(), variant.getMinQuantity(), variant.getMaxQuantity()));
+		}
+	}
 }

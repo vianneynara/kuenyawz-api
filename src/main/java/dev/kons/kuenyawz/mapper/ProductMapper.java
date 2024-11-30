@@ -17,9 +17,8 @@ public interface ProductMapper {
 	@Mapping(target = "images", ignore = true)
 	ProductDto fromEntity(Product product);
 
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "variants", ignore = true)
-    @Mapping(target = "images", ignore = true)
+	@Mapping(target = "version", ignore = true)
+	@Mapping(target = "variants", ignore = true)
 	@BeanMapping(nullValuePropertyMappingStrategy = org.mapstruct.NullValuePropertyMappingStrategy.IGNORE)
 	Product updateProductFromPatch(ProductPatchDto dto, @MappingTarget Product product);
 }

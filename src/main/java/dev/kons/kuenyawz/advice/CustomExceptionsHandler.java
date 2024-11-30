@@ -9,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @ControllerAdvice
 @Order(2)
@@ -72,5 +75,14 @@ public class CustomExceptionsHandler {
 	@ExceptionHandler(SpecificationException.class)
 	public ResponseEntity<Object> handleSpecificationException(SpecificationException ex) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponse.of(ex.getMessage()));
+	}
+
+	@ExceptionHandler(MidtransTransactionException.class)
+	public ResponseEntity<Object> handleMidtransTransactionException(MidtransTransactionException ex) {
+		List<Map<String, Object>> body = List.of(
+			Map.of("message", ex.getMessage()),
+			Map.of("errors", ex.getErrorResponse().getErrorMessages())
+		);
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
 	}
 }

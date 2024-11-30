@@ -108,6 +108,12 @@ public class VariantServiceImpl implements VariantService {
 	}
 
 	@Override
+	public Variant getVariantById(long variantId) {
+		return variantRepository.findById(variantId)
+			.orElseThrow(() -> new ResourceNotFoundException("Variant with ID '" + variantId + "' not found"));
+	}
+
+	@Override
 	public List<VariantDto> getVariantsOfProductId(Long productId) {
 		List<Variant> variants = variantRepository.findAllByProduct_ProductId(productId);
 		List<VariantDto> variantDtos = variants.stream().map(variantMapper::fromEntity).toList();

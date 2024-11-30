@@ -220,6 +220,14 @@ public class ProductServiceImpl implements ProductService {
 		return productDto;
 	}
 
+	@Override
+	public ProductDto convertToDtoNoVariant(Product product) {
+		ProductDto productDto = productMapper.fromEntity(product);
+		productDto.setVariants(null);
+		productDto.setImages(imageStorageService.getImageUrls(product));
+		return productDto;
+	}
+
 	private void validateProductPostDto(ProductPostDto productPostDto) {
 		if (productPostDto == null) {
 			throw new InvalidRequestBodyValue("ProductPostDto cannot be null");

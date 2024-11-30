@@ -1,5 +1,6 @@
 package dev.kons.kuenyawz.services.entity;
 
+import dev.kons.kuenyawz.constants.PaymentType;
 import dev.kons.kuenyawz.dtos.purchase.PurchaseDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePatchDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
@@ -8,6 +9,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,6 +24,7 @@ public interface PurchaseService {
 	 * @param criteria {@link PurchaseSearchCriteria} search criteria
 	 * @return Paginated list of {@link PurchaseDto}
 	 */
+	@Transactional(readOnly = true)
 	Page<PurchaseDto> findAll(PurchaseSearchCriteria criteria);
 
 	/**
@@ -28,6 +34,7 @@ public interface PurchaseService {
 	 * @param criteria  {@link PurchaseSearchCriteria} search criteria
 	 * @return Paginated list of {@link PurchaseDto}
 	 */
+	@Transactional(readOnly = true)
 	Page<PurchaseDto> findAll(Long accountId, PurchaseSearchCriteria criteria);
 
 	/**
@@ -36,6 +43,7 @@ public interface PurchaseService {
 	 * @param purchaseId {@link Long}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional(readOnly = true)
 	PurchaseDto findById(Long purchaseId);
 
 	/**
@@ -44,14 +52,16 @@ public interface PurchaseService {
 	 * @param transactionId {@link Long}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional(readOnly = true)
 	PurchaseDto findByTransactionId(Long transactionId);
 
 	/**
-	 * Finds a purchase by its Xendit's invoice id.
+	 * Finds a purchase by its invoice id.
 	 *
 	 * @param invoiceId {@link String}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional(readOnly = true)
 	PurchaseDto findByInvoiceId(String invoiceId);
 
 	/**
@@ -60,7 +70,8 @@ public interface PurchaseService {
 	 * @param purchasePostDto {@link PurchasePostDto}
 	 * @return {@link PurchaseDto}
 	 */
-	PurchaseDto create(PurchasePostDto purchasePostDto);
+	@Transactional
+	Purchase create(PurchasePostDto purchasePostDto);
 
 	/**
 	 * Patches a purchase.
@@ -69,6 +80,7 @@ public interface PurchaseService {
 	 * @param purchasePatchDto {@link PurchasePatchDto}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional
 	PurchaseDto patch(Long purchaseId, PurchasePatchDto purchasePatchDto);
 
 	// Other business logic
@@ -80,6 +92,7 @@ public interface PurchaseService {
 	 * @param purchaseId {@link Long}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional
 	PurchaseDto cancel(Long purchaseId);
 
 	/**
@@ -89,6 +102,7 @@ public interface PurchaseService {
 	 * @param purchaseId {@link Long}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional
 	PurchaseDto confirm(Long purchaseId);
 
 	/**
@@ -99,6 +113,7 @@ public interface PurchaseService {
 	 * @param fee        {@link BigDecimal} delivery fee
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional
 	PurchaseDto changeFee(Long purchaseId, BigDecimal fee);
 
 	/**
@@ -108,38 +123,81 @@ public interface PurchaseService {
 	 * @param status     {@link Purchase.PurchaseStatus}
 	 * @return {@link PurchaseDto}
 	 */
+	@Transactional
 	PurchaseDto changeStatus(Long purchaseId, Purchase.PurchaseStatus status);
+
+	/**
+	 * Converts a purchase entity to a purchase dto.
+	 *
+	 * @param purchase {@link Purchase}
+	 * @return {@link PurchaseDto}
+	 */
+	PurchaseDto convertToDto(Purchase purchase);
 
 	@Getter
 	@Setter
 	@Builder
 	class PurchaseSearchCriteria {
+
 		private Boolean isAscending;
 		private Purchase.PurchaseStatus status;
-		private Purchase.PaymentType paymentType;
+		private PaymentType paymentType;
 		private LocalDate from;
 		private LocalDate to;
+		private Long accountId;
+		private String orderBy;
 		private Integer page;
 		private Integer pageSize;
 
-		static PurchaseSearchCriteria of(Boolean isAscending, Purchase.PurchaseStatus status, Purchase.PaymentType paymentType, LocalDate from, LocalDate to, Integer page, Integer pageSize) {
+		public static PurchaseSearchCriteria of(Boolean isAscending, String status, String paymentType, LocalDate from, LocalDate to, Long accountId, String sortBy, Integer page, Integer pageSize) {
+			isAscending = (isAscending != null && isAscending);
+			Purchase.PurchaseStatus statusEnum = (status != null) ? Purchase.PurchaseStatus.fromString(status) : null;
+			PaymentType enumPaymentType = (paymentType != null) ? PaymentType.fromString(paymentType) : null;
 			return PurchaseSearchCriteria.builder()
 				.isAscending(isAscending)
-				.status(status)
-				.paymentType(paymentType)
+				.status(statusEnum)
+				.paymentType(enumPaymentType)
 				.from(from)
 				.to(to)
+				.accountId(accountId)
+				.orderBy(sortBy)
 				.page(page)
 				.pageSize(pageSize)
 				.build();
 		}
 
-		private Integer getPage() {
+		public String getOrderBy() {
+			return (orderBy == null) ? "createdAt" : orderBy;
+		}
+
+		public Integer getPage() {
 			return (page == null || page < 0) ? 0 : page;
 		}
 
-		private Integer getPageSize() {
+		public Integer getPageSize() {
 			return (pageSize == null || pageSize < 1 || pageSize > 1000) ? 10 : pageSize;
+		}
+
+		public Pageable getPageable() {
+			return PageRequest.of(
+				getPage(),
+				getPageSize()
+			);
+		}
+
+		public Pageable getPageable(Sort sorter) {
+			if (sorter == null) {
+				sorter = Sort.by((isAscending != null && isAscending)
+					? Sort.Order.asc(orderBy != null ? orderBy : "purchaseId")
+					: Sort.Order.desc(orderBy != null ? orderBy : "purchaseId")
+				);
+			}
+
+			return PageRequest.of(
+				getPage(),
+				getPageSize(),
+				sorter
+			);
 		}
 	}
 }

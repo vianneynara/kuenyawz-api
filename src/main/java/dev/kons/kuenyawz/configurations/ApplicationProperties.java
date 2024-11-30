@@ -41,14 +41,25 @@ public class ApplicationProperties {
 	@Value("#{'${application.accepted-image-extensions}'.split(',')}")
 	private List<String> acceptedImageExtensions;
 
+	private Vendor vendor = new Vendor();
 	private Database database = new Database();
 	private Security security = new Security();
+	private Midtrans midtrans = new Midtrans();
 
 	// Initializing through dotenv
 	@Autowired
 	public void initialize(Dotenv dotenv) {
 		this.version = dotenv.get("APP_VERSION", "0.0");
 		this.repositoryUrl = dotenv.get("APP_REPOSITORY_URL", "https://github.com/vianneynara/*");
+
+		this.vendor.instagram = dotenv.get("VENDOR_INSTAGRAM", null);
+		this.vendor.email = dotenv.get("VENDOR_EMAIL", null);
+		this.vendor.phone = dotenv.get("VENDOR_PHONE", null);
+		this.vendor.address = dotenv.get("VENDOR_ADDRESS", null);
+		this.vendor.latitude = Double.parseDouble(dotenv.get("VENDOR_LATITUDE", "0"));
+		this.vendor.longitude = Double.parseDouble(dotenv.get("VENDOR_LONGITUDE", "0"));
+		this.vendor.paymentFee = Double.parseDouble(dotenv.get("VENDOR_PAYMENT_FEE", "4000"));
+		this.vendor.feePerKm = Double.parseDouble(dotenv.get("VENDOR_FEE_PER_KM", "3500"));
 
 		this.database.url = dotenv.get("DB_URL", "jdbc:postgresql://localhost:5432/kuenyawz");
 		this.database.username = dotenv.get("DB_USERNAME", "kuenyawz");
@@ -61,10 +72,21 @@ public class ApplicationProperties {
 		this.security.fonnteApiToken = dotenv.get("FONNTE_API_TOKEN", null);
 		this.security.otpExpireSeconds = Long.parseLong(dotenv.get("OTP_EXPIRE_SECONDS", "300"));
 		this.security.otpLength = Integer.parseInt(dotenv.get("OTP_LENGTH", "6"));
+
+		this.midtrans.serverKey = dotenv.get("MIDTRANS_SERVER_KEY", null);
+		this.midtrans.baseUrl = dotenv.get("MIDTRANS_BASE_URL", "https://api.sandbox.midtrans.com");
+		this.midtrans.notificationUrl = dotenv.get("MIDTRANS_NOTIFICATION_URL", null);
+		this.midtrans.finishUrl = dotenv.get("MIDTRANS_FINISH_URL", null);
+		this.midtrans.unfinishUrl = dotenv.get("MIDTRANS_UNFINISH_URL", null);
+		this.midtrans.errorUrl = dotenv.get("MIDTRANS_ERROR_URL, null");
 	}
 
 	public String getFullBaseUrl() {
 		return httpProtocol + "://" + publicIp + ":" + serverPort;
+	}
+
+	public Vendor vendor() {
+		return vendor;
 	}
 
 	public Database database() {
@@ -73,6 +95,23 @@ public class ApplicationProperties {
 
 	public Security security() {
 		return security;
+	}
+
+	public Midtrans midtrans() {
+		return midtrans;
+	}
+
+	@Getter
+	@Setter
+	public static class Vendor {
+		private String instagram;
+		private String email;
+		private String phone;
+		private String address;
+		private Double latitude;
+		private Double longitude;
+		private Double paymentFee;
+		private Double feePerKm;
 	}
 
 	@Getter
@@ -93,5 +132,18 @@ public class ApplicationProperties {
 		private String fonnteApiToken;
 		private long otpExpireSeconds;
 		private int otpLength;
+	}
+
+	@Getter
+	@Setter
+	public static class Midtrans {
+		private String serverKey;
+		private String baseUrl;
+		private String notificationUrl;
+
+		// Redirect URLs
+		private String finishUrl;
+		private String unfinishUrl;
+		private String errorUrl;
 	}
 }

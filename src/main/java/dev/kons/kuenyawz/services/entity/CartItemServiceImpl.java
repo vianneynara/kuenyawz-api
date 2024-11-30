@@ -104,8 +104,8 @@ public class CartItemServiceImpl implements CartItemService {
 			}
 		}
 		if (cartItemPatchDto.getQuantity() != null
-			&& (cartItemPatchDto.getQuantity() < newVariant.getMinQuantity()
-			|| cartItemPatchDto.getQuantity() > newVariant.getMaxQuantity())
+			&& (cartItemPatchDto.getQuantity() <= newVariant.getMinQuantity()
+			|| cartItemPatchDto.getQuantity() >= newVariant.getMaxQuantity())
 		) {
 			cartItemPatchDto.setQuantity(newVariant.getMinQuantity());
 		}

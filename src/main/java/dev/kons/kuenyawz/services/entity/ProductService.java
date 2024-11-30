@@ -115,4 +115,6 @@ public interface ProductService {
 	boolean existsById(Long productId);
 
 	ProductDto convertToDto(Product product);
+
+	ProductDto convertToDtoNoVariant(Product product);
 }

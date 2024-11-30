@@ -1,6 +1,6 @@
 package dev.kons.kuenyawz.dtos.purchase;
 
-import dev.kons.kuenyawz.entities.Purchase;
+import dev.kons.kuenyawz.constants.PaymentType;
 import dev.kons.kuenyawz.entities.Transaction;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -21,17 +21,20 @@ public class TransactionDto {
 	@Schema(description = "Transaction id", example = "12345678")
 	private Long transactionId;
 
-	@Schema(description = "Xendit invoice id", example = "jsDAj9768ASdy7")
-	private String invoiceId;
+	@Schema(description = "Midtrans invoice id", example = "jsDAj9768ASdy7")
+	private String referenceId;
 
 	@Schema(description = "Amount of the transaction", example = "10000.00")
 	private BigDecimal amount;
 
-	@Schema(description = "Transaction status", example = "PENDING")
-	private Transaction.TransactionStatus status;
+	@Schema(description = "Payment url", example = "https://sandbox.midtrans.com/oAJid-js8uKJ9u-9uesF")
+	private String paymentUrl;
 
 	@Schema(description = "Payment type of the transaction", example = "DOWN_PAYMENT")
-	private Purchase.PaymentType paymentType;
+	private PaymentType paymentType;
+
+	@Schema(description = "Transaction status", example = "PENDING")
+	private Transaction.TransactionStatus status;
 
 	@Schema(description = "Time of expiration")
 	private LocalDateTime expiresAt;
@@ -42,10 +45,18 @@ public class TransactionDto {
 	@Schema(description = "Time of creation")
 	private LocalDateTime createdAt;
 
+	@Schema(description = "Account id", example = "12345678")
+	private Long accountId;
+
+	@Schema(description = "Purchase id", example = "12345678")
+	private Long purchaseId;
+
     public static TransactionDto fromEntity(Transaction transaction) {
         return TransactionDto.builder()
             .transactionId(transaction.getTransactionId())
-            .invoiceId(transaction.getInvoiceId())
+            .referenceId(transaction.getReferenceId())
+			.paymentUrl(transaction.getPaymentUrl())
+			.paymentType(transaction.getPaymentType())
             .amount(transaction.getAmount())
             .status(transaction.getStatus())
             .expiresAt(transaction.getExpiresAt())
