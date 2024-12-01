@@ -34,7 +34,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class OrderProcessingServiceImpl implements OrderProcessingService {
+public class OrderingServiceImpl implements OrderingService {
 
 	private final PurchaseService purchaseService;
 	private final TransactionService transactionService;

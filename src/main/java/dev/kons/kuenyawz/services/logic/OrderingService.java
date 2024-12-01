@@ -3,7 +3,7 @@ package dev.kons.kuenyawz.services.logic;
 import dev.kons.kuenyawz.dtos.purchase.PurchaseDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
 
-public interface OrderProcessingService {
+public interface OrderingService {
 	/**
 	 * Initiates order processing flow, which includes:
 	 * <ol>
