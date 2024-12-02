@@ -67,7 +67,7 @@ public class Transaction extends Auditables {
 	@JoinColumn(name = "account_id", nullable = false)
 	private Account account;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "purchase_id", nullable = false)
 	private Purchase purchase;
 
@@ -135,7 +135,7 @@ public class Transaction extends Auditables {
         }
 
 		@JsonCreator
-		public static TransactionStatus fromValue(String value) {
+		public static TransactionStatus fromString(String value) {
 			for (TransactionStatus status : TransactionStatus.values()) {
 				if (status.name().equalsIgnoreCase(value)) {
 					return status;
