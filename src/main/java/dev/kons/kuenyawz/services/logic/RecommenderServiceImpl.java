@@ -41,16 +41,26 @@ public class RecommenderServiceImpl implements RecommenderService {
 		Set<Map<Long, Set<Long>>> purchaseData = gatherPurchaseData();
 		var ruleSets = aprioriService.findAllFrequentSetOfItems(purchaseData);
 
-		for (Map<Long, Set<Long>> ruleSet : ruleSets) {
-			Iterator<Long> recommendedIterator = ruleSet.values().iterator().next().iterator();
-			Apriori apriori = Apriori.builder()
-				.productId(ruleSet.keySet().iterator().next())
-				.recommended1(recommendedIterator.hasNext() ? recommendedIterator.next() : null)
-				.recommended2(recommendedIterator.hasNext() ? recommendedIterator.next() : null)
-				.recommended3(recommendedIterator.hasNext() ? recommendedIterator.next() : null)
-				.build();
+		for (Map.Entry<Long, Set<Long>> entry : ruleSets.entrySet()) {
+			Long productId = entry.getKey();
+			Set<Long> recommendedIds = entry.getValue();
+
+			Apriori apriori = new Apriori();
+			apriori.setProductId(productId);
+
+			Iterator<Long> iterator = recommendedIds.iterator();
+			if (iterator.hasNext()) {
+				apriori.setRecommended1(iterator.next());
+			}
+			if (iterator.hasNext()) {
+				apriori.setRecommended2(iterator.next());
+			}
+			if (iterator.hasNext()) {
+				apriori.setRecommended3(iterator.next());
+			}
 
 			aprioriRepository.save(apriori);
+
 		}
 	}
 
@@ -107,6 +117,7 @@ public class RecommenderServiceImpl implements RecommenderService {
 	}
 
 	private List<ProductDto> oldRecommender(Long productId, Boolean addRandom) {
+		System.out.println("Running old recommender!");
 		if (!productService.existsById(productId)) {
 			throw new ResourceNotFoundException("Product not found");
 		}
