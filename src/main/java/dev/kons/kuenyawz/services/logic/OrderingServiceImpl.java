@@ -149,7 +149,8 @@ public class OrderingServiceImpl implements OrderingService {
 			throw new IllegalOperationException("Cannot cancel delivered purchase");
 		}
 
-		transactionService.validateOwnership(purchaseId, AuthService.getAuthenticatedAccount().getAccountId());
+		if (!AuthService.isAuthenticatedAdmin())
+			transactionService.validateOwnership(purchaseId, AuthService.getAuthenticatedAccount().getAccountId());
 
 		LocalDate currentDate = LocalDate.now();
 		if (currentDate.isAfter(purchase.getEventDate())) {
