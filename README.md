@@ -13,14 +13,14 @@ This project is to be implemented for our **[KuenyaWZ](https://github.com/vianne
     - [x] Product
     - [x] Variant (subset of Product)
     - [x] Product Images
-    - [ ] Order
-    - [ ] Order Item (subset of Order)
-    - [ ] Transaction
-    - [ ] Likes
-    - [ ] CustomSchedule
+    - [x] Order
+    - [x] Order Item (subset of Order)
+    - [x] Transaction
+    - [ ] ~~Likes~~
+    - [x] CustomSchedule
 - [x] Authentication/Authorization
     - [ ] ~~Basic~~
-    - [x] JWT
+    - [x] JWT Authentication
 
 Should be noted that we'll need to implement integration of methods
 for the actual website business logic.
