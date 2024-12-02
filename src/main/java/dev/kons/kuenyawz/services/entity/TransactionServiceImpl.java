@@ -8,6 +8,7 @@ import dev.kons.kuenyawz.entities.Purchase;
 import dev.kons.kuenyawz.entities.Transaction;
 import dev.kons.kuenyawz.exceptions.IllegalOperationException;
 import dev.kons.kuenyawz.exceptions.UnauthorizedException;
+import dev.kons.kuenyawz.repositories.PurchaseRepository;
 import dev.kons.kuenyawz.repositories.TransactionRepository;
 import dev.kons.kuenyawz.repositories.TransactionSpec;
 import dev.kons.kuenyawz.services.logic.AuthService;
@@ -35,6 +36,7 @@ public class TransactionServiceImpl implements TransactionService {
 	private final TransactionRepository transactionRepository;
 	private final SnowFlakeIdGenerator snowFlakeIdGenerator;
 	private final MidtransApiService midtransApiService;
+	private final PurchaseRepository purchaseRepository;
 
 	@Override
 	public Page<TransactionDto> findAll(TransactionSearchCriteria criteria) {
@@ -118,6 +120,13 @@ public class TransactionServiceImpl implements TransactionService {
 		Transaction.TransactionStatus status = Transaction.TransactionStatus.fromString(res.getTransactionStatus());
 		transaction.setStatus(status);
 
+		Purchase purchase = transaction.getPurchase();
+		if (purchase.getStatus() == Purchase.PurchaseStatus.PENDING
+			&& (status == Transaction.TransactionStatus.CAPTURE || status == Transaction.TransactionStatus.SETTLEMENT)) {
+			purchase.setStatus(Purchase.PurchaseStatus.CONFIRMING);
+			purchaseRepository.save(purchase);
+		}
+
 		Transaction savedTransaction = transactionRepository.save(transaction);
 		return convertToDto(savedTransaction);
 	}
@@ -128,6 +137,13 @@ public class TransactionServiceImpl implements TransactionService {
 
 		Transaction.TransactionStatus status = Transaction.TransactionStatus.fromString(res.getTransactionStatus());
 		transaction.setStatus(status);
+
+		Purchase purchase = transaction.getPurchase();
+		if (purchase.getStatus() == Purchase.PurchaseStatus.PENDING
+			&& (status == Transaction.TransactionStatus.CAPTURE || status == Transaction.TransactionStatus.SETTLEMENT)) {
+			purchase.setStatus(Purchase.PurchaseStatus.CONFIRMING);
+			purchaseRepository.save(purchase);
+		}
 
 		Transaction savedTransaction = transactionRepository.save(transaction);
 		return convertToDto(savedTransaction);
