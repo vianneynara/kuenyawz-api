@@ -18,18 +18,18 @@ public class Apriori {
     private Long aprioriId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "base_product_id", nullable = false)
     private Product product;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "recommended_product1_id", nullable = false)
     private Product recommended1;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "recommended_product2_id", nullable = false)
     private Product recommended2;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "recommended_product3_id", nullable = false)
     private Product recommended3;
 }
