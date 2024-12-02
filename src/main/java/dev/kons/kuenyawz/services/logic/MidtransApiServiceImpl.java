@@ -9,7 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.io.IOException;
@@ -47,6 +49,9 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 				.block();
 		} catch (WebClientResponseException e) {
 			return handleException(e);
+		} catch (WebClientRequestException e) {
+			log.error("Error processing Midtrans transaction", e);
+			throw new MidtransTransactionException("Error processing request to Midtrans");
 		}
 	}
 
@@ -56,10 +61,15 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 			return webClient.get()
 				.uri("/v2/{order_id}/status", orderId)
 				.retrieve()
+				.onStatus(status -> status.value() == 404, ClientResponse::createException)
 				.bodyToMono(TransactionResponse.class)
 				.block();
 		} catch (WebClientResponseException e) {
-			return handleException(e);
+			if (e.getResponseBodyAsString().contains("404 Not Found")) {
+				throw new MidtransTransactionException("Transaction with id " + orderId + " not found in Midtrans");
+			} else {
+				return handleException(e);
+			}
 		}
 	}
 
@@ -72,20 +82,25 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 				.bodyToMono(TransactionResponse.class)
 				.block();
 		} catch (WebClientResponseException e) {
-			return handleException(e);
+			if (e.getResponseBodyAsString().contains("404 Not Found")) {
+				throw new MidtransTransactionException("Transaction with id " + orderId + " not found in Midtrans");
+			} else {
+				return handleException(e);
+			}
 		}
 	}
 
 	private TransactionResponse handleException(WebClientResponseException e) {
 		try {
+			log.error("Error processing Midtrans transaction: {}", e.getResponseBodyAsString());
 			TransactionResponse response = objectMapper.readValue(
 				e.getResponseBodyAsString(),
 				TransactionResponse.class
 			);
-			log.error("Error processing Midtrans transaction: {}", e.getResponseBodyAsString());
 			throw new MidtransTransactionException(null, response);
 		} catch (IOException parseException) {
-			throw new RuntimeException("Error processing Midtrans transaction", e);
+			log.error("Error parsing Midtrans error response", parseException);
+			throw new MidtransTransactionException("Error processing Midtrans transaction");
 		}
 	}
 }
