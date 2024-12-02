@@ -27,12 +27,12 @@ public class TransactionController {
 
 	private final TransactionService transactionService;
 
-//	@Operation(summary = "Get transactions")
-//	@ApiResponses({
-//		@ApiResponse(responseCode = "200", description = "Transactions retrieved successfully")
-//	})
-//	@SecurityRequirement(name = "cookieAuth")
-//	@GetMapping
+	@Operation(summary = "Get transactions")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Transactions retrieved successfully")
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@GetMapping
 	public ResponseEntity<?> getTransactions(
 		@RequestParam(required = false) Boolean asc,
 		@RequestParam(required = false) String status,
