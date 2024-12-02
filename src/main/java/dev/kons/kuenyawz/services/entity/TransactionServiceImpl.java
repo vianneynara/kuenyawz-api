@@ -122,8 +122,14 @@ public class TransactionServiceImpl implements TransactionService {
 
 		Purchase purchase = transaction.getPurchase();
 		if (purchase.getStatus() == Purchase.PurchaseStatus.PENDING
-			&& (status == Transaction.TransactionStatus.CAPTURE || status == Transaction.TransactionStatus.SETTLEMENT)) {
+			&& (status == Transaction.TransactionStatus.CAPTURE || status == Transaction.TransactionStatus.SETTLEMENT)
+		) {
 			purchase.setStatus(Purchase.PurchaseStatus.CONFIRMING);
+			purchaseRepository.save(purchase);
+		} else if (purchase.getStatus() == Purchase.PurchaseStatus.PENDING
+			&& (status == Transaction.TransactionStatus.CANCEL || status == Transaction.TransactionStatus.EXPIRE)
+		) {
+			purchase.setStatus(Purchase.PurchaseStatus.CANCELLED);
 			purchaseRepository.save(purchase);
 		}
 
@@ -140,8 +146,14 @@ public class TransactionServiceImpl implements TransactionService {
 
 		Purchase purchase = transaction.getPurchase();
 		if (purchase.getStatus() == Purchase.PurchaseStatus.PENDING
-			&& (status == Transaction.TransactionStatus.CAPTURE || status == Transaction.TransactionStatus.SETTLEMENT)) {
+			&& (status == Transaction.TransactionStatus.CAPTURE || status == Transaction.TransactionStatus.SETTLEMENT)
+		) {
 			purchase.setStatus(Purchase.PurchaseStatus.CONFIRMING);
+			purchaseRepository.save(purchase);
+		} else if (purchase.getStatus() == Purchase.PurchaseStatus.PENDING
+			&& (status == Transaction.TransactionStatus.CANCEL || status == Transaction.TransactionStatus.EXPIRE)
+		) {
+			purchase.setStatus(Purchase.PurchaseStatus.CANCELLED);
 			purchaseRepository.save(purchase);
 		}
 
