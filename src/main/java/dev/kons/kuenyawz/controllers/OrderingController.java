@@ -115,9 +115,9 @@ public class OrderingController {
 		return ResponseEntity.ok(purchaseDto);
 	}
 
-	@Operation(summary = "Get a purchase/order")
+	@Operation(summary = "Get a purchase/order's transaction")
 	@ApiResponses({
-		@ApiResponse(responseCode = "200", description = "Order fetched successfully"),
+		@ApiResponse(responseCode = "200", description = "Transaction fetched successfully"),
 		@ApiResponse(responseCode = "400", description = "Bad request")
 	})
 	@SecurityRequirement(name = "cookieAuth")
