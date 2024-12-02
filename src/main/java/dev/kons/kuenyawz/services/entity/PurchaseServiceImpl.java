@@ -74,6 +74,15 @@ public class PurchaseServiceImpl implements PurchaseService {
 	}
 
 	@Override
+	public List<Purchase> getAprioriNeeds() {
+		Specification<Purchase> spec = PurchaseSpec
+			.withStatus(Purchase.PurchaseStatus.CONFIRMED)
+			.or(PurchaseSpec.withStatus(Purchase.PurchaseStatus.DELIVERED));
+
+		return purchaseRepository.findAll(spec);
+	}
+
+	@Override
 	public PurchaseDto findById(Long purchaseId) {
 		final Purchase purchase = purchaseRepository.findById(purchaseId)
 			.orElseThrow(() -> new EntityNotFoundException("Purchase not found"));

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public interface PurchaseService {
 	/**
@@ -36,6 +37,12 @@ public interface PurchaseService {
 	 */
 	@Transactional(readOnly = true)
 	Page<PurchaseDto> findAll(Long accountId, PurchaseSearchCriteria criteria);
+
+	/**
+	 * Gets all purchases without pagination.
+	 */
+	@Transactional(readOnly = true)
+	List<Purchase> getAprioriNeeds();
 
 	/**
 	 * Finds a purchase by its purchase id.
