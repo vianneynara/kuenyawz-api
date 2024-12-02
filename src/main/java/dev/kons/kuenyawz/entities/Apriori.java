@@ -17,19 +17,15 @@ public class Apriori {
     @Column
     private Long aprioriId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "base_product_id", nullable = false)
-    private Product product;
+    @Column
+    private Long productId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "recommended_product1_id", nullable = false)
-    private Product recommended1;
+    @Column
+    private Long recommended1;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "recommended_product2_id", nullable = false)
-    private Product recommended2;
+    @Column
+    private Long recommended2;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "recommended_product3_id", nullable = false)
-    private Product recommended3;
+    @Column
+    private Long recommended3;
 }
