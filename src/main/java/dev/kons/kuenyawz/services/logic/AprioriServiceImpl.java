@@ -2,10 +2,12 @@ package dev.kons.kuenyawz.services.logic;
 
 import dev.kons.kuenyawz.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 @RequiredArgsConstructor
 public class AprioriServiceImpl implements AprioriService {
 
