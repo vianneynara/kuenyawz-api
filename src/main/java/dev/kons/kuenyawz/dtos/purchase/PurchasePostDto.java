@@ -31,12 +31,12 @@ public class PurchasePostDto {
 	@NotNull(message = "Longitude is required")
 	private Double longitude;
 
-	@Schema(description = "Date of the event (ISO-8601)", example = "2021-12-01")
+	@Schema(description = "Date of the event (ISO-8601)", example = "2024-12-06")
 	@NotBlank(message = "Event date is required")
 	@Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "Invalid date format")
 	private String eventDate;
 
-	@Schema(description = "Payment type of the purchase", example = "DOWN_PAYMENT")
+	@Schema(description = "Payment type of the purchase", example = "FULL_PAYMENT")
 	@NotBlank(message = "Payment type is required")
 	@Pattern(regexp = "^(DOWN_PAYMENT|FULL_PAYMENT)$", message = "Invalid payment type")
 	private String paymentType;
