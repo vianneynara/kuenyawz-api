@@ -169,4 +169,34 @@ public class OrderingServiceImpl implements OrderingService {
 
 		return purchaseMapper.toDto(savedPurchase);
 	}
+
+	@Override
+	public PurchaseDto confirmOrder(Long purchaseId) {
+		AuthService.validateIsAdmin();
+
+		Purchase purchase = purchaseService.getById(purchaseId);
+
+		if (purchase.getStatus() == Purchase.PurchaseStatus.DELIVERED) {
+			throw new IllegalOperationException("Purchase is already delivered");
+		} else if (purchase.getStatus() == Purchase.PurchaseStatus.CANCELLED) {
+			throw new IllegalOperationException("Cannot confirm cancelled purchase");
+		} else if (purchase.getStatus() == Purchase.PurchaseStatus.CONFIRMED) {
+			throw new IllegalOperationException("Purchase is already confirmed");
+		}
+
+		List<TransactionDto> transactions = transactionService.findByPurchaseId(purchaseId);
+		transactions.stream()
+			.filter(t ->
+				t.getStatus() == Transaction.TransactionStatus.CAPTURE
+				|| t.getStatus() == Transaction.TransactionStatus.SETTLEMENT)
+			.findAny()
+			.orElseThrow(
+				() -> new IllegalOperationException("Transaction for this purchase has not been paid yet")
+			);
+
+		purchase.setStatus(Purchase.PurchaseStatus.CONFIRMED);
+		Purchase savedPurchase = purchaseRepository.save(purchase);
+
+		return purchaseMapper.toDto(savedPurchase);
+	}
 }
