@@ -194,8 +194,7 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 
 		if (transaction.getStatus() == Transaction.TransactionStatus.CREATED) {
-			log.warn("Transaction {} has already been cancelled", transaction.getTransactionId());
-			return;
+			log.warn("Transaction {} has not been continued yet, cancelling", transaction.getTransactionId());
 		}
 
 		if (transaction.getStatus() == Transaction.TransactionStatus.CANCEL) {
@@ -204,9 +203,9 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 
 		// Call Midtrans API to cancel the transaction
-		TransactionResponse response = midtransApiService.cancelTransaction(String.valueOf(transaction.getPurchase().getPurchaseId()));
+		TransactionResponse response = midtransApiService.cancelTransaction(String.valueOf(transaction.getTransactionId()));
 		if (Objects.equals(response.getStatusCode(), "404")) {
-			throw new EntityNotFoundException("Transaction not found in Midtrans");
+			log.info("Transaction {} not found in Midtrans, cancelling locally", transaction.getTransactionId());
 		} else if (Objects.equals(response.getStatusCode(), "412")) {
 			throw new IllegalOperationException("Modification is not allowed on the transaction");
 		}
@@ -227,5 +226,13 @@ public class TransactionServiceImpl implements TransactionService {
 		dto.setPurchaseId(purchase.getPurchaseId());
 
 		return dto;
+	}
+
+	@Override
+	public void validateOwnership(Long purchaseId, Long accountId) {
+		List<Transaction> transaction = transactionRepository.findByPurchase_PurchaseIdAndAccount_AccountId(purchaseId, accountId);
+		if (transaction.isEmpty()) {
+			throw new UnauthorizedException("You are not authorized to access this order");
+		}
 	}
 }
