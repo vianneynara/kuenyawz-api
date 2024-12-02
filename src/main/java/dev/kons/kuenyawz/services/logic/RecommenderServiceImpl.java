@@ -1,18 +1,23 @@
 package dev.kons.kuenyawz.services.logic;
 
 import dev.kons.kuenyawz.dtos.product.ProductDto;
+import dev.kons.kuenyawz.entities.Apriori;
 import dev.kons.kuenyawz.entities.Product;
+import dev.kons.kuenyawz.entities.Purchase;
 import dev.kons.kuenyawz.exceptions.IllegalOperationException;
 import dev.kons.kuenyawz.exceptions.ResourceNotFoundException;
+import dev.kons.kuenyawz.repositories.AprioriRepository;
 import dev.kons.kuenyawz.repositories.ProductRepository;
 import dev.kons.kuenyawz.repositories.ProductSpec;
 import dev.kons.kuenyawz.services.entity.ProductService;
+import dev.kons.kuenyawz.services.entity.PurchaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,9 +25,88 @@ public class RecommenderServiceImpl implements RecommenderService {
 
 	private final ProductService productService;
 	private final ProductRepository productRepository;
+	private final AprioriService aprioriService;
+	private final PurchaseService purchaseService;
+	private final AprioriRepository aprioriRepository;
 
 	@Override
 	public List<ProductDto> getRecommendsOfProduct(Long productId, Boolean addRandom) {
+		return newRecommender(productId);
+	}
+
+	@Override
+	public void generateApriori() {
+		aprioriRepository.deleteAll();
+
+		Set<Map<Long, Set<Long>>> purchaseData = gatherPurchaseData();
+		var ruleSets = aprioriService.findAllFrequentSetOfItems(purchaseData);
+
+		for (Map<Long, Set<Long>> ruleSet : ruleSets) {
+			Iterator<Long> recommendedIterator = ruleSet.values().iterator().next().iterator();
+			Apriori apriori = Apriori.builder()
+				.productId(ruleSet.keySet().iterator().next())
+				.recommended1(recommendedIterator.hasNext() ? recommendedIterator.next() : null)
+				.recommended2(recommendedIterator.hasNext() ? recommendedIterator.next() : null)
+				.recommended3(recommendedIterator.hasNext() ? recommendedIterator.next() : null)
+				.build();
+
+			aprioriRepository.save(apriori);
+		}
+	}
+
+	@Override
+	public void clearAprioriRecommendations() {
+		aprioriRepository.deleteAll();
+	}
+
+	private Set<Map<Long, Set<Long>>> gatherPurchaseData() {
+		List<Purchase> purchases = purchaseService.getAprioriNeeds();
+		return convertToAprioriSource(purchases);
+	}
+
+	public Set<Map<Long, Set<Long>>> convertToAprioriSource(List<Purchase> purchases) {
+		Set<Map<Long, Set<Long>>> purchasesAndProductIds = new HashSet<>();
+
+		// Create set of product ids for each purchase and put it to the map
+		for (Purchase purchase : purchases) {
+			Set<Long> productIds = purchase.getPurchaseItems().stream()
+				.map(purchaseItem -> purchaseItem.getVariant().getProduct().getProductId())
+				.collect(Collectors.toSet());
+
+			Map<Long, Set<Long>> map = Map.of(purchase.getPurchaseId(), productIds);
+			purchasesAndProductIds.add(map);
+		}
+
+		return purchasesAndProductIds;
+	}
+
+	private List<ProductDto> newRecommender(Long productId) {
+		Optional<Apriori> result = aprioriRepository.findByProductId(productId);
+		if (result.isEmpty()) {
+			return oldRecommender(productId, true);
+		} else {
+			final var apriori = result.get();
+			List<ProductDto> recommendations = new ArrayList<>();
+
+			Optional.ofNullable(apriori.getRecommended1())
+				.map(productService::getProduct)
+				.ifPresent(recommendations::add);
+
+			Optional.ofNullable(apriori.getRecommended2())
+				.map(productService::getProduct)
+				.ifPresent(recommendations::add);
+
+			Optional.ofNullable(apriori.getRecommended3())
+				.map(productService::getProduct)
+				.ifPresent(recommendations::add);
+
+			return recommendations.isEmpty()
+				? oldRecommender(productId, true)
+				: recommendations;
+		}
+	}
+
+	private List<ProductDto> oldRecommender(Long productId, Boolean addRandom) {
 		if (!productService.existsById(productId)) {
 			throw new ResourceNotFoundException("Product not found");
 		}

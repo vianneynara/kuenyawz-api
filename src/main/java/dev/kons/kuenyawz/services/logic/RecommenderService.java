@@ -1,6 +1,7 @@
 package dev.kons.kuenyawz.services.logic;
 
 import dev.kons.kuenyawz.dtos.product.ProductDto;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,4 +14,15 @@ public interface RecommenderService {
 	 * @apiNote It currently only mocks the function, it will be implemented in the future.
 	 */
 	List<ProductDto> getRecommendsOfProduct(Long productId, Boolean addRandom);
+
+	/**
+	 * Trigger the Apriori algorithm to generate the frequent item sets.
+	 */
+	void generateApriori();
+
+	/**
+	 * Clear all the Apriori recommendations.
+	 */
+	@Transactional
+	void clearAprioriRecommendations();
 }
