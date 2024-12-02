@@ -74,7 +74,8 @@ public class ApplicationProperties {
 		this.security.otpLength = Integer.parseInt(dotenv.get("OTP_LENGTH", "6"));
 
 		this.midtrans.serverKey = dotenv.get("MIDTRANS_SERVER_KEY", null);
-		this.midtrans.baseUrl = dotenv.get("MIDTRANS_BASE_URL", "https://api.sandbox.midtrans.com");
+		this.midtrans.baseUrlApp = dotenv.get("MIDTRANS_BASE_URL_APP", "https://app.sandbox.midtrans.com");
+		this.midtrans.baseUrlApi = dotenv.get("MIDTRANS_BASE_URL_API", "https://api.sandbox.midtrans.com");
 		this.midtrans.notificationUrl = dotenv.get("MIDTRANS_NOTIFICATION_URL", null);
 		this.midtrans.finishUrl = dotenv.get("MIDTRANS_FINISH_URL", null);
 		this.midtrans.unfinishUrl = dotenv.get("MIDTRANS_UNFINISH_URL", null);
@@ -138,7 +139,8 @@ public class ApplicationProperties {
 	@Setter
 	public static class Midtrans {
 		private String serverKey;
-		private String baseUrl;
+		private String baseUrlApp;
+		private String baseUrlApi;
 		private String notificationUrl;
 
 		// Redirect URLs
