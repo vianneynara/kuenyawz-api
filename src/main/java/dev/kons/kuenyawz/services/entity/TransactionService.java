@@ -163,6 +163,8 @@ public interface TransactionService {
 	 */
 	TransactionDto convertToDto(Transaction transaction, Account account, Purchase purchase);
 
+	void validateOwnership(Long purchaseId, Long accountId);
+
 	@Getter
 	@Setter
 	@Builder
