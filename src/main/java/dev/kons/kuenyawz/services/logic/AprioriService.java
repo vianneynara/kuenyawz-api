@@ -11,7 +11,7 @@ public interface AprioriService {
      * @return Set<Map < Long ( ProductId ), Set < Long ( ProductId )>>>
      * @input Set<Map < Long ( OrderId ), Set < Long ( ProductId )>>>
      */
-    Set<Map<Long, Set<Long>>> findAllFrequentSetOfItems(Set<Map<Long, Set<Long>>> orders);
+    Map<Long, Set<Long>> findAllFrequentSetOfItems(Set<Map<Long, Set<Long>>> orders);
 
     /**
      * Find frequent of one item(Product), to find the match frequent item with the selected item
