@@ -81,7 +81,7 @@ public class CustomExceptionsHandler {
 	public ResponseEntity<Object> handleMidtransTransactionException(MidtransTransactionException ex) {
 		List<Map<String, Object>> body = List.of(
 			Map.of("message", ex.getMessage()),
-			Map.of("errors", ex.getErrorResponse().getErrorMessages())
+			Map.of("errors", ex.getErrorResponse() != null ? ex.getErrorResponse().getErrorMessages() : "Check log")
 		);
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
 	}
