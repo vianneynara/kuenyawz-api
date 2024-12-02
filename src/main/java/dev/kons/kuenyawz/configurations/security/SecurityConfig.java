@@ -101,7 +101,12 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.DELETE, "/api/products/**", "/api/images/**").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole("ADMIN")
 
+				// Recommender endpoints
+				.requestMatchers(HttpMethod.POST, "/api/recommender/generate").hasRole("ADMIN")
+
 				// Closure endpoints
+				.requestMatchers(HttpMethod.POST, "/api/closure").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.DELETE, "/api/closure/**").hasRole("ADMIN")
 
 				// Catch-all
 				.anyRequest().authenticated()
