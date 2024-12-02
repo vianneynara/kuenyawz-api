@@ -105,9 +105,6 @@ public class TransactionRequest {
 		}
 
 		public static TransactionDetails of(Purchase purchase, Long transactionId, ApplicationProperties properties) {
-			log.info("total price: {}", purchase.getTotalPrice());
-			log.info("delivery fee: {}", purchase.getDeliveryFee());
-			log.info("payment fee: {}", properties.vendor().getPaymentFee());
 			return TransactionDetails.builder()
 				.orderId(transactionId.toString())
 				.grossAmount(purchase.getTotalPrice()
@@ -126,7 +123,6 @@ public class TransactionRequest {
 		private String name;
 
 		public static ItemDetail of(PurchaseItem purchaseItem) {
-			System.out.printf("%s\n", purchaseItem.getVariant().getVariantId());
 			return ItemDetail.builder()
 				.id(purchaseItem.getVariant().getVariantId().toString())
 				.price(purchaseItem.getBoughtPrice())

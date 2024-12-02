@@ -6,6 +6,7 @@ import dev.kons.kuenyawz.dtos.purchase.TransactionPatchDto;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.entities.Purchase;
 import dev.kons.kuenyawz.entities.Transaction;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -84,6 +85,14 @@ public interface TransactionService {
 	List<TransactionDto> findByPurchaseId(Long purchaseId);
 
 	/**
+	 * Fetches a transaction by its id.
+	 *
+	 * @param transactionId {@link Long}
+	 * @return {@link TransactionDto}
+	 */
+	TransactionDto fetchTransaction(Long transactionId);
+
+	/**
 	 * Builds a new transaction without saving it.
 	 *
 	 * @param purchase
@@ -120,6 +129,22 @@ public interface TransactionService {
 	@Transactional
 	void cancelAllOf(Long purchaseId);
 
+/**
+ * Calls the payment gateway to cancel a transaction by its id.
+ *
+ * @param transactionId {@link Long} transaction id
+ */
+	@Transactional
+	void cancelOne(@NotNull Long transactionId);
+
+	/**
+	 * Calls the payment gateway to cancel a transaction by the entity.
+	 *
+	 * @param transaction {@link Transaction} transaction
+	 */
+	@Transactional
+	void cancelOne(Transaction transaction);
+
 	/**
 	 * Converts a transaction entity to DTO.
 	 *
@@ -138,6 +163,8 @@ public interface TransactionService {
 	 */
 	TransactionDto convertToDto(Transaction transaction, Account account, Purchase purchase);
 
+	void validateOwnership(Long purchaseId, Long accountId);
+
 	@Getter
 	@Setter
 	@Builder
@@ -153,11 +180,11 @@ public interface TransactionService {
 		private Integer page;
 		private Integer pageSize;
 
-		static TransactionSearchCriteria of(Boolean isAscending, Transaction.TransactionStatus status, PaymentType paymentType, Long purchaseId, LocalDate from, LocalDate to, Integer page, Integer pageSize) {
+		public static TransactionSearchCriteria of(Boolean isAscending, String status, String paymentType, Long purchaseId, LocalDate from, LocalDate to, Integer page, Integer pageSize) {
 			return TransactionSearchCriteria.builder()
 				.isAscending(isAscending)
-				.status(status)
-				.paymentType(paymentType)
+				.status(status != null ? Transaction.TransactionStatus.fromString(status) : null)
+				.paymentType(paymentType != null ? PaymentType.fromString(paymentType) : null)
 				.purchaseId(purchaseId)
 				.from(from)
 				.to(to)

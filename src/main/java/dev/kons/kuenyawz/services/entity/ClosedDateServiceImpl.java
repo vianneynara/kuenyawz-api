@@ -178,15 +178,11 @@ public class ClosedDateServiceImpl implements ClosedDateService {
 
 	@Override
 	public void deleteById(Long closedDateId) {
-		validateIsAdmin();
-
 		closedDateRepository.deleteById(closedDateId);
 	}
 
 	@Override
 	public void deleteBetween(LocalDate from, LocalDate to) {
-		validateIsAdmin();
-
 		closedDateRepository.deleteAllByDateBetween(from, to);
 	}
 

@@ -5,7 +5,10 @@ import dev.kons.kuenyawz.constants.PaymentType;
 import dev.kons.kuenyawz.dtos.purchase.PurchaseDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePatchDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
-import dev.kons.kuenyawz.entities.*;
+import dev.kons.kuenyawz.entities.Coordinate;
+import dev.kons.kuenyawz.entities.Purchase;
+import dev.kons.kuenyawz.entities.PurchaseItem;
+import dev.kons.kuenyawz.entities.Variant;
 import dev.kons.kuenyawz.exceptions.IllegalOperationException;
 import dev.kons.kuenyawz.exceptions.UnauthorizedException;
 import dev.kons.kuenyawz.mapper.PurchaseMapper;
@@ -52,9 +55,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 	private Page<PurchaseDto> findAllHelper(PurchaseSearchCriteria criteria) {
 		Specification<Purchase> spec = PurchaseSpec.withAccountId1(criteria.getAccountId())
 			.and(PurchaseSpec.withStatus(criteria.getStatus()))
-			.and(PurchaseSpec.withPaymentType(criteria.getPaymentType()))
-			.and(PurchaseSpec.withDateAfter(criteria.getFrom()))
-			.and(PurchaseSpec.withDateBefore(criteria.getTo()));
+			.and(PurchaseSpec.withPaymentType(criteria.getPaymentType()));
 
 		if (criteria.getFrom() != null && criteria.getTo() != null) {
 			spec = spec.and(PurchaseSpec.withDateBetween(criteria.getFrom(), criteria.getTo()));
@@ -81,6 +82,13 @@ public class PurchaseServiceImpl implements PurchaseService {
 	}
 
 	@Override
+	public Purchase getById(Long purchaseId) {
+		return purchaseRepository.findById(purchaseId)
+			.orElseThrow(() -> new EntityNotFoundException("Purchase not found"));
+	}
+
+
+	@Override
 	public PurchaseDto findByTransactionId(Long transactionId) {
 		final Purchase purchase = transactionService.getById(transactionId).getPurchase();
 		validateAccess(purchase);
@@ -96,7 +104,6 @@ public class PurchaseServiceImpl implements PurchaseService {
 
 	@Override
 	public Purchase create(PurchasePostDto purchasePostDto) {
-		Account account = AuthService.getAuthenticatedAccount();
 		if (!AuthService.isAuthenticatedUser())
 			throw new UnauthorizedException("You are not authorized to perform this action");
 		double distance = Coordinate.of(purchasePostDto.getLatitude(), purchasePostDto.getLongitude())

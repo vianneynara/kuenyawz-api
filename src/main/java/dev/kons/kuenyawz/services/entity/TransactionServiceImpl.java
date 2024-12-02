@@ -1,11 +1,13 @@
 package dev.kons.kuenyawz.services.entity;
 
+import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
 import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
 import dev.kons.kuenyawz.dtos.purchase.TransactionPatchDto;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.entities.Purchase;
 import dev.kons.kuenyawz.entities.Transaction;
-import dev.kons.kuenyawz.mapper.TransactionMapper;
+import dev.kons.kuenyawz.exceptions.IllegalOperationException;
+import dev.kons.kuenyawz.exceptions.UnauthorizedException;
 import dev.kons.kuenyawz.repositories.TransactionRepository;
 import dev.kons.kuenyawz.repositories.TransactionSpec;
 import dev.kons.kuenyawz.services.logic.AuthService;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +35,6 @@ public class TransactionServiceImpl implements TransactionService {
 	private final TransactionRepository transactionRepository;
 	private final SnowFlakeIdGenerator snowFlakeIdGenerator;
 	private final MidtransApiService midtransApiService;
-	private final TransactionMapper transactionMapper;
 
 	@Override
 	public Page<TransactionDto> findAll(TransactionSearchCriteria criteria) {
@@ -105,6 +107,21 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
+	public TransactionDto fetchTransaction(Long transactionId) {
+		Transaction transaction = transactionRepository.findById(transactionId)
+			.orElseThrow(() -> new EntityNotFoundException("Transaction not found"));
+		TransactionResponse res = midtransApiService.fetchTransactionStatus(String.valueOf(transactionId));
+
+		log.info("Response: {}", res);
+
+		Transaction.TransactionStatus status = Transaction.TransactionStatus.fromString(res.getTransactionStatus());
+		transaction.setStatus(status);
+
+		Transaction savedTransaction = transactionRepository.save(transaction);
+		return convertToDto(savedTransaction);
+	}
+
+	@Override
 	public Transaction build(Purchase purchase, Account account) {
 		AuthService.validateMatchesId(account.getAccountId());
 
@@ -151,23 +168,50 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public void cancelAllOf(Long purchaseId) {
 		List<Transaction> transactions = transactionRepository.findByPurchase_PurchaseId(purchaseId);
-		transactions.forEach(this::cancelOne);
+		transactions.forEach(t -> {
+			log.warn("Cancelling transaction id {} of purchase {}", t.getTransactionId(), purchaseId);
+			cancelOneProcess(t);
+		});
 	}
 
-	public void cancelOne(@NotNull Transaction transaction) {
-		if (transaction.getStatus() == Transaction.TransactionStatus.CANCEL) {
-//			throw new IllegalOperationException("Transaction %d has already been cancelled");
-			log.warn("Transaction {} has already been cancelled", transaction.getTransactionId());
-			return;
-		}
-		transaction.setStatus(Transaction.TransactionStatus.CANCEL);
-		transactionRepository.save(transaction);
-	}
-
+	@Override
 	public void cancelOne(@NotNull Long transactionId) {
 		Transaction transaction = transactionRepository.findById(transactionId)
 			.orElseThrow(() -> new EntityNotFoundException("Transaction with id " + transactionId + " not found"));
-		cancelOne(transaction);
+
+		cancelOneProcess(transaction);
+	}
+
+	@Override
+	public void cancelOne(@NotNull Transaction transaction) {
+		cancelOneProcess(transaction);
+	}
+
+	private void cancelOneProcess(Transaction transaction) {
+		Account account = AuthService.getAuthenticatedAccount();
+		if (!(AuthService.isAuthenticatedAdmin() || Objects.equals(transaction.getAccount().getAccountId(), account.getAccountId()))) {
+			throw new UnauthorizedException("You are not authorized to cancel this transaction");
+		}
+
+		if (transaction.getStatus() == Transaction.TransactionStatus.CREATED) {
+			log.warn("Transaction {} has not been continued yet, cancelling", transaction.getTransactionId());
+		}
+
+		if (transaction.getStatus() == Transaction.TransactionStatus.CANCEL) {
+			log.warn("Transaction {} has already been cancelled", transaction.getTransactionId());
+			return;
+		}
+
+		// Call Midtrans API to cancel the transaction
+		TransactionResponse response = midtransApiService.cancelTransaction(String.valueOf(transaction.getTransactionId()));
+		if (Objects.equals(response.getStatusCode(), "404")) {
+			log.info("Transaction {} not found in Midtrans, cancelling locally", transaction.getTransactionId());
+		} else if (Objects.equals(response.getStatusCode(), "412")) {
+			throw new IllegalOperationException("Modification is not allowed on the transaction");
+		}
+
+		transaction.setStatus(Transaction.TransactionStatus.CANCEL);
+		transactionRepository.save(transaction);
 	}
 
 	@Override
@@ -182,5 +226,13 @@ public class TransactionServiceImpl implements TransactionService {
 		dto.setPurchaseId(purchase.getPurchaseId());
 
 		return dto;
+	}
+
+	@Override
+	public void validateOwnership(Long purchaseId, Long accountId) {
+		List<Transaction> transaction = transactionRepository.findByPurchase_PurchaseIdAndAccount_AccountId(purchaseId, accountId);
+		if (transaction.isEmpty()) {
+			throw new UnauthorizedException("You are not authorized to access this order");
+		}
 	}
 }

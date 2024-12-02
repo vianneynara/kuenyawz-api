@@ -5,7 +5,7 @@ import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.services.entity.PurchaseService;
 import dev.kons.kuenyawz.services.logic.AuthService;
-import dev.kons.kuenyawz.services.logic.OrderProcessingService;
+import dev.kons.kuenyawz.services.logic.OrderingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -26,9 +26,9 @@ import java.time.LocalDate;
 @RestController
 @RequiredArgsConstructor
 @Validated
-public class OrderProcessingController {
+public class OrderingController {
 
-	private final OrderProcessingService orderProcessingService;
+	private final OrderingService orderingService;
 	private final PurchaseService purchaseService;
 
 	@Operation(summary = "Get purchases/orders")
@@ -83,7 +83,21 @@ public class OrderProcessingController {
 		if (!AuthService.isAuthenticatedUser()) {
 			return ResponseEntity.badRequest().body("Must be logged in to process order");
 		}
-		PurchaseDto purchaseDto = orderProcessingService.processOrder(purchasePostDto);
+		PurchaseDto purchaseDto = orderingService.processOrder(purchasePostDto);
+		return ResponseEntity.ok(purchaseDto);
+	}
+
+	@Operation(summary = "Cancels an order")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Order cancelled successfully"),
+		@ApiResponse(responseCode = "400", description = "Bad request")
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@PostMapping("/{purchaseId}/cancel")
+	public ResponseEntity<?> cancelOrder(
+		@PathVariable Long purchaseId
+	) {
+		PurchaseDto purchaseDto = orderingService.cancelOrder(purchaseId);
 		return ResponseEntity.ok(purchaseDto);
 	}
 }

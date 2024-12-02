@@ -47,6 +47,15 @@ public interface PurchaseService {
 	PurchaseDto findById(Long purchaseId);
 
 	/**
+	 * Gets a purchase by its id, returns the entity.
+	 *
+	 * @param purchaseId {@link Long}
+	 * @return {@link Purchase} entity
+	 */
+	@Transactional(readOnly = true)
+	Purchase getById(Long purchaseId);
+
+	/**
 	 * Finds a purchase by its transaction id.
 	 *
 	 * @param transactionId {@link Long}
