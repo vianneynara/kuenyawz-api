@@ -93,6 +93,14 @@ public interface TransactionService {
 	TransactionDto fetchTransaction(Long transactionId);
 
 	/**
+	 * Fetches a transaction by entity for direct search.
+	 *
+	 * @param transaction {@link Transaction}
+	 * @return {@link TransactionDto}
+	 */
+	TransactionDto fetchTransaction(Transaction transaction);
+
+	/**
 	 * Builds a new transaction without saving it.
 	 *
 	 * @param purchase
@@ -164,6 +172,8 @@ public interface TransactionService {
 	TransactionDto convertToDto(Transaction transaction, Account account, Purchase purchase);
 
 	void validateOwnership(Long purchaseId, Long accountId);
+
+	boolean isOwner(Long purchaseId, Long accountId);
 
 	@Getter
 	@Setter

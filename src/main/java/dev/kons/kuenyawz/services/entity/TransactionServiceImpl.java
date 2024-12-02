@@ -100,7 +100,10 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public List<TransactionDto> findByPurchaseId(Long purchaseId) {
-		return transactionRepository.findByPurchase_PurchaseId(purchaseId)
+		Pageable pageable = Pageable.unpaged(
+			Sort.by(Sort.Order.desc("createdAt"))
+		);
+		return transactionRepository.findByPurchase_PurchaseId(purchaseId, pageable)
 			.stream()
 			.map(this::convertToDto)
 			.toList();
@@ -112,7 +115,16 @@ public class TransactionServiceImpl implements TransactionService {
 			.orElseThrow(() -> new EntityNotFoundException("Transaction not found"));
 		TransactionResponse res = midtransApiService.fetchTransactionStatus(String.valueOf(transactionId));
 
-		log.info("Response: {}", res);
+		Transaction.TransactionStatus status = Transaction.TransactionStatus.fromString(res.getTransactionStatus());
+		transaction.setStatus(status);
+
+		Transaction savedTransaction = transactionRepository.save(transaction);
+		return convertToDto(savedTransaction);
+	}
+
+	@Override
+	public TransactionDto fetchTransaction(Transaction transaction) {
+		TransactionResponse res = midtransApiService.fetchTransactionStatus(String.valueOf(transaction.getTransactionId()));
 
 		Transaction.TransactionStatus status = Transaction.TransactionStatus.fromString(res.getTransactionStatus());
 		transaction.setStatus(status);
@@ -167,7 +179,10 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public void cancelAllOf(Long purchaseId) {
-		List<Transaction> transactions = transactionRepository.findByPurchase_PurchaseId(purchaseId);
+		Pageable pageable = Pageable.unpaged(
+			Sort.by(Sort.Order.desc("createdAt"))
+		);
+		Page<Transaction> transactions = transactionRepository.findByPurchase_PurchaseId(purchaseId, pageable);
 		transactions.forEach(t -> {
 			log.warn("Cancelling transaction id {} of purchase {}", t.getTransactionId(), purchaseId);
 			cancelOneProcess(t);
@@ -234,5 +249,11 @@ public class TransactionServiceImpl implements TransactionService {
 		if (transaction.isEmpty()) {
 			throw new UnauthorizedException("You are not authorized to access this order");
 		}
+	}
+
+	@Override
+	public boolean isOwner(Long purchaseId, Long accountId) {
+		List<Transaction> transaction = transactionRepository.findByPurchase_PurchaseIdAndAccount_AccountId(purchaseId, accountId);
+		return !transaction.isEmpty();
 	}
 }

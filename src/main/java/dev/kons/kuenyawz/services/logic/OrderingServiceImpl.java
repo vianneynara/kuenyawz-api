@@ -5,6 +5,7 @@ import dev.kons.kuenyawz.dtos.midtrans.TransactionRequest;
 import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
 import dev.kons.kuenyawz.dtos.purchase.PurchaseDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
+import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.entities.ClosedDate;
 import dev.kons.kuenyawz.entities.Purchase;
@@ -168,5 +169,76 @@ public class OrderingServiceImpl implements OrderingService {
 		);
 
 		return purchaseMapper.toDto(savedPurchase);
+	}
+
+	@Override
+	public PurchaseDto confirmOrder(Long purchaseId) {
+		AuthService.validateIsAdmin();
+
+		Purchase purchase = purchaseService.getById(purchaseId);
+
+		if (purchase.getStatus() == Purchase.PurchaseStatus.DELIVERED) {
+			throw new IllegalOperationException("Purchase is already delivered");
+		} else if (purchase.getStatus() == Purchase.PurchaseStatus.CANCELLED) {
+			throw new IllegalOperationException("Cannot confirm cancelled purchase");
+		} else if (purchase.getStatus() == Purchase.PurchaseStatus.CONFIRMED) {
+			throw new IllegalOperationException("Purchase is already confirmed");
+		}
+
+		List<TransactionDto> transactions = transactionService.findByPurchaseId(purchaseId);
+		transactions.stream()
+			.filter(t ->
+				t.getStatus() == Transaction.TransactionStatus.CAPTURE
+				|| t.getStatus() == Transaction.TransactionStatus.SETTLEMENT)
+			.findAny()
+			.orElseThrow(
+				() -> new IllegalOperationException("Transaction for this purchase has not been paid yet")
+			);
+
+		purchase.setStatus(Purchase.PurchaseStatus.CONFIRMED);
+		Purchase savedPurchase = purchaseRepository.save(purchase);
+
+		return purchaseMapper.toDto(savedPurchase);
+	}
+
+	@Deprecated
+	@Override
+	public Page<PurchaseDto> findAll(PurchaseService.PurchaseSearchCriteria criteria) {
+		Page<PurchaseDto> purchases;
+		if (AuthService.isAuthenticatedAdmin()) {
+			purchases = purchaseService.findAll(criteria);
+		} else {
+			Account account = AuthService.getAuthenticatedAccount();
+			purchases = purchaseService.findAll(account.getAccountId(), criteria);
+		}
+		return purchases;
+	}
+
+	@Override
+	public PurchaseDto findPurchase(Long purchaseId) {
+		validateOwnershipOrAdmin(purchaseId);
+
+		Purchase purchase = purchaseService.getById(purchaseId);
+		return purchaseMapper.toDto(purchase);
+	}
+
+	@Override
+	public TransactionDto findTransactionOfPurchase(Long purchaseId) {
+		validateOwnershipOrAdmin(purchaseId);
+
+		List<TransactionDto> transactions = transactionService.findByPurchaseId(purchaseId);
+		if (transactions.isEmpty()) {
+			throw new IllegalOperationException("No transaction found for this purchase");
+		}
+		var transaction = transactions.getFirst();
+		return transactionService.fetchTransaction(transaction.getTransactionId());
+	}
+
+	private void validateOwnershipOrAdmin(Long purchaseId) {
+		if (!transactionService.isOwner(purchaseId, AuthService.getAuthenticatedAccount().getAccountId())
+			&& !AuthService.isAuthenticatedAdmin()
+		) {
+			throw new IllegalOperationException("You are not authorized to view this transaction");
+		}
 	}
 }

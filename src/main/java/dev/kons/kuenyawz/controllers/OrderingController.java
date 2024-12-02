@@ -100,4 +100,32 @@ public class OrderingController {
 		PurchaseDto purchaseDto = orderingService.cancelOrder(purchaseId);
 		return ResponseEntity.ok(purchaseDto);
 	}
+
+	@Operation(summary = "Confirms an order")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Order confirmed successfully"),
+		@ApiResponse(responseCode = "400", description = "Bad request")
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@PostMapping("/{purchaseId}/confirm")
+	public ResponseEntity<?> confirmOrder(
+		@PathVariable Long purchaseId
+	) {
+		PurchaseDto purchaseDto = orderingService.confirmOrder(purchaseId);
+		return ResponseEntity.ok(purchaseDto);
+	}
+
+	@Operation(summary = "Get a purchase/order")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Order fetched successfully"),
+		@ApiResponse(responseCode = "400", description = "Bad request")
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@GetMapping("/{purchaseId}/transaction")
+	public ResponseEntity<?> getTransaction(
+		@PathVariable Long purchaseId
+	) {
+		PurchaseDto purchaseDto = orderingService.findPurchase(purchaseId);
+		return ResponseEntity.ok(purchaseDto);
+	}
 }
