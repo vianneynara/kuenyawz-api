@@ -5,6 +5,7 @@ import dev.kons.kuenyawz.dtos.midtrans.TransactionRequest;
 import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
 import dev.kons.kuenyawz.dtos.purchase.PurchaseDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
+import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.entities.ClosedDate;
 import dev.kons.kuenyawz.entities.Purchase;
@@ -198,5 +199,46 @@ public class OrderingServiceImpl implements OrderingService {
 		Purchase savedPurchase = purchaseRepository.save(purchase);
 
 		return purchaseMapper.toDto(savedPurchase);
+	}
+
+	@Deprecated
+	@Override
+	public Page<PurchaseDto> findAll(PurchaseService.PurchaseSearchCriteria criteria) {
+		Page<PurchaseDto> purchases;
+		if (AuthService.isAuthenticatedAdmin()) {
+			purchases = purchaseService.findAll(criteria);
+		} else {
+			Account account = AuthService.getAuthenticatedAccount();
+			purchases = purchaseService.findAll(account.getAccountId(), criteria);
+		}
+		return purchases;
+	}
+
+	@Override
+	public PurchaseDto findPurchase(Long purchaseId) {
+		validateOwnershipOrAdmin(purchaseId);
+
+		Purchase purchase = purchaseService.getById(purchaseId);
+		return purchaseMapper.toDto(purchase);
+	}
+
+	@Override
+	public TransactionDto findTransactionOfPurchase(Long purchaseId) {
+		validateOwnershipOrAdmin(purchaseId);
+
+		List<TransactionDto> transactions = transactionService.findByPurchaseId(purchaseId);
+		if (transactions.isEmpty()) {
+			throw new IllegalOperationException("No transaction found for this purchase");
+		}
+		var transaction = transactions.getFirst();
+		return transactionService.fetchTransaction(transaction.getTransactionId());
+	}
+
+	private void validateOwnershipOrAdmin(Long purchaseId) {
+		if (!transactionService.isOwner(purchaseId, AuthService.getAuthenticatedAccount().getAccountId())
+			&& !AuthService.isAuthenticatedAdmin()
+		) {
+			throw new IllegalOperationException("You are not authorized to view this transaction");
+		}
 	}
 }
