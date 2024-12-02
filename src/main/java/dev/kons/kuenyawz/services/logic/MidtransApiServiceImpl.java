@@ -30,7 +30,7 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 		final String encodedAuth = Base64.getEncoder().encodeToString(authorization.getBytes());
 
 		this.webClient = webClientBuilder
-			.baseUrl(properties.midtrans().getBaseUrl())
+			.baseUrl(properties.midtrans().getBaseUrlApp())
 			.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 			.defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + encodedAuth)
 			.build();
@@ -58,7 +58,8 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 	@Override
 	public TransactionResponse fetchTransactionStatus(String orderId) {
 		try {
-			return webClient.get()
+			var wc = ofBaseUrl(properties.midtrans().getBaseUrlApi());
+			return wc.get()
 				.uri("/v2/{order_id}/status", orderId)
 				.retrieve()
 				.onStatus(status -> status.value() == 404, ClientResponse::createException)
@@ -76,18 +77,23 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 	@Override
 	public TransactionResponse cancelTransaction(String orderId) {
 		try {
-			return webClient.post()
+			var wc = ofBaseUrl(properties.midtrans().getBaseUrlApi());
+			return wc.post()
 				.uri("/v2/{order_id}/cancel", orderId)
 				.retrieve()
 				.bodyToMono(TransactionResponse.class)
 				.block();
 		} catch (WebClientResponseException e) {
 			if (e.getResponseBodyAsString().contains("404 Not Found")) {
-				throw new MidtransTransactionException("Transaction with id " + orderId + " not found in Midtrans");
+				return TransactionResponse.builder().statusCode("404").build();
 			} else {
 				return handleException(e);
 			}
 		}
+	}
+
+	private WebClient ofBaseUrl(String baseUrl) {
+		return webClient.mutate().baseUrl(baseUrl).build();
 	}
 
 	private TransactionResponse handleException(WebClientResponseException e) {
