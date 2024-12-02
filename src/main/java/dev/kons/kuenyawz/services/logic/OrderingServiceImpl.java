@@ -18,7 +18,6 @@ import dev.kons.kuenyawz.services.entity.CartItemService;
 import dev.kons.kuenyawz.services.entity.ClosedDateService;
 import dev.kons.kuenyawz.services.entity.PurchaseService;
 import dev.kons.kuenyawz.services.entity.TransactionService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -62,7 +61,6 @@ public class OrderingServiceImpl implements OrderingService {
 					|| t.getStatus() == Transaction.TransactionStatus.PENDING)
 			.findAny()
 			.ifPresent(t -> {
-				log.warn("Ongoing transaction found: {}", t);
 				throw new IllegalOperationException("There's already an ongoing transaction");
 			});
 
@@ -70,6 +68,11 @@ public class OrderingServiceImpl implements OrderingService {
 		LocalDate eventDate = LocalDate.parse(PurchasePostDto.getEventDate());
 		LocalDate prepDate2 = eventDate.minusDays(1);
 		LocalDate prepDate1 = eventDate.minusDays(2);
+
+		if (LocalDate.now().isAfter(prepDate1.minusDays(1))) {
+			throw new IllegalOperationException("Cannot create within 2 days before event date");
+		}
+
 		if (!closedDateService.getAllBetween(prepDate1, eventDate).isEmpty()) {
 			throw new IllegalOperationException(String.format("Cannot create purchase on a closed date: %s ~ %s",
 				prepDate1, eventDate));
@@ -77,7 +80,7 @@ public class OrderingServiceImpl implements OrderingService {
 
 		Purchase purchase = purchaseService.create(PurchasePostDto);
 
-		// Build transaction
+		// Build transaction (not saved yet)
 		Transaction transaction = transactionService.build(purchase, account);
 
 		List<TransactionRequest.ItemDetail> items = TransactionRequest.ItemDetail.of(purchase.getPurchaseItems());
@@ -112,10 +115,7 @@ public class OrderingServiceImpl implements OrderingService {
 		transaction.setReferenceId(response.getTransactionId());
 		Transaction savedTransaction = transactionRepository.save(transaction);
 
-		// Update purchase with the transaction
-		purchase = purchaseRepository.findById(purchase.getPurchaseId())
-			.orElseThrow(() -> new EntityNotFoundException("Purchase not found"));
-
+		// Update purchase DTO with the transaction
 		PurchaseDto purchaseDto = purchaseMapper.toDto(purchase);
 		purchaseDto.setTransactions(List.of(transactionService.convertToDto(savedTransaction, account, purchase)));
 
@@ -136,5 +136,37 @@ public class OrderingServiceImpl implements OrderingService {
 		}
 
 		return purchaseDto;
+	}
+
+	@Override
+	public PurchaseDto cancelOrder(Long purchaseId) {
+		Purchase purchase = purchaseService.getById(purchaseId);
+
+		if (purchase.getStatus() == Purchase.PurchaseStatus.CANCELLED) {
+			throw new IllegalOperationException("Purchase is already cancelled");
+		} else if (purchase.getStatus() == Purchase.PurchaseStatus.DELIVERED) {
+			throw new IllegalOperationException("Cannot cancel delivered purchase");
+		}
+
+		transactionService.validateOwnership(purchaseId, AuthService.getAuthenticatedAccount().getAccountId());
+
+		LocalDate currentDate = LocalDate.now();
+		if (currentDate.isAfter(purchase.getEventDate())) {
+			throw new IllegalOperationException("Cannot cancel purchase after event date");
+		} else if (currentDate.isAfter(purchase.getEventDate().minusDays(2)) && !AuthService.isAuthenticatedAdmin()) {
+			throw new IllegalOperationException("Cannot cancel purchase during preparation period");
+		}
+
+		transactionService.cancelAllOf(purchaseId);
+
+		purchase.setStatus(Purchase.PurchaseStatus.CANCELLED);
+		Purchase savedPurchase = purchaseRepository.save(purchase);
+
+		closedDateService.deleteBetween(
+			purchase.getEventDate().minusDays(2),
+			purchase.getEventDate()
+		);
+
+		return purchaseMapper.toDto(savedPurchase);
 	}
 }

@@ -17,4 +17,12 @@ public interface OrderingService {
 	 * @return
 	 */
 	PurchaseDto processOrder(PurchasePostDto PurchasePostDto);
+
+	/**
+	 * Cancels an order by its purchase id. This also cancels all transactions related to the purchase.
+	 *
+	 * @param purchaseId {@link Long}
+	 * @return {@link PurchaseDto}
+	 */
+	PurchaseDto cancelOrder(Long purchaseId);
 }
