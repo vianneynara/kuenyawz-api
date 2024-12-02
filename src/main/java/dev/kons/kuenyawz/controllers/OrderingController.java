@@ -86,4 +86,18 @@ public class OrderingController {
 		PurchaseDto purchaseDto = orderingService.processOrder(purchasePostDto);
 		return ResponseEntity.ok(purchaseDto);
 	}
+
+	@Operation(summary = "Cancels an order")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Order cancelled successfully"),
+		@ApiResponse(responseCode = "400", description = "Bad request")
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@PostMapping("/{purchaseId}/cancel")
+	public ResponseEntity<?> cancelOrder(
+		@PathVariable Long purchaseId
+	) {
+		PurchaseDto purchaseDto = orderingService.cancelOrder(purchaseId);
+		return ResponseEntity.ok(purchaseDto);
+	}
 }
