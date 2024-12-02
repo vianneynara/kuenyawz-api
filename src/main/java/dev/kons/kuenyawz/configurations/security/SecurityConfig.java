@@ -81,8 +81,19 @@ public class SecurityConfig {
 
 				// Closure endpoints
 				.requestMatchers(HttpMethod.POST, "/api/closure").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.DELETE, "/api/closure").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.DELETE, "/api/closure**").hasRole("ADMIN")
 				.requestMatchers(HttpMethod.PATCH, "/api/closure").hasRole("ADMIN")
+
+				// Order Processing endpoints
+				.requestMatchers(HttpMethod.GET, "/api/orders").hasAnyRole("ADMIN", "USER")
+				.requestMatchers(HttpMethod.POST, "/api/orders").hasRole("USER")
+				.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/cancel").hasAnyRole("ADMIN", "USER")
+				.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/confirm").hasAnyRole("ADMIN")
+				.requestMatchers(HttpMethod.GET, "/api/orders/{purchaseId:\\d+}/transaction").hasAnyRole("ADMIN", "USER")
+
+				// Transaction endpoints
+				.requestMatchers(HttpMethod.GET, "/api/transactions").hasAnyRole("ADMIN", "USER")
+				.requestMatchers(HttpMethod.GET, "/api/transactions/{transactionId:\\d+}").hasAnyRole("ADMIN", "USER")
 
 				// Product/Image admin endpoints
 				.requestMatchers(HttpMethod.POST, "/api/products/**", "/api/images/**").hasRole("ADMIN")

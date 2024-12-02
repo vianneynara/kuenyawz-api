@@ -22,7 +22,7 @@ public class ClosedDatePostDto {
 
 	@Schema(description = "Type of closure", example = "CLOSED")
 	@NotNull(message = "Closure type is required")
-	@Pattern(regexp = "^(CLOSED|RESERVED)$", message = "Invalid closure type")
+	@Pattern(regexp = "^(CLOSED|RESERVED|PREP)$", message = "Invalid closure type")
 	private String type;
 
 	@Schema(description = "Reason for closure", example = "It's rizzmas")

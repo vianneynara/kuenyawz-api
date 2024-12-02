@@ -20,8 +20,8 @@ public class OtpVerifyDto {
 	@CleanString
 	private String phone;
 
-    @Schema(description = "OTP code", example = "123456", pattern = "^[1-9]{6}$")
-    @Pattern(regexp = "^[1-9a-zA-Z]{6}$", message = "Invalid OTP format")
+    @Schema(description = "OTP code", example = "123456", pattern = "^[0-9a-zA-Z]{6}$")
+    @Pattern(regexp = "^[0-9a-zA-Z]{6}$", message = "Invalid OTP format")
 	@NotBlank(message = "OTP code is required")
 	@CleanString
 	private String otp;

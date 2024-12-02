@@ -3,12 +3,14 @@ package dev.kons.kuenyawz.services.entity;
 import dev.kons.kuenyawz.dtos.closeddate.ClosedDateDto;
 import dev.kons.kuenyawz.dtos.closeddate.ClosedDatePatchDto;
 import dev.kons.kuenyawz.dtos.closeddate.ClosedDatePostDto;
+import dev.kons.kuenyawz.entities.ClosedDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 public interface ClosedDateService {
 	/**
@@ -110,13 +112,22 @@ public interface ClosedDateService {
 	ClosedDateDto getByDate(LocalDate date);
 
 	/**
-	 * Creates a new closed date.
+	 * Creates new closed dates.
 	 *
 	 * @param closedDatePostDto {@link ClosedDatePostDto} object
 	 * @return {@link ClosedDateDto}
 	 */
 	@Transactional
 	Iterable<ClosedDateDto> create(Iterable<ClosedDatePostDto> closedDatePostDto);
+
+	/**
+	 * Creates new closed dates.
+	 *
+	 * @param closedDatePostDto {@link ClosedDate} object
+	 * @return {@link ClosedDateDto}
+	 */
+	@Transactional
+	Iterable<ClosedDate> save(Set<ClosedDate> closedDatePostDto);
 
 	/**
 	 * Updates a closed date.
