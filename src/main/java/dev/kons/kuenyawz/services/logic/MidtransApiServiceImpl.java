@@ -2,7 +2,7 @@ package dev.kons.kuenyawz.services.logic;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.kons.kuenyawz.configurations.ApplicationProperties;
-import dev.kons.kuenyawz.dtos.midtrans.TransactionRequest;
+import dev.kons.kuenyawz.dtos.midtrans.MidtransRequest;
 import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
 import dev.kons.kuenyawz.exceptions.MidtransTransactionException;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 	}
 
 	@Override
-	public TransactionResponse createTransaction(TransactionRequest request) {
+	public TransactionResponse createTransaction(MidtransRequest request) {
 		try {
 			return webClient.post()
 				.uri("/snap/v1/transactions")

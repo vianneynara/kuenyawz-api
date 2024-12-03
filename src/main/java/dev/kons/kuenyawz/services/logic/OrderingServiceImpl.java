@@ -1,7 +1,7 @@
 package dev.kons.kuenyawz.services.logic;
 
 import dev.kons.kuenyawz.configurations.ApplicationProperties;
-import dev.kons.kuenyawz.dtos.midtrans.TransactionRequest;
+import dev.kons.kuenyawz.dtos.midtrans.MidtransRequest;
 import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
 import dev.kons.kuenyawz.dtos.purchase.PurchaseDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
@@ -84,16 +84,16 @@ public class OrderingServiceImpl implements OrderingService {
 		// Build transaction (not saved yet)
 		Transaction transaction = transactionService.build(purchase, account);
 
-		List<TransactionRequest.ItemDetail> items = TransactionRequest.ItemDetail.of(purchase.getPurchaseItems());
+		List<MidtransRequest.ItemDetail> items = MidtransRequest.ItemDetail.of(purchase.getPurchaseItems());
 		if (purchase.getDeliveryFee() != null) {
-			items.add(TransactionRequest.ItemDetail.builder()
+			items.add(MidtransRequest.ItemDetail.builder()
 				.id("delivery_fee")
 				.name("Delivery Fee")
 				.price(purchase.getDeliveryFee())
 				.quantity(1)
 				.build());
 		}
-		items.add(TransactionRequest.ItemDetail.builder()
+		items.add(MidtransRequest.ItemDetail.builder()
 			.id("service_fee")
 			.name("Service Fee")
 			.price(BigDecimal.valueOf(properties.vendor().getPaymentFee()))
@@ -101,11 +101,11 @@ public class OrderingServiceImpl implements OrderingService {
 			.build());
 
 		// Create the request body
-		TransactionRequest request = TransactionRequest.builder()
-			.transactionDetails(TransactionRequest.TransactionDetails.of(purchase, transaction.getTransactionId(), properties))
+		MidtransRequest request = MidtransRequest.builder()
+			.transactionDetails(MidtransRequest.TransactionDetails.of(purchase, transaction.getTransactionId(), properties))
 			.itemDetails(items)
-			.customerDetails(TransactionRequest.CustomerDetails.of(purchase, account))
-			.expiry(TransactionRequest.Expiry.defaultExpiry())
+			.customerDetails(MidtransRequest.CustomerDetails.of(purchase, account))
+			.expiry(MidtransRequest.Expiry.defaultExpiry())
 			.build();
 
 		// Send the request to payment gateway

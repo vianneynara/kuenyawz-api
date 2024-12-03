@@ -1,6 +1,6 @@
 package dev.kons.kuenyawz.services.logic;
 
-import dev.kons.kuenyawz.dtos.midtrans.TransactionRequest;
+import dev.kons.kuenyawz.dtos.midtrans.MidtransRequest;
 import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
 
 public interface MidtransApiService {
@@ -9,10 +9,10 @@ public interface MidtransApiService {
 	 * <br>
 	 * {@code POST https://app.sandbox.midtrans.com/snap/v1/transactions}
 	 *
-	 * @param request {@link TransactionRequest} transaction request
+	 * @param request {@link MidtransRequest} transaction request
 	 * @return {@link TransactionResponse} transaction response
 	 */
-	TransactionResponse createTransaction(TransactionRequest request);
+	TransactionResponse createTransaction(MidtransRequest request);
 
 	/**
 	 * Fetches a transaction status by its order (purchase) id.
