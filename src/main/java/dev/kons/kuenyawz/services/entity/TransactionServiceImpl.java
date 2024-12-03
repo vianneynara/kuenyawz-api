@@ -1,6 +1,6 @@
 package dev.kons.kuenyawz.services.entity;
 
-import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
+import dev.kons.kuenyawz.dtos.midtrans.MidtransResponse;
 import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
 import dev.kons.kuenyawz.dtos.purchase.TransactionPatchDto;
 import dev.kons.kuenyawz.entities.Account;
@@ -115,7 +115,7 @@ public class TransactionServiceImpl implements TransactionService {
 	public TransactionDto fetchTransaction(Long transactionId) {
 		Transaction transaction = transactionRepository.findById(transactionId)
 			.orElseThrow(() -> new EntityNotFoundException("Transaction not found"));
-		TransactionResponse res = midtransApiService.fetchTransactionStatus(String.valueOf(transactionId));
+		MidtransResponse res = midtransApiService.fetchTransactionStatus(String.valueOf(transactionId));
 
 		Transaction.TransactionStatus status = Transaction.TransactionStatus.fromString(res.getTransactionStatus());
 		transaction.setStatus(status);
@@ -139,7 +139,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 	@Override
 	public TransactionDto fetchTransaction(Transaction transaction) {
-		TransactionResponse res = midtransApiService.fetchTransactionStatus(String.valueOf(transaction.getTransactionId()));
+		MidtransResponse res = midtransApiService.fetchTransactionStatus(String.valueOf(transaction.getTransactionId()));
 
 		Transaction.TransactionStatus status = Transaction.TransactionStatus.fromString(res.getTransactionStatus());
 		transaction.setStatus(status);
@@ -246,7 +246,7 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 
 		// Call Midtrans API to cancel the transaction
-		TransactionResponse response = midtransApiService.cancelTransaction(String.valueOf(transaction.getTransactionId()));
+		MidtransResponse response = midtransApiService.cancelTransaction(String.valueOf(transaction.getTransactionId()));
 		if (Objects.equals(response.getStatusCode(), "404")) {
 			log.info("Transaction {} not found in Midtrans, cancelling locally", transaction.getTransactionId());
 		} else if (Objects.equals(response.getStatusCode(), "412")) {

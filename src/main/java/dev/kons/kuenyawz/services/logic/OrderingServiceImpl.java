@@ -2,7 +2,7 @@ package dev.kons.kuenyawz.services.logic;
 
 import dev.kons.kuenyawz.configurations.ApplicationProperties;
 import dev.kons.kuenyawz.dtos.midtrans.MidtransRequest;
-import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
+import dev.kons.kuenyawz.dtos.midtrans.MidtransResponse;
 import dev.kons.kuenyawz.dtos.purchase.PurchaseDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
 import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
@@ -109,7 +109,7 @@ public class OrderingServiceImpl implements OrderingService {
 			.build();
 
 		// Send the request to payment gateway
-		TransactionResponse response = midtransApiService.createTransaction(request);
+		MidtransResponse response = midtransApiService.createTransaction(request);
 
 		// Save the transaction
 		transaction.setPaymentUrl(response.getRedirectUrl());
