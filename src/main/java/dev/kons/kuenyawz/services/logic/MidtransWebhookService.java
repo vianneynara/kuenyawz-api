@@ -2,6 +2,7 @@ package dev.kons.kuenyawz.services.logic;
 
 import dev.kons.kuenyawz.dtos.midtrans.MidtransNotification;
 import dev.kons.kuenyawz.exceptions.MidtransTransactionException;
+import dev.kons.kuenyawz.exceptions.UnauthorizedException;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -26,7 +27,7 @@ public interface MidtransWebhookService {
 		final var generatedSignature = generateSignatureKey(notification, merchantServerKey);
 
 		if (!receivedSignature.equals(generatedSignature)) {
-			throw new MidtransTransactionException("Invalid signature key");
+			throw new UnauthorizedException("Invalid signature key");
 		}
 	}
 
