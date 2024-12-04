@@ -128,4 +128,39 @@ public class OrderingController {
 		PurchaseDto purchaseDto = orderingService.findPurchase(purchaseId);
 		return ResponseEntity.ok(purchaseDto);
 	}
+
+	@Operation(summary = "Upgrade an order's status to its next stage")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Order status upgraded successfully"),
+		@ApiResponse(responseCode = "400", description = "Bad request"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized"),
+		@ApiResponse(responseCode = "403", description = "Forbidden"),
+		@ApiResponse(responseCode = "404", description = "Not found")
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@PostMapping("/{purchaseId}/status/next")
+	public ResponseEntity<?> upgradeStatus(
+		@PathVariable Long purchaseId
+	) {
+		PurchaseDto purchaseDto = orderingService.upgradeOrderStatus(purchaseId);
+		return ResponseEntity.ok(purchaseDto);
+	}
+
+	@Operation(summary = "Change an order's status")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Order status changed successfully"),
+		@ApiResponse(responseCode = "400", description = "Bad request"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized"),
+		@ApiResponse(responseCode = "403", description = "Forbidden"),
+		@ApiResponse(responseCode = "404", description = "Not found")
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@PostMapping("/{purchaseId}/status")
+	public ResponseEntity<?> changeStatus(
+		@PathVariable Long purchaseId,
+		@RequestParam String status
+	) {
+		PurchaseDto purchaseDto = orderingService.changeOrderStatus(purchaseId, status);
+		return ResponseEntity.ok(purchaseDto);
+	}
 }
