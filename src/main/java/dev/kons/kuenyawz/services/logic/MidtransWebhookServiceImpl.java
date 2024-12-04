@@ -4,12 +4,15 @@ import dev.kons.kuenyawz.configurations.ApplicationProperties;
 import dev.kons.kuenyawz.dtos.midtrans.MidtransNotification;
 import dev.kons.kuenyawz.entities.Purchase;
 import dev.kons.kuenyawz.entities.Transaction;
+import dev.kons.kuenyawz.exceptions.InvalidRequestBodyValue;
 import dev.kons.kuenyawz.repositories.PurchaseRepository;
 import dev.kons.kuenyawz.repositories.TransactionRepository;
 import dev.kons.kuenyawz.services.entity.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.math.RoundingMode;
 
 @Service
 @RequiredArgsConstructor
@@ -32,19 +35,23 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 		Transaction.TransactionStatus newStatus = Transaction.TransactionStatus.fromString(notification.getTransactionStatus());
 		if (newStatus.ordinal() < transaction.getStatus().ordinal()) {
 			log.warn("Transaction status can't be downgraded, current status: {}, new status: {}", transaction.getStatus(), newStatus);
-			return;
+//			return;
+			throw new InvalidRequestBodyValue("Transaction status can't be downgraded");
 		}
 
 		// Validate merchant id
 		if (!notification.getMerchantId().equals(properties.midtrans().getMerchantId())) {
 			log.warn("Merchant id is not valid, expected: {}, actual: {}", properties.midtrans().getMerchantId(), notification.getMerchantId());
-			return;
+//			return;
+			throw new InvalidRequestBodyValue("Merchant id is not valid");
 		}
 
-		// Validate transaction amount
-		if (!notification.getGrossAmount().equals(transaction.getAmount().toString())) {
+		// Validate transaction amount, round the decimal to 0 fractional digits
+		final var actualAmount = transaction.getAmount().setScale(0, RoundingMode.UNNECESSARY);
+		if (!notification.getGrossAmount().equals(actualAmount.toString())) {
 			log.warn("Gross amount is not valid, expected: {}, actual: {}", transaction.getAmount(), notification.getGrossAmount());
-			return;
+//			return;
+			throw new InvalidRequestBodyValue("Gross amount is invalid");
 		}
 
 		// Update the status of the transaction and purchase
