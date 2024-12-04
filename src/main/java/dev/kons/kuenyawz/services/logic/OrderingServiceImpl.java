@@ -217,6 +217,11 @@ public class OrderingServiceImpl implements OrderingService {
 		return purchaseService.upgradeStatus(purchaseId);
 	}
 
+	@Override
+	public Map<String, String> availableStatuses(Long purchaseId) {
+		return purchaseService.availableStatuses(purchaseId);
+	}
+
 	@Deprecated
 	@Override
 	public Page<PurchaseDto> findAll(PurchaseService.PurchaseSearchCriteria criteria) {

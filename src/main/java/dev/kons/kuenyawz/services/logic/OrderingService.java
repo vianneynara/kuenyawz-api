@@ -7,6 +7,8 @@ import dev.kons.kuenyawz.entities.Purchase;
 import dev.kons.kuenyawz.services.entity.PurchaseService;
 import org.springframework.data.domain.Page;
 
+import java.util.Map;
+
 public interface OrderingService {
 	/**
 	 * Initiates order processing flow, which includes:
@@ -56,6 +58,14 @@ public interface OrderingService {
 	 * @return {@link PurchaseDto}
 	 */
 	PurchaseDto upgradeOrderStatus(Long purchaseId);
+
+	/**
+	 * Gets a map of available next statuses for an order by its purchase id.
+	 *
+	 * @param purchaseId {@link Long}
+	 * @return {@link Map} key-value pair of status and description
+	 */
+	Map<String, String> availableStatuses(Long purchaseId);
 
 	/**
 	 * Finds all purchases with pagination. Will return based on account session type.
