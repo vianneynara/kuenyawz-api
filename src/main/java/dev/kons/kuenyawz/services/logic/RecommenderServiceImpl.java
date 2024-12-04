@@ -119,7 +119,6 @@ public class RecommenderServiceImpl implements RecommenderService {
 	}
 
 	private List<ProductDto> oldRecommender(Long productId, Boolean addRandom) {
-		System.out.println("Running old recommender!");
 		if (!productService.existsById(productId)) {
 			throw new ResourceNotFoundException("Product not found");
 		}

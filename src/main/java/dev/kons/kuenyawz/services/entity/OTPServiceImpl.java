@@ -71,7 +71,6 @@ public class OTPServiceImpl implements OTPService {
 	@Override
 	public boolean matchStoredOTP(String phone, String otp) {
 		Optional<OTP> storedOtp = otpRepository.findByPhoneAndExpiresAtAfter(phone, LocalDateTime.now());
-		System.out.println(storedOtp);
 		if (storedOtp.isEmpty() || !storedOtp.get().getOtp().equals(otp)) {
 			throw new InvalidCredentialsException("Invalid OTP");
 		}
