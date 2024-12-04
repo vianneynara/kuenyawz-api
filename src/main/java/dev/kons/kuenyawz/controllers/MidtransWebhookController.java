@@ -5,14 +5,14 @@ import dev.kons.kuenyawz.services.logic.MidtransWebhookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Tag(name = "Midtrans webhook", description = "Midtrans webhook endpoints")
 @RestController
@@ -34,5 +34,22 @@ public class MidtransWebhookController {
 	) {
 		midtransWebhookService.processNotification(notification);
 		return ResponseEntity.ok().build();
+	}
+
+	@Operation(summary = "Sign Notification",
+		description = "Used to sign notification for midtrans")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Notification has been signed"),
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@PostMapping("/sign")
+	public ResponseEntity<Map<String, String>> signNotification(
+		@RequestParam String orderId,
+		@RequestParam String statusCode,
+		@RequestParam String grossAmount,
+		@RequestParam(required = false) String merchantServerKey
+	) {
+		final String signatureKey = midtransWebhookService.signatureCreator(orderId, statusCode, grossAmount, merchantServerKey);
+		return ResponseEntity.ok(Map.of("signatureKey", signatureKey));
 	}
 }
