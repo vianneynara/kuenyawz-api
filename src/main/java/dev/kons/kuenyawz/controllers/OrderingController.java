@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @Tag(name = "Order Processing Routes", description = "Endpoints for processing orders")
 @RequestMapping("/orders")
@@ -127,6 +128,20 @@ public class OrderingController {
 	) {
 		PurchaseDto purchaseDto = orderingService.findPurchase(purchaseId);
 		return ResponseEntity.ok(purchaseDto);
+	}
+
+	@Operation(summary = "Get the next status of an order")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Next status fetched successfully"),
+		@ApiResponse(responseCode = "400", description = "Bad request")
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@GetMapping("/{purchaseId}/status/next")
+	public ResponseEntity<?> getNextStatus(
+		@PathVariable Long purchaseId
+	) {
+		Map<String, String> statuses = orderingService.availableStatuses(purchaseId);
+		return ResponseEntity.ok(statuses);
 	}
 
 	@Operation(summary = "Upgrade an order's status to its next stage")
