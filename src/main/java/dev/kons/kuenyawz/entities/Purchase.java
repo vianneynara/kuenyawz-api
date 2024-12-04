@@ -176,28 +176,28 @@ public class Purchase extends Auditables {
 	@Getter
 	public enum PurchaseStatus {
 		@JsonProperty("PENDING")
-		PENDING("Waiting for system"),
+		PENDING("Purchase is waiting for system"),
 
-		@JsonProperty("WAITING_DOWN_PAYMENT")
-		WAITING_DOWN_PAYMENT("Waiting for down payment"),
+//		@JsonProperty("WAITING_DOWN_PAYMENT")
+//		WAITING_DOWN_PAYMENT("Purchase is waiting for down payment"),
+//
+//		@JsonProperty("WAITING_SETTLEMENT")
+//		WAITING_SETTLEMENT("Purchase is waiting for settlement"),
 
 		@JsonProperty("CONFIRMING")
-		CONFIRMING("Waiting for confirmation from seller"),
+		CONFIRMING("Purchase is waiting for confirmation from seller"),
 
 		@JsonProperty("CONFIRMED")
-		CONFIRMED("Confirmed by seller"),
-
-		@JsonProperty("WAITING_SETTLEMENT")
-		WAITING_SETTLEMENT("Waiting for settlement"),
+		CONFIRMED("Purchase confirmed by seller"),
 
 		@JsonProperty("PROCESSING")
-		PROCESSING("Being processed"),
+		PROCESSING("Purchase is being processed"),
 
 		@JsonProperty("DELIVERED")
-		DELIVERED("Purchase delivered"),
+		DELIVERED("Purchase has been delivered"),
 
 		@JsonProperty("CANCELLED")
-		CANCELLED("Purchase cancelled");
+		CANCELLED("Purchase has been cancelled");
 
 		private final String description;
 
