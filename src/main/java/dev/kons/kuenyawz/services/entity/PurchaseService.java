@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface PurchaseService {
 	/**
@@ -158,6 +159,15 @@ public interface PurchaseService {
 	 * @return {@link PurchaseDto}
 	 */
 	PurchaseDto convertToDto(Purchase purchase);
+
+	/**
+	 * Returns a map of next available statuses for a purchase. Used to determine the next status
+	 * available to upgrade.
+	 *
+	 * @param purchaseId {@link Long}
+	 * @return {@link Map<String, String>} Status : Status Description
+	 */
+	Map<String, String> availableStatuses(Long purchaseId);
 
 	@Getter
 	@Setter

@@ -26,7 +26,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -256,6 +258,32 @@ public class PurchaseServiceImpl implements PurchaseService {
 	@Override
 	public PurchaseDto convertToDto(Purchase purchase) {
 		return purchaseMapper.toDto(purchase);
+	}
+
+	@Override
+	public Map<String, String> availableStatuses(Long purchaseId) {
+		final Purchase purchase = purchaseRepository.findById(purchaseId)
+			.orElseThrow(() -> new EntityNotFoundException("Purchase not found"));
+		final var currentStatus = purchase.getStatus();
+
+		if (currentStatus == Purchase.PurchaseStatus.CANCELLED)
+			throw new IllegalOperationException("Cannot progress beyond finished status: " + currentStatus);
+
+		Map<String, String> statusMap = new LinkedHashMap<>();
+
+		Purchase.PurchaseStatus nextStatus = currentStatus;
+		while (nextStatus != null) {
+			try {
+				nextStatus = nextStatus.next();
+				if (nextStatus == Purchase.PurchaseStatus.CANCELLED)
+					break;
+				statusMap.put(nextStatus.name(), nextStatus.getDescription());
+			} catch (IllegalOperationException e) {
+				break;
+			}
+		}
+
+		return statusMap;
 	}
 
 	/**
