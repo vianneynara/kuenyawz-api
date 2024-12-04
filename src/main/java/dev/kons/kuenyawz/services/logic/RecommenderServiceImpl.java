@@ -60,7 +60,6 @@ public class RecommenderServiceImpl implements RecommenderService {
 			}
 
 			aprioriRepository.save(apriori);
-
 		}
 	}
 
@@ -100,14 +99,17 @@ public class RecommenderServiceImpl implements RecommenderService {
 
 			Optional.ofNullable(apriori.getRecommended1())
 				.map(productService::getProduct)
+				.filter(ProductDto::isAvailable)
 				.ifPresent(recommendations::add);
 
 			Optional.ofNullable(apriori.getRecommended2())
 				.map(productService::getProduct)
+				.filter(ProductDto::isAvailable)
 				.ifPresent(recommendations::add);
 
 			Optional.ofNullable(apriori.getRecommended3())
 				.map(productService::getProduct)
+				.filter(ProductDto::isAvailable)
 				.ifPresent(recommendations::add);
 
 			return recommendations.isEmpty()
@@ -117,7 +119,6 @@ public class RecommenderServiceImpl implements RecommenderService {
 	}
 
 	private List<ProductDto> oldRecommender(Long productId, Boolean addRandom) {
-		System.out.println("Running old recommender!");
 		if (!productService.existsById(productId)) {
 			throw new ResourceNotFoundException("Product not found");
 		}
@@ -126,7 +127,7 @@ public class RecommenderServiceImpl implements RecommenderService {
 		}
 		addRandom = (addRandom != null && addRandom);
 		Specification<Product> spec = ProductSpec.withFilters(
-			null, null, null,
+			null, null, true,
 			null, null, true, productId);
 		List<Product> products = productRepository.findAll(spec,
 			addRandom ? PageRequest.of(0, 3) : PageRequest.of(0, 1)

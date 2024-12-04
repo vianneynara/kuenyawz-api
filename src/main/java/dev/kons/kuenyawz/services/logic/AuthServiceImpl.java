@@ -76,7 +76,6 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public AccountSecureDto getUserInfo(Long accountId) {
 		Account account = accountService.getAccount(accountId);
-		System.out.println(account);
 
 		AccountSecureDto accountSecureDto = accountMapper.fromEntity(account);
 		return accountSecureDto;
