@@ -244,6 +244,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 		return convertToDto(saved);
 	}
 
+	@Override
 	public PurchaseDto upgradeStatus(Long purchaseId) {
 		final Purchase purchase = purchaseRepository.findById(purchaseId)
 			.orElseThrow(() -> new EntityNotFoundException("Purchase not found"));

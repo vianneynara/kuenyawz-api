@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(name = "Closed Date Modifying", description = "Request body to edit an existing closed date")
+@Schema(description = "Request body to edit an existing closed date")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

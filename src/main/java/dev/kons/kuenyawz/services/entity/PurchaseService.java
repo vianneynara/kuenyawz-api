@@ -143,6 +143,15 @@ public interface PurchaseService {
 	PurchaseDto changeStatus(Long purchaseId, Purchase.PurchaseStatus status);
 
 	/**
+	 * Upgrades the status of a purchase to its next status. This is done by admin.
+	 *
+	 * @param purchaseId {@link Long}
+	 * @return {@link PurchaseDto}
+	 */
+	@Transactional
+	PurchaseDto upgradeStatus(Long purchaseId);
+
+	/**
 	 * Converts a purchase entity to a purchase dto.
 	 *
 	 * @param purchase {@link Purchase}

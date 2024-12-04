@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@Schema(name = "Closed Date Transfer Object", description = "Response containing closed date information")
+@Schema(description = "Response containing closed date information")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
