@@ -3,6 +3,7 @@ package dev.kons.kuenyawz.services.logic;
 import dev.kons.kuenyawz.dtos.midtrans.MidtransNotification;
 import dev.kons.kuenyawz.exceptions.MidtransTransactionException;
 import dev.kons.kuenyawz.exceptions.UnauthorizedException;
+import jakarta.validation.constraints.NotNull;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -15,6 +16,22 @@ public interface MidtransWebhookService {
 	 * @param notification Notification from Midtrans
 	 */
 	void processNotification(MidtransNotification notification);
+
+	/**
+	 * Very unsafe, test-only method to create a signature key.
+	 *
+	 * @param orderId {@link String} the transaction id as defined in {@link OrderingServiceImpl}
+	 * @param statusCode {@link String} the status code of the transaction
+	 * @param grossAmount {@link String} the gross amount of the transaction
+	 * @param merchantServerKey {@link String} the merchant server key
+	 * @return {@link String} the generated signature key
+	 */
+	String signatureCreator(
+		@NotNull String orderId,
+		@NotNull String statusCode,
+		@NotNull String grossAmount,
+		String merchantServerKey
+	);
 
 	/**
 	 * Validate the signature key of the notification. Will throw an exception if the signature key is invalid.

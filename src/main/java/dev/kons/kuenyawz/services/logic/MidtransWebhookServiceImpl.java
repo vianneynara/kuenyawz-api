@@ -74,6 +74,19 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 		purchaseRepository.save(purchase);
 	}
 
+	@Override
+	public String signatureCreator(String orderId, String statusCode, String grossAmount, String merchantServerKey) {
+		AuthService.validateIsAdmin();
+
+		final MidtransNotification notification = MidtransNotification.builder()
+			.orderId(orderId)
+			.statusCode(statusCode)
+			.grossAmount(grossAmount)
+			.build();
+		merchantServerKey = merchantServerKey != null ? merchantServerKey : properties.midtrans().getServerKey();
+		return MidtransWebhookService.generateSignatureKey(notification, merchantServerKey);
+	}
+
 	private boolean notFraud(MidtransNotification notification) {
 		if (notification.getFraudStatus() == null) {
 			return true;
