@@ -250,6 +250,9 @@ public class PurchaseServiceImpl implements PurchaseService {
 	public PurchaseDto upgradeStatus(Long purchaseId) {
 		final Purchase purchase = purchaseRepository.findById(purchaseId)
 			.orElseThrow(() -> new EntityNotFoundException("Purchase not found"));
+		if (purchase.isFinished())
+			throw new IllegalOperationException("Cannot progress beyond finished status: " + purchase.getStatus());
+
 		purchase.setStatus(purchase.getStatus().next());
 		Purchase saved = purchaseRepository.save(purchase);
 		return convertToDto(saved);
