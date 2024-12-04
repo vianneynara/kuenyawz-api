@@ -72,6 +72,20 @@ public class OrderingController {
 		return ResponseEntity.ok(result);
 	}
 
+	@Operation(summary = "Get a purchase/order")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Order fetched successfully"),
+		@ApiResponse(responseCode = "400", description = "Bad request")
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@GetMapping("/{purchaseId}")
+	public ResponseEntity<?> getOrder(
+		@PathVariable Long purchaseId
+	) {
+		PurchaseDto purchaseDto = orderingService.findPurchase(purchaseId);
+		return ResponseEntity.ok(purchaseDto);
+	}
+
 	@Operation(summary = "Process an order")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Order processed successfully"),
