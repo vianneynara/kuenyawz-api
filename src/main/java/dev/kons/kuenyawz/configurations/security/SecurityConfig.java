@@ -61,6 +61,11 @@ public class SecurityConfig {
 					"/api/closure",
 					"/api/closure/**").permitAll()
 
+				// Public webhooks
+				.requestMatchers(HttpMethod.POST,
+					"/api/midtrans/notify"
+				).permitAll()
+
 				// Auth endpoints (all public)
 				.requestMatchers(HttpMethod.POST,
 					"/api/auth/register",
@@ -72,6 +77,10 @@ public class SecurityConfig {
 
 				// Simulator endpoints
 				.requestMatchers("/api/sim/**").permitAll()
+
+				// TODO: use .denyAll() in production to reject incoming requests
+				// Experimental endpoints
+				.requestMatchers(HttpMethod.POST, "/api/midtrans/sign").hasRole("ADMIN")
 
 				// Account endpoints
 				.requestMatchers(HttpMethod.GET, "/api/accounts").hasRole("ADMIN")
@@ -85,10 +94,13 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.PATCH, "/api/closure").hasRole("ADMIN")
 
 				// Order Processing endpoints
-				.requestMatchers(HttpMethod.GET, "/api/orders").hasAnyRole("ADMIN", "USER")
+				.requestMatchers(HttpMethod.GET, "/api/orders/**").hasAnyRole("ADMIN", "USER")
 				.requestMatchers(HttpMethod.POST, "/api/orders").hasRole("USER")
 				.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/cancel").hasAnyRole("ADMIN", "USER")
 				.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/confirm").hasAnyRole("ADMIN")
+				.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/status").hasAnyRole("ADMIN")
+				.requestMatchers(HttpMethod.GET, "/api/orders/{purchaseId:\\d+}/status/next").hasAnyRole("ADMIN", "USER")
+				.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/status/next").hasAnyRole("ADMIN")
 				.requestMatchers(HttpMethod.GET, "/api/orders/{purchaseId:\\d+}/transaction").hasAnyRole("ADMIN", "USER")
 
 				// Transaction endpoints
