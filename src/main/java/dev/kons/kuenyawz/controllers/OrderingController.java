@@ -2,6 +2,7 @@ package dev.kons.kuenyawz.controllers;
 
 import dev.kons.kuenyawz.dtos.purchase.PurchaseDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
+import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.services.entity.PurchaseService;
 import dev.kons.kuenyawz.services.logic.AuthService;
@@ -126,8 +127,8 @@ public class OrderingController {
 	public ResponseEntity<?> getTransaction(
 		@PathVariable Long purchaseId
 	) {
-		PurchaseDto purchaseDto = orderingService.findPurchase(purchaseId);
-		return ResponseEntity.ok(purchaseDto);
+		TransactionDto transactionDto = orderingService.findTransactionOfPurchase(purchaseId);
+		return ResponseEntity.ok(transactionDto);
 	}
 
 	@Operation(summary = "Get the next status of an order")
