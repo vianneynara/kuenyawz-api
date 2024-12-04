@@ -133,7 +133,9 @@ public class OrderingController {
 	@Operation(summary = "Get the next status of an order")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Next status fetched successfully"),
-		@ApiResponse(responseCode = "400", description = "Bad request")
+		@ApiResponse(responseCode = "400", description = "Bad request"),
+		@ApiResponse(responseCode = "403", description = "Next status states unavailable"),
+		@ApiResponse(responseCode = "404", description = "Not found")
 	})
 	@SecurityRequirement(name = "cookieAuth")
 	@GetMapping("/{purchaseId}/status/next")
@@ -149,7 +151,7 @@ public class OrderingController {
 		@ApiResponse(responseCode = "200", description = "Order status upgraded successfully"),
 		@ApiResponse(responseCode = "400", description = "Bad request"),
 		@ApiResponse(responseCode = "401", description = "Unauthorized"),
-		@ApiResponse(responseCode = "403", description = "Forbidden"),
+		@ApiResponse(responseCode = "403", description = "Can not proceed to next status"),
 		@ApiResponse(responseCode = "404", description = "Not found")
 	})
 	@SecurityRequirement(name = "cookieAuth")
@@ -166,7 +168,7 @@ public class OrderingController {
 		@ApiResponse(responseCode = "200", description = "Order status changed successfully"),
 		@ApiResponse(responseCode = "400", description = "Bad request"),
 		@ApiResponse(responseCode = "401", description = "Unauthorized"),
-		@ApiResponse(responseCode = "403", description = "Forbidden"),
+		@ApiResponse(responseCode = "403", description = "Can not proceed to next status"),
 		@ApiResponse(responseCode = "404", description = "Not found")
 	})
 	@SecurityRequirement(name = "cookieAuth")
