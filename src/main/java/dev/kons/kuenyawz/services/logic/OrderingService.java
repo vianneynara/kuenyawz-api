@@ -46,7 +46,7 @@ public interface OrderingService {
 	 * @param status {@link Purchase.PurchaseStatus}
 	 * @return {@link PurchaseDto}
 	 */
-	PurchaseDto changeOrderStatus(Long purchaseId, Purchase.PurchaseStatus status);
+	PurchaseDto changeOrderStatus(Long purchaseId, String status);
 
 	/**
 	 * Upgrades the status of an order by its purchase id to its next status.

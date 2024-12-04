@@ -203,10 +203,11 @@ public class OrderingServiceImpl implements OrderingService {
 	}
 
 	@Override
-	public PurchaseDto changeOrderStatus(Long purchaseId, Purchase.PurchaseStatus status) {
+	public PurchaseDto changeOrderStatus(Long purchaseId, String status) {
 		AuthService.validateIsAdmin();
 
-		return purchaseService.changeStatus(purchaseId, status);
+		var statusEnum = Purchase.PurchaseStatus.fromString(status);
+		return purchaseService.changeStatus(purchaseId, statusEnum);
 	}
 
 	@Override
