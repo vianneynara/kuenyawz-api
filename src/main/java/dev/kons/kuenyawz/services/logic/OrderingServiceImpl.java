@@ -202,6 +202,20 @@ public class OrderingServiceImpl implements OrderingService {
 		return purchaseMapper.toDto(savedPurchase);
 	}
 
+	@Override
+	public PurchaseDto changeOrderStatus(Long purchaseId, Purchase.PurchaseStatus status) {
+		AuthService.validateIsAdmin();
+
+		return purchaseService.changeStatus(purchaseId, status);
+	}
+
+	@Override
+	public PurchaseDto upgradeOrderStatus(Long purchaseId) {
+		AuthService.validateIsAdmin();
+
+		return purchaseService.upgradeStatus(purchaseId);
+	}
+
 	@Deprecated
 	@Override
 	public Page<PurchaseDto> findAll(PurchaseService.PurchaseSearchCriteria criteria) {
