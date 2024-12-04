@@ -50,8 +50,9 @@ public interface MidtransWebhookService {
 
 	/**
 	 * To generate signature key specifically for Midtrans notification.
-	 * The generated signature key is used to validate the authenticity of the notification.
-	 * The generated signature key is generated using SHA-512 algorithm.
+	 * The order of the parameters follows
+	 * <a href="https://docs.midtrans.com/reference/receiving-notifications#signature-key">Midtrans#signature-key</a>,
+	 * generated using SHA-512 algorithm.
 	 *
 	 * @param notification {@link MidtransNotification}
 	 * @param merchantServerKey Merchant server key
