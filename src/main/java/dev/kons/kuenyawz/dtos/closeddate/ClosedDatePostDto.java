@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(name = "Closed Date Creation", description = "Request body to create closed date")
+@Schema(description = "Request body to create closed date")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

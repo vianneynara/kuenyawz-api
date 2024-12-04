@@ -73,6 +73,7 @@ public class ApplicationProperties {
 		this.security.otpExpireSeconds = Long.parseLong(dotenv.get("OTP_EXPIRE_SECONDS", "300"));
 		this.security.otpLength = Integer.parseInt(dotenv.get("OTP_LENGTH", "6"));
 
+		this.midtrans.merchantId = dotenv.get("MIDTRANS_MERCHANT_ID", null);
 		this.midtrans.serverKey = dotenv.get("MIDTRANS_SERVER_KEY", null);
 		this.midtrans.baseUrlApp = dotenv.get("MIDTRANS_BASE_URL_APP", "https://app.sandbox.midtrans.com");
 		this.midtrans.baseUrlApi = dotenv.get("MIDTRANS_BASE_URL_API", "https://api.sandbox.midtrans.com");
@@ -138,6 +139,7 @@ public class ApplicationProperties {
 	@Getter
 	@Setter
 	public static class Midtrans {
+		private String merchantId;
 		private String serverKey;
 		private String baseUrlApp;
 		private String baseUrlApi;

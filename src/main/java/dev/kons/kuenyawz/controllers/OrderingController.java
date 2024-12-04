@@ -2,6 +2,7 @@ package dev.kons.kuenyawz.controllers;
 
 import dev.kons.kuenyawz.dtos.purchase.PurchaseDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
+import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.services.entity.PurchaseService;
 import dev.kons.kuenyawz.services.logic.AuthService;
@@ -20,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @Tag(name = "Order Processing Routes", description = "Endpoints for processing orders")
 @RequestMapping("/orders")
@@ -68,6 +70,20 @@ public class OrderingController {
 			result = purchaseService.findAll(account.getAccountId(), criteria);
 		}
 		return ResponseEntity.ok(result);
+	}
+
+	@Operation(summary = "Get a purchase/order")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Order fetched successfully"),
+		@ApiResponse(responseCode = "400", description = "Bad request")
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@GetMapping("/{purchaseId}")
+	public ResponseEntity<?> getOrder(
+		@PathVariable Long purchaseId
+	) {
+		PurchaseDto purchaseDto = orderingService.findPurchase(purchaseId);
+		return ResponseEntity.ok(purchaseDto);
 	}
 
 	@Operation(summary = "Process an order")
@@ -125,7 +141,58 @@ public class OrderingController {
 	public ResponseEntity<?> getTransaction(
 		@PathVariable Long purchaseId
 	) {
-		PurchaseDto purchaseDto = orderingService.findPurchase(purchaseId);
+		TransactionDto transactionDto = orderingService.findTransactionOfPurchase(purchaseId);
+		return ResponseEntity.ok(transactionDto);
+	}
+
+	@Operation(summary = "Get the next status of an order")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Next status fetched successfully"),
+		@ApiResponse(responseCode = "400", description = "Bad request"),
+		@ApiResponse(responseCode = "403", description = "Next status states unavailable"),
+		@ApiResponse(responseCode = "404", description = "Not found")
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@GetMapping("/{purchaseId}/status/next")
+	public ResponseEntity<?> getNextStatus(
+		@PathVariable Long purchaseId
+	) {
+		Map<String, String> statuses = orderingService.availableStatuses(purchaseId);
+		return ResponseEntity.ok(statuses);
+	}
+
+	@Operation(summary = "Upgrade an order's status to its next stage")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Order status upgraded successfully"),
+		@ApiResponse(responseCode = "400", description = "Bad request"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized"),
+		@ApiResponse(responseCode = "403", description = "Can not proceed to next status"),
+		@ApiResponse(responseCode = "404", description = "Not found")
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@PostMapping("/{purchaseId}/status/next")
+	public ResponseEntity<?> upgradeStatus(
+		@PathVariable Long purchaseId
+	) {
+		PurchaseDto purchaseDto = orderingService.upgradeOrderStatus(purchaseId);
+		return ResponseEntity.ok(purchaseDto);
+	}
+
+	@Operation(summary = "Change an order's status")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Order status changed successfully"),
+		@ApiResponse(responseCode = "400", description = "Bad request"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized"),
+		@ApiResponse(responseCode = "403", description = "Can not proceed to next status"),
+		@ApiResponse(responseCode = "404", description = "Not found")
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@PostMapping("/{purchaseId}/status")
+	public ResponseEntity<?> changeStatus(
+		@PathVariable Long purchaseId,
+		@RequestParam String status
+	) {
+		PurchaseDto purchaseDto = orderingService.changeOrderStatus(purchaseId, status);
 		return ResponseEntity.ok(purchaseDto);
 	}
 }

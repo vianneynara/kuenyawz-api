@@ -1,6 +1,6 @@
 package dev.kons.kuenyawz.services.entity;
 
-import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
+import dev.kons.kuenyawz.dtos.midtrans.MidtransResponse;
 import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
 import dev.kons.kuenyawz.dtos.purchase.TransactionPatchDto;
 import dev.kons.kuenyawz.entities.Account;
@@ -115,50 +115,45 @@ public class TransactionServiceImpl implements TransactionService {
 	public TransactionDto fetchTransaction(Long transactionId) {
 		Transaction transaction = transactionRepository.findById(transactionId)
 			.orElseThrow(() -> new EntityNotFoundException("Transaction not found"));
-		TransactionResponse res = midtransApiService.fetchTransactionStatus(String.valueOf(transactionId));
+		MidtransResponse res = midtransApiService.fetchTransactionStatus(String.valueOf(transactionId));
 
-		Transaction.TransactionStatus status = Transaction.TransactionStatus.fromString(res.getTransactionStatus());
-		transaction.setStatus(status);
-
-		Purchase purchase = transaction.getPurchase();
-		if (purchase.getStatus() == Purchase.PurchaseStatus.PENDING
-			&& (status == Transaction.TransactionStatus.CAPTURE || status == Transaction.TransactionStatus.SETTLEMENT)
-		) {
-			purchase.setStatus(Purchase.PurchaseStatus.CONFIRMING);
-			purchaseRepository.save(purchase);
-		} else if (purchase.getStatus() == Purchase.PurchaseStatus.PENDING
-			&& (status == Transaction.TransactionStatus.CANCEL || status == Transaction.TransactionStatus.EXPIRE)
-		) {
-			purchase.setStatus(Purchase.PurchaseStatus.CANCELLED);
-			purchaseRepository.save(purchase);
-		}
-
-		Transaction savedTransaction = transactionRepository.save(transaction);
-		return convertToDto(savedTransaction);
+		return fetchTransactionHelper(transaction, res);
 	}
 
 	@Override
 	public TransactionDto fetchTransaction(Transaction transaction) {
-		TransactionResponse res = midtransApiService.fetchTransactionStatus(String.valueOf(transaction.getTransactionId()));
+		MidtransResponse res = midtransApiService.fetchTransactionStatus(String.valueOf(transaction.getTransactionId()));
 
+		return fetchTransactionHelper(transaction, res);
+	}
+
+	private TransactionDto fetchTransactionHelper(Transaction transaction, MidtransResponse res) {
 		Transaction.TransactionStatus status = Transaction.TransactionStatus.fromString(res.getTransactionStatus());
+		Purchase purchase = transaction.getPurchase();
+
+		// Check for fraud status of the transaction, this is for card payments
+		if (res.getFraudStatus() != null && !res.getFraudStatus().equalsIgnoreCase("accept")) {
+			transaction.setStatus(Transaction.TransactionStatus.CANCEL);
+			purchase.setStatus(Purchase.PurchaseStatus.CANCELLED);
+			transactionRepository.save(transaction);
+			purchaseRepository.save(purchase);
+			return convertToDto(transaction);
+		}
+
 		transaction.setStatus(status);
 
-		Purchase purchase = transaction.getPurchase();
-		if (purchase.getStatus() == Purchase.PurchaseStatus.PENDING
-			&& (status == Transaction.TransactionStatus.CAPTURE || status == Transaction.TransactionStatus.SETTLEMENT)
-		) {
-			purchase.setStatus(Purchase.PurchaseStatus.CONFIRMING);
-			purchaseRepository.save(purchase);
-		} else if (purchase.getStatus() == Purchase.PurchaseStatus.PENDING
-			&& (status == Transaction.TransactionStatus.CANCEL || status == Transaction.TransactionStatus.EXPIRE)
-		) {
-			purchase.setStatus(Purchase.PurchaseStatus.CANCELLED);
+		// Update purchase status based on transaction status
+		if (purchase.getStatus() == Purchase.PurchaseStatus.PENDING) {
+			if (status == Transaction.TransactionStatus.CAPTURE || status == Transaction.TransactionStatus.SETTLEMENT) {
+				purchase.setStatus(Purchase.PurchaseStatus.CONFIRMING);
+			} else if (status == Transaction.TransactionStatus.CANCEL || status == Transaction.TransactionStatus.EXPIRE) {
+				purchase.setStatus(Purchase.PurchaseStatus.CANCELLED);
+			}
 			purchaseRepository.save(purchase);
 		}
 
-		Transaction savedTransaction = transactionRepository.save(transaction);
-		return convertToDto(savedTransaction);
+		transactionRepository.save(transaction);
+		return convertToDto(transaction);
 	}
 
 	@Override
@@ -246,7 +241,7 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 
 		// Call Midtrans API to cancel the transaction
-		TransactionResponse response = midtransApiService.cancelTransaction(String.valueOf(transaction.getTransactionId()));
+		MidtransResponse response = midtransApiService.cancelTransaction(String.valueOf(transaction.getTransactionId()));
 		if (Objects.equals(response.getStatusCode(), "404")) {
 			log.info("Transaction {} not found in Midtrans, cancelling locally", transaction.getTransactionId());
 		} else if (Objects.equals(response.getStatusCode(), "412")) {

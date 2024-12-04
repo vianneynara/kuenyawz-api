@@ -49,22 +49,39 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 	public void init() {
 		productImagesDir = properties.getProductImagesDir();
 		try {
-			uploadLocation = Path.of(System.getProperty("user.dir"), ROOT_TO_UPLOAD, productImagesDir)
+			Path projectUploadLocation = Path.of(System.getProperty("user.dir"), ROOT_TO_UPLOAD, productImagesDir)
 				.normalize()
 				.toAbsolutePath();
-			log.info("Upload directory set at '{}'", uploadLocation);
-			acceptedExtensions = Set.copyOf(properties.getAcceptedImageExtensions());
-			if (!Files.exists(uploadLocation)) {
-				log.info("Creating upload directory at: {}", uploadLocation);
-				Files.createDirectories(uploadLocation);
+
+			// Attempt to create directories in the project path
+			Files.createDirectories(projectUploadLocation);
+			uploadLocation = projectUploadLocation;
+
+			log.info("Using project upload directory at: {}", uploadLocation);
+		} catch (IOException | SecurityException projectDirException) {
+			// Fallback to container/docker upload directory
+			try {
+				Path containerUploadLocation = Path.of("/app/uploads", productImagesDir)
+					.normalize()
+					.toAbsolutePath();
+
+				Files.createDirectories(containerUploadLocation);
+				uploadLocation = containerUploadLocation;
+
+				log.warn("Fallback to container upload directory at: {}", uploadLocation);
+			} catch (IOException containerDirException) {
+				log.error("Failed to create upload directory in both project and container locations", containerDirException);
+				throw new ResourceUploadException("Could not create upload directory in any location");
 			}
-		} catch (IOException e) {
-			log.error("Failed to create upload directory at {}", uploadLocation, e);
-			throw new ResourceUploadException("Could not create upload directory");
-		} catch (SecurityException e) {
-			log.error("Permission denied to create upload directory at {}", uploadLocation, e);
-			throw new ResourceUploadException("Permission denied to create upload directory");
 		}
+
+		// Ensure the directory exists and is writable
+		if (!Files.exists(uploadLocation) || !Files.isWritable(uploadLocation)) {
+			throw new ResourceUploadException("Upload directory is not writable: " + uploadLocation);
+		}
+
+		acceptedExtensions = Set.copyOf(properties.getAcceptedImageExtensions());
+		log.info("Final upload location set to: {}", uploadLocation);
 	}
 
 	@Override
@@ -216,7 +233,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 	 * Process image storing using multipart file to be converted to {@link ImageUploadDto}.
 	 *
 	 * @param product {@link Product}
-	 * @param file {@link MultipartFile}
+	 * @param file    {@link MultipartFile}
 	 * @return {@link ImageResourceDTO}
 	 */
 	private ImageResourceDTO processImageStoring(Product product, MultipartFile file) {
@@ -226,7 +243,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 	/**
 	 * {@link ImageUploadDto} storing procedure.
 	 *
-	 * @param product {@link Product}
+	 * @param product        {@link Product}
 	 * @param imageUploadDto {@link }
 	 * @return {@link ImageResourceDTO}
 	 */

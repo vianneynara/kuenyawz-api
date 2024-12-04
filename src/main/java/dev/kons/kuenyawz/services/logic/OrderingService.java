@@ -3,8 +3,11 @@ package dev.kons.kuenyawz.services.logic;
 import dev.kons.kuenyawz.dtos.purchase.PurchaseDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
 import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
+import dev.kons.kuenyawz.entities.Purchase;
 import dev.kons.kuenyawz.services.entity.PurchaseService;
 import org.springframework.data.domain.Page;
+
+import java.util.Map;
 
 public interface OrderingService {
 	/**
@@ -37,6 +40,32 @@ public interface OrderingService {
 	 * @return {@link PurchaseDto}
 	 */
 	PurchaseDto confirmOrder(Long purchaseId);
+
+	/**
+	 * Changes the status of an order by its purchase id. Calls the purchase service to change the status.
+	 *
+	 * @param purchaseId {@link Long}
+	 * @param status {@link Purchase.PurchaseStatus}
+	 * @return {@link PurchaseDto}
+	 */
+	PurchaseDto changeOrderStatus(Long purchaseId, String status);
+
+	/**
+	 * Upgrades the status of an order by its purchase id to its next status.
+	 * Calls the purchase service to upgrade the status.
+	 *
+	 * @param purchaseId {@link Long}
+	 * @return {@link PurchaseDto}
+	 */
+	PurchaseDto upgradeOrderStatus(Long purchaseId);
+
+	/**
+	 * Gets a map of available next statuses for an order by its purchase id.
+	 *
+	 * @param purchaseId {@link Long}
+	 * @return {@link Map} key-value pair of status and description
+	 */
+	Map<String, String> availableStatuses(Long purchaseId);
 
 	/**
 	 * Finds all purchases with pagination. Will return based on account session type.

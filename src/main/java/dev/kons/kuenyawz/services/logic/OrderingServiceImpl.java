@@ -1,8 +1,8 @@
 package dev.kons.kuenyawz.services.logic;
 
 import dev.kons.kuenyawz.configurations.ApplicationProperties;
-import dev.kons.kuenyawz.dtos.midtrans.TransactionRequest;
-import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
+import dev.kons.kuenyawz.dtos.midtrans.MidtransRequest;
+import dev.kons.kuenyawz.dtos.midtrans.MidtransResponse;
 import dev.kons.kuenyawz.dtos.purchase.PurchaseDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
 import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -84,16 +85,16 @@ public class OrderingServiceImpl implements OrderingService {
 		// Build transaction (not saved yet)
 		Transaction transaction = transactionService.build(purchase, account);
 
-		List<TransactionRequest.ItemDetail> items = TransactionRequest.ItemDetail.of(purchase.getPurchaseItems());
+		List<MidtransRequest.ItemDetail> items = MidtransRequest.ItemDetail.of(purchase.getPurchaseItems());
 		if (purchase.getDeliveryFee() != null) {
-			items.add(TransactionRequest.ItemDetail.builder()
+			items.add(MidtransRequest.ItemDetail.builder()
 				.id("delivery_fee")
 				.name("Delivery Fee")
 				.price(purchase.getDeliveryFee())
 				.quantity(1)
 				.build());
 		}
-		items.add(TransactionRequest.ItemDetail.builder()
+		items.add(MidtransRequest.ItemDetail.builder()
 			.id("service_fee")
 			.name("Service Fee")
 			.price(BigDecimal.valueOf(properties.vendor().getPaymentFee()))
@@ -101,15 +102,15 @@ public class OrderingServiceImpl implements OrderingService {
 			.build());
 
 		// Create the request body
-		TransactionRequest request = TransactionRequest.builder()
-			.transactionDetails(TransactionRequest.TransactionDetails.of(purchase, transaction.getTransactionId(), properties))
+		MidtransRequest request = MidtransRequest.builder()
+			.transactionDetails(MidtransRequest.TransactionDetails.of(purchase, transaction.getTransactionId(), properties))
 			.itemDetails(items)
-			.customerDetails(TransactionRequest.CustomerDetails.of(purchase, account))
-			.expiry(TransactionRequest.Expiry.defaultExpiry())
+			.customerDetails(MidtransRequest.CustomerDetails.of(purchase, account))
+			.expiry(MidtransRequest.Expiry.defaultExpiry())
 			.build();
 
 		// Send the request to payment gateway
-		TransactionResponse response = midtransApiService.createTransaction(request);
+		MidtransResponse response = midtransApiService.createTransaction(request);
 
 		// Save the transaction
 		transaction.setPaymentUrl(response.getRedirectUrl());
@@ -200,6 +201,26 @@ public class OrderingServiceImpl implements OrderingService {
 		Purchase savedPurchase = purchaseRepository.save(purchase);
 
 		return purchaseMapper.toDto(savedPurchase);
+	}
+
+	@Override
+	public PurchaseDto changeOrderStatus(Long purchaseId, String status) {
+		AuthService.validateIsAdmin();
+
+		var statusEnum = Purchase.PurchaseStatus.fromString(status);
+		return purchaseService.changeStatus(purchaseId, statusEnum);
+	}
+
+	@Override
+	public PurchaseDto upgradeOrderStatus(Long purchaseId) {
+		AuthService.validateIsAdmin();
+
+		return purchaseService.upgradeStatus(purchaseId);
+	}
+
+	@Override
+	public Map<String, String> availableStatuses(Long purchaseId) {
+		return purchaseService.availableStatuses(purchaseId);
 	}
 
 	@Deprecated

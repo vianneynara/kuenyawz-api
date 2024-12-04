@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-@Schema(name = "Item of a purchase", description = "Purchase item of specific variant for a purchase")
+@Schema(description = "Purchase item of specific variant for a purchase")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

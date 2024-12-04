@@ -2,8 +2,8 @@ package dev.kons.kuenyawz.services.logic;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.kons.kuenyawz.configurations.ApplicationProperties;
-import dev.kons.kuenyawz.dtos.midtrans.TransactionRequest;
-import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
+import dev.kons.kuenyawz.dtos.midtrans.MidtransRequest;
+import dev.kons.kuenyawz.dtos.midtrans.MidtransResponse;
 import dev.kons.kuenyawz.exceptions.MidtransTransactionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -39,13 +39,13 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 	}
 
 	@Override
-	public TransactionResponse createTransaction(TransactionRequest request) {
+	public MidtransResponse createTransaction(MidtransRequest request) {
 		try {
 			return webClient.post()
 				.uri("/snap/v1/transactions")
 				.bodyValue(request)
 				.retrieve()
-				.bodyToMono(TransactionResponse.class)
+				.bodyToMono(MidtransResponse.class)
 				.block();
 		} catch (WebClientResponseException e) {
 			return handleException(e);
@@ -56,14 +56,14 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 	}
 
 	@Override
-	public TransactionResponse fetchTransactionStatus(String orderId) {
+	public MidtransResponse fetchTransactionStatus(String orderId) {
 		try {
 			var wc = ofBaseUrl(properties.midtrans().getBaseUrlApi());
 			return wc.get()
 				.uri("/v2/{order_id}/status", orderId)
 				.retrieve()
 				.onStatus(status -> status.value() == 404, ClientResponse::createException)
-				.bodyToMono(TransactionResponse.class)
+				.bodyToMono(MidtransResponse.class)
 				.block();
 		} catch (WebClientResponseException e) {
 			if (e.getResponseBodyAsString().contains("404 Not Found")) {
@@ -75,17 +75,17 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 	}
 
 	@Override
-	public TransactionResponse cancelTransaction(String orderId) {
+	public MidtransResponse cancelTransaction(String orderId) {
 		try {
 			var wc = ofBaseUrl(properties.midtrans().getBaseUrlApi());
 			return wc.post()
 				.uri("/v2/{order_id}/cancel", orderId)
 				.retrieve()
-				.bodyToMono(TransactionResponse.class)
+				.bodyToMono(MidtransResponse.class)
 				.block();
 		} catch (WebClientResponseException e) {
 			if (e.getResponseBodyAsString().contains("404 Not Found")) {
-				return TransactionResponse.builder().statusCode("404").build();
+				return MidtransResponse.builder().statusCode("404").build();
 			} else {
 				return handleException(e);
 			}
@@ -96,12 +96,12 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 		return webClient.mutate().baseUrl(baseUrl).build();
 	}
 
-	private TransactionResponse handleException(WebClientResponseException e) {
+	private MidtransResponse handleException(WebClientResponseException e) {
 		try {
 			log.error("Error processing Midtrans transaction: {}", e.getResponseBodyAsString());
-			TransactionResponse response = objectMapper.readValue(
+			MidtransResponse response = objectMapper.readValue(
 				e.getResponseBodyAsString(),
-				TransactionResponse.class
+				MidtransResponse.class
 			);
 			throw new MidtransTransactionException(null, response);
 		} catch (IOException parseException) {

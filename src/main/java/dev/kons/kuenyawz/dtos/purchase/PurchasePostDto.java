@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Schema(name = "Purchase Post", description = "Purchase creation request")
+@Schema(description = "Purchase creation request")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

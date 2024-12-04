@@ -1,7 +1,7 @@
 package dev.kons.kuenyawz.services.logic;
 
-import dev.kons.kuenyawz.dtos.midtrans.TransactionRequest;
-import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
+import dev.kons.kuenyawz.dtos.midtrans.MidtransRequest;
+import dev.kons.kuenyawz.dtos.midtrans.MidtransResponse;
 
 public interface MidtransApiService {
 	/**
@@ -9,10 +9,10 @@ public interface MidtransApiService {
 	 * <br>
 	 * {@code POST https://app.sandbox.midtrans.com/snap/v1/transactions}
 	 *
-	 * @param request {@link TransactionRequest} transaction request
-	 * @return {@link TransactionResponse} transaction response
+	 * @param request {@link MidtransRequest} transaction request
+	 * @return {@link MidtransResponse} transaction response
 	 */
-	TransactionResponse createTransaction(TransactionRequest request);
+	MidtransResponse createTransaction(MidtransRequest request);
 
 	/**
 	 * Fetches a transaction status by its order (purchase) id.
@@ -20,9 +20,9 @@ public interface MidtransApiService {
 	 * {@code GET https://api.sandbox.midtrans.com/v2/{order_id}/status}
 	 *
 	 * @param orderId {@link String} order id
-	 * @return {@link TransactionResponse} transaction response
+	 * @return {@link MidtransResponse} transaction response
 	 */
-	TransactionResponse fetchTransactionStatus(String orderId);
+	MidtransResponse fetchTransactionStatus(String orderId);
 
 	/**
 	 * Cancels/voids a transaction by its order (purchase) id.
@@ -30,7 +30,7 @@ public interface MidtransApiService {
 	 * {@code POST https://api.sandbox.midtrans.com/v2/{order_id}/cancel}
 	 *
 	 * @param orderId {@link String} order id
-	 * @return {@link TransactionResponse} transaction response
+	 * @return {@link MidtransResponse} transaction response
 	 */
-	TransactionResponse cancelTransaction(String orderId);
+	MidtransResponse cancelTransaction(String orderId);
 }

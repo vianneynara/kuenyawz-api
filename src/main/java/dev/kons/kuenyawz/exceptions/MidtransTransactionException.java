@@ -1,6 +1,6 @@
 package dev.kons.kuenyawz.exceptions;
 
-import dev.kons.kuenyawz.dtos.midtrans.TransactionResponse;
+import dev.kons.kuenyawz.dtos.midtrans.MidtransResponse;
 import lombok.Getter;
 
 @Getter
@@ -8,7 +8,7 @@ public class MidtransTransactionException extends RuntimeException {
 
 	public static final String DEFAULT_MESSAGE = "There was an error during Midtrans transaction";
 
-	private TransactionResponse errorResponse;
+	private MidtransResponse errorResponse;
 
 	public MidtransTransactionException() {
 		super(DEFAULT_MESSAGE);
@@ -18,7 +18,7 @@ public class MidtransTransactionException extends RuntimeException {
 		super(message);
 	}
 
-	public MidtransTransactionException(String message, TransactionResponse errorResponse) {
+	public MidtransTransactionException(String message, MidtransResponse errorResponse) {
 		super(message != null ? message : DEFAULT_MESSAGE);
 		this.errorResponse = errorResponse;
 	}

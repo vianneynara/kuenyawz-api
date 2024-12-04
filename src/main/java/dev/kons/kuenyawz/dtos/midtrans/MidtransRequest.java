@@ -69,7 +69,7 @@ import java.util.stream.Collectors;
 @Data
 @Builder
 @Slf4j
-public class TransactionRequest {
+public class MidtransRequest {
 	@NotNull
 	@JsonProperty("transaction_details")
 	private TransactionDetails transactionDetails;

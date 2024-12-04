@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(name = "Purchase item of specific variant", description = "Purchase item of specific variant for a purchase")
+@Schema(description = "Purchase item of specific variant for a purchase")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
