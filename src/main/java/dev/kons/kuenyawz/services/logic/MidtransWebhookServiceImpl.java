@@ -1,5 +1,7 @@
 package dev.kons.kuenyawz.services.logic;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.kons.kuenyawz.configurations.ApplicationProperties;
 import dev.kons.kuenyawz.dtos.midtrans.MidtransNotification;
 import dev.kons.kuenyawz.entities.Purchase;
@@ -23,9 +25,11 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 	private final TransactionService transactionService;
 	private final PurchaseRepository purchaseRepository;
 	private final TransactionRepository transactionRepository;
+	private final ObjectMapper mapper;
 
 	@Override
 	public void processNotification(MidtransNotification notification) {
+		printNotification(notification); // TODO: remove in production
 		MidtransWebhookService.validateSignatureKey(notification, properties.midtrans().getServerKey());
 
 		Transaction transaction = transactionService.getById(Long.valueOf(notification.getOrderId()));
@@ -92,5 +96,14 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 			return true;
 		}
 		return notification.getFraudStatus().equalsIgnoreCase("accept");
+	}
+
+	private void printNotification(MidtransNotification notification) {
+		try {
+			System.out.printf("Received notification: %s%n",
+				mapper.writerWithDefaultPrettyPrinter().writeValueAsString(notification));
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
