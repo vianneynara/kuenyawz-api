@@ -41,6 +41,7 @@ public class ApplicationProperties {
 	@Value("#{'${application.accepted-image-extensions}'.split(',')}")
 	private List<String> acceptedImageExtensions;
 
+	private Seeder seeder = new Seeder();
 	private Vendor vendor = new Vendor();
 	private Database database = new Database();
 	private Security security = new Security();
@@ -51,6 +52,10 @@ public class ApplicationProperties {
 	public void initialize(Dotenv dotenv) {
 		this.version = dotenv.get("APP_VERSION", "0.0");
 		this.repositoryUrl = dotenv.get("APP_REPOSITORY_URL", "https://github.com/vianneynara/*");
+
+		// Override default seeder values if set in .env
+		this.seeder.seedAccounts = Boolean.parseBoolean(dotenv.get("SEED_ACCOUNTS", seeder.getSeedAccounts() ? "true" : "false"));
+		this.seeder.seedProducts = Boolean.parseBoolean(dotenv.get("SEED_PRODUCTS", seeder.getSeedProducts() ? "true" : "false"));
 
 		this.vendor.instagram = dotenv.get("VENDOR_INSTAGRAM", null);
 		this.vendor.email = dotenv.get("VENDOR_EMAIL", null);
@@ -87,6 +92,10 @@ public class ApplicationProperties {
 		return httpProtocol + "://" + publicIp + ":" + serverPort;
 	}
 
+	public Seeder seeder() {
+		return seeder;
+	}
+
 	public Vendor vendor() {
 		return vendor;
 	}
@@ -101,6 +110,13 @@ public class ApplicationProperties {
 
 	public Midtrans midtrans() {
 		return midtrans;
+	}
+
+	@Getter
+	@Setter
+	public static class Seeder {
+		private Boolean seedAccounts = false;
+		private Boolean seedProducts = false;
 	}
 
 	@Getter
