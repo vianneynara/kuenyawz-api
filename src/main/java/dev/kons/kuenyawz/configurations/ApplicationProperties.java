@@ -50,47 +50,62 @@ public class ApplicationProperties {
 	// Initializing through dotenv
 	@Autowired
 	public void initialize(Dotenv dotenv) {
-		this.version = dotenv.get("APP_VERSION", "0.0");
-		this.repositoryUrl = dotenv.get("APP_REPOSITORY_URL", "https://github.com/vianneynara/*");
+		this.version = getEnv("APP_VERSION", "0.0", dotenv);
+		this.repositoryUrl = getEnv("APP_REPOSITORY_URL", "https://github.com/vianneynara/*", dotenv);
 
-		// Override default seeder values if set in .env
-		this.seeder.seedAccounts = Boolean.parseBoolean(dotenv.get("SEED_ACCOUNTS", seeder.getSeedAccounts() ? "true" : "false"));
-		this.seeder.seedProducts = Boolean.parseBoolean(dotenv.get("SEED_PRODUCTS", seeder.getSeedProducts() ? "true" : "false"));
+		this.seeder.seedAccounts = Boolean.parseBoolean(getEnv("SEED_ACCOUNTS", "true", dotenv));
+		this.seeder.seedProducts = Boolean.parseBoolean(getEnv("SEED_PRODUCTS", "true", dotenv));
 
-		this.vendor.instagram = dotenv.get("VENDOR_INSTAGRAM", null);
-		this.vendor.email = dotenv.get("VENDOR_EMAIL", null);
-		this.vendor.phone = dotenv.get("VENDOR_PHONE", null);
-		this.vendor.address = dotenv.get("VENDOR_ADDRESS", null);
-		this.vendor.latitude = Double.parseDouble(dotenv.get("VENDOR_LATITUDE", "0"));
-		this.vendor.longitude = Double.parseDouble(dotenv.get("VENDOR_LONGITUDE", "0"));
-		this.vendor.paymentFee = Double.parseDouble(dotenv.get("VENDOR_PAYMENT_FEE", "4000"));
-		this.vendor.feePerKm = Double.parseDouble(dotenv.get("VENDOR_FEE_PER_KM", "3500"));
+		this.vendor.instagram = getEnv("VENDOR_INSTAGRAM", null, dotenv);
+		this.vendor.email = getEnv("VENDOR_EMAIL", null, dotenv);
+		this.vendor.phone = getEnv("VENDOR_PHONE", null, dotenv);
+		this.vendor.address = getEnv("VENDOR_ADDRESS", null, dotenv);
+		this.vendor.latitude = Double.parseDouble(getEnv("VENDOR_LATITUDE", "0", dotenv));
+		this.vendor.longitude = Double.parseDouble(getEnv("VENDOR_LONGITUDE", "0", dotenv));
+		this.vendor.paymentFee = Double.parseDouble(getEnv("VENDOR_PAYMENT_FEE", "4000", dotenv));
+		this.vendor.feePerKm = Double.parseDouble(getEnv("VENDOR_FEE_PER_KM", "3500", dotenv));
 
-		this.database.url = dotenv.get("DB_URL", "jdbc:postgresql://localhost:5432/kuenyawz");
-		this.database.username = dotenv.get("DB_USERNAME", "kuenyawz");
-		this.database.password = dotenv.get("DB_PASSWORD", "kuenyawz");
+		this.database.url = getEnv("DB_URL", "jdbc:postgresql://localhost:5432/kuenyawz", dotenv);
+		this.database.username = getEnv("DB_USERNAME", "kuenyawz", dotenv);
+		this.database.password = getEnv("DB_PASSWORD", "kuenyawz", dotenv);
 
-		this.security.jwtSecret = dotenv.get("JWT_SECRET", "secret");
-		this.security.jwtTokenExpSeconds = Long.parseLong(dotenv.get("JWT_ACCESS_EXP_SECONDS", "3600"));
-		this.security.jwtRefreshDays = Long.parseLong(dotenv.get("REFRESH_TOKEN_EXP_DAYS", "7"));
-		this.security.otpPhoneNumber = dotenv.get("OTP_PHONE_NUMBER", null);
-		this.security.fonnteApiToken = dotenv.get("FONNTE_API_TOKEN", null);
-		this.security.otpExpireSeconds = Long.parseLong(dotenv.get("OTP_EXPIRE_SECONDS", "300"));
-		this.security.otpLength = Integer.parseInt(dotenv.get("OTP_LENGTH", "6"));
+		this.security.jwtSecret = getEnv("JWT_SECRET", "secret", dotenv);
+		this.security.jwtTokenExpSeconds = Long.parseLong(getEnv("JWT_ACCESS_EXP_SECONDS", "3600", dotenv));
+		this.security.jwtRefreshDays = Long.parseLong(getEnv("REFRESH_TOKEN_EXP_DAYS", "7", dotenv));
+		this.security.otpPhoneNumber = getEnv("OTP_PHONE_NUMBER", null, dotenv);
+		this.security.fonnteApiToken = getEnv("FONNTE_API_TOKEN", null, dotenv);
+		this.security.otpExpireSeconds = Long.parseLong(getEnv("OTP_EXPIRE_SECONDS", "300", dotenv));
+		this.security.otpLength = Integer.parseInt(getEnv("OTP_LENGTH", "6", dotenv));
 
-		this.midtrans.merchantId = dotenv.get("MIDTRANS_MERCHANT_ID", null);
-		this.midtrans.serverKey = dotenv.get("MIDTRANS_SERVER_KEY", null);
-		this.midtrans.baseUrlApp = dotenv.get("MIDTRANS_BASE_URL_APP", "https://app.sandbox.midtrans.com");
-		this.midtrans.baseUrlApi = dotenv.get("MIDTRANS_BASE_URL_API", "https://api.sandbox.midtrans.com");
-		this.midtrans.notificationUrl = dotenv.get("MIDTRANS_NOTIFICATION_URL", null);
-		this.midtrans.finishUrl = dotenv.get("MIDTRANS_FINISH_URL", null);
-		this.midtrans.unfinishUrl = dotenv.get("MIDTRANS_UNFINISH_URL", null);
-		this.midtrans.errorUrl = dotenv.get("MIDTRANS_ERROR_URL, null");
+		this.midtrans.merchantId = getEnv("MIDTRANS_MERCHANT_ID", null, dotenv);
+		this.midtrans.serverKey = getEnv("MIDTRANS_SERVER_KEY", null, dotenv);
+		this.midtrans.baseUrlApp = getEnv("MIDTRANS_BASE_URL_APP", "https://app.sandbox.midtrans.com", dotenv);
+		this.midtrans.baseUrlApi = getEnv("MIDTRANS_BASE_URL_API", "https://api.sandbox.midtrans.com", dotenv);
+		this.midtrans.notificationUrl = getEnv("MIDTRANS_NOTIFICATION_URL", null, dotenv);
+		this.midtrans.finishUrl = getEnv("MIDTRANS_FINISH_URL", null, dotenv);
+		this.midtrans.unfinishUrl = getEnv("MIDTRANS_UNFINISH_URL", null, dotenv);
+		this.midtrans.errorUrl = getEnv("MIDTRANS_ERROR_URL", null, dotenv);
 	}
 
 	public String getFullBaseUrl() {
 		return httpProtocol + "://" + publicIp + ":" + serverPort;
 	}
+
+	/**
+	 * Gets the environment variable from the system or dotenv.
+	 *
+	 * @return {@link String} value of the environment variable
+	 */
+	private String getEnv(String key, String defaultValue, Dotenv dotenv) {
+		// Prioritize system environment variables
+		String systemEnvValue = System.getenv(key);
+		if (systemEnvValue != null) {
+			return systemEnvValue;
+		}
+		// Fallback to Dotenv
+		return dotenv.get(key, defaultValue);
+	}
+
 
 	public Seeder seeder() {
 		return seeder;
