@@ -1,8 +1,8 @@
 package dev.kons.kuenyawz.boostrappers;
 
+import dev.kons.kuenyawz.configurations.ApplicationProperties;
 import dev.kons.kuenyawz.repositories.AccountRepository;
 import dev.kons.kuenyawz.repositories.ProductRepository;
-import dev.kons.kuenyawz.services.entity.AccountService;
 import dev.kons.kuenyawz.services.logic.AccountCsvService;
 import dev.kons.kuenyawz.services.logic.ProductCsvService;
 import lombok.RequiredArgsConstructor;
@@ -21,15 +21,14 @@ import java.io.IOException;
 @Slf4j
 public class DatabaseBootstrapper implements ApplicationListener<ApplicationReadyEvent>, CommandLineRunner {
 
-	private final AccountService accountService;
+	private final ApplicationProperties properties;
 	private final ProductCsvService productCsvService;
 	private final ProductRepository productRepository;
+	private final AccountCsvService accountCsvService;
+	private final AccountRepository accountRepository;
 
 	private static final String PATH_TO_PRODUCT_SEEDER = "seeders/Products.csv";
 	private static final String PATH_TO_ACCOUNT_SEEDER = "seeders/Accounts.csv";
-
-	private final AccountRepository accountRepository;
-	private final AccountCsvService accountCsvService;
 
 	public void injectAccounts() {
 		if (accountRepository.count() >= 5) {
@@ -74,9 +73,13 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 	}
 
 	private void start() {
-		log.info("Bootstrapping database...");
-		injectAccounts();
-		injectProducts();
-		log.info("Database bootstrapping complete");
+		if (properties.seeder().getSeedAccounts()) {
+			log.info("Injecting accounts...");
+			injectAccounts();
+		}
+		if (properties.seeder().getSeedProducts()) {
+			log.info("Injecting products...");
+			injectProducts();
+		}
 	}
 }
