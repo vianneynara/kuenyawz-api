@@ -41,6 +41,7 @@ public class ApplicationProperties {
 	@Value("#{'${application.accepted-image-extensions}'.split(',')}")
 	private List<String> acceptedImageExtensions;
 
+	private Frontend frontend = new Frontend();
 	private Seeder seeder = new Seeder();
 	private Vendor vendor = new Vendor();
 	private Database database = new Database();
@@ -52,6 +53,8 @@ public class ApplicationProperties {
 	public void initialize(Dotenv dotenv) {
 		this.version = getEnv("APP_VERSION", "0.0", dotenv);
 		this.repositoryUrl = getEnv("APP_REPOSITORY_URL", "https://github.com/vianneynara/*", dotenv);
+
+		this.frontend.baseUrl = getEnv("FRONTEND_BASE_URL", "http://localhost:5173", dotenv);
 
 		this.seeder.seedAccounts = Boolean.parseBoolean(getEnv("SEED_ACCOUNTS", "true", dotenv));
 		this.seeder.seedProducts = Boolean.parseBoolean(getEnv("SEED_PRODUCTS", "true", dotenv));
@@ -106,6 +109,9 @@ public class ApplicationProperties {
 		return dotenv.get(key, defaultValue);
 	}
 
+	public Frontend frontend() {
+		return frontend;
+	}
 
 	public Seeder seeder() {
 		return seeder;
@@ -125,6 +131,12 @@ public class ApplicationProperties {
 
 	public Midtrans midtrans() {
 		return midtrans;
+	}
+
+	@Getter
+	@Setter
+	public static class Frontend {
+		private String baseUrl;
 	}
 
 	@Getter
