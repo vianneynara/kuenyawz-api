@@ -22,7 +22,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -87,6 +86,9 @@ class ProductControllerIT {
 
     @Test
     void testGetAllProducts() throws Exception {
+		// Insert new product
+		testCreateProduct();
+
         // Act & Assert
         MvcResult result = mockMvc.perform(get("/api/products"))
             .andExpect(status().isOk())
@@ -94,6 +96,6 @@ class ProductControllerIT {
 //            .andDo(print()); // This helps with debugging
 
 		// Assert
-		assertThat(result.getResponse().getContentAsString()).contains("Marmer Buttercake");
+		assertThat(result.getResponse().getContentAsString()).contains("Test Product1");
 	}
 }
