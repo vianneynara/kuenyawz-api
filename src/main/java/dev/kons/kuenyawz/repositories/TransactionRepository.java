@@ -16,4 +16,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
 	Page<Transaction> findByPurchase_PurchaseId(Long purchaseId, Pageable pageable);
 
 	List<Transaction> findByPurchase_PurchaseIdAndAccount_AccountId(Long purchaseId, Long accountId);
+
+	Optional<Transaction> findFirstByPurchase_PurchaseIdOrderByCreatedAtDesc(Long purchaseId);
 }
