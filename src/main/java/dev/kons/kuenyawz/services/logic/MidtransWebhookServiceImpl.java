@@ -26,6 +26,7 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 	private final PurchaseRepository purchaseRepository;
 	private final TransactionRepository transactionRepository;
 	private final ObjectMapper mapper;
+	private final WhatsappApiService whatsappApiService;
 
 	@Override
 	public void processNotification(MidtransNotification notification) {
@@ -64,11 +65,19 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 			|| notification.getTransactionStatus().equalsIgnoreCase("settlement"))
 		) {
 			if (purchase.getStatus().ordinal() >= Purchase.PurchaseStatus.CONFIRMING.ordinal()) {
-				log.warn("Purchase status is not updated, current status: {}, new status: {}", purchase.getStatus(), Purchase.PurchaseStatus.CONFIRMING);
+				log.warn("Purchase [{}] status is not updated, current status: {}, new status: {}", purchase.getPurchaseId(), purchase.getStatus(), Purchase.PurchaseStatus.CONFIRMING);
 				return;
 			}
 			transaction.setStatus(newStatus);
-			purchase.setStatus(Purchase.PurchaseStatus.CONFIRMING);
+
+			// Send WhatsApp notification to vendor
+			if (purchase.getStatus() == Purchase.PurchaseStatus.PENDING) {
+				String message = String.format("Ada pesanan baru dengan kode *%s*, segera cek aplikasi! %n%n%s",
+					purchase.getPurchaseId(), properties.frontend().getBaseUrl()
+				);
+				whatsappApiService.send(properties.vendor().getPhone(), message, "62");
+				purchase.setStatus(Purchase.PurchaseStatus.CONFIRMING);
+			}
 		} else {
 			transaction.setStatus(newStatus);
 			purchase.setStatus(Purchase.PurchaseStatus.CANCELLED);

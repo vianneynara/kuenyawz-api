@@ -1,5 +1,6 @@
 package dev.kons.kuenyawz.services.entity;
 
+import dev.kons.kuenyawz.configurations.ApplicationProperties;
 import dev.kons.kuenyawz.dtos.midtrans.MidtransResponse;
 import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
 import dev.kons.kuenyawz.dtos.purchase.TransactionPatchDto;
@@ -13,6 +14,7 @@ import dev.kons.kuenyawz.repositories.TransactionRepository;
 import dev.kons.kuenyawz.repositories.TransactionSpec;
 import dev.kons.kuenyawz.services.logic.AuthService;
 import dev.kons.kuenyawz.services.logic.MidtransApiService;
+import dev.kons.kuenyawz.services.logic.WhatsappApiService;
 import dev.kons.kuenyawz.utils.idgenerator.SnowFlakeIdGenerator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
@@ -37,6 +39,8 @@ public class TransactionServiceImpl implements TransactionService {
 	private final SnowFlakeIdGenerator snowFlakeIdGenerator;
 	private final MidtransApiService midtransApiService;
 	private final PurchaseRepository purchaseRepository;
+	private final WhatsappApiService whatsappApiService;
+	private final ApplicationProperties properties;
 
 	@Override
 	public Page<TransactionDto> findAll(TransactionSearchCriteria criteria) {
@@ -145,6 +149,10 @@ public class TransactionServiceImpl implements TransactionService {
 		// Update purchase status based on transaction status
 		if (purchase.getStatus() == Purchase.PurchaseStatus.PENDING) {
 			if (status == Transaction.TransactionStatus.CAPTURE || status == Transaction.TransactionStatus.SETTLEMENT) {
+				String message = String.format("Ada pesanan baru dengan kode *%s*, segera cek aplikasi! %n%n%s",
+					purchase.getPurchaseId(), properties.frontend().getBaseUrl()
+				);
+				whatsappApiService.send(properties.vendor().getPhone(), message, "62");
 				purchase.setStatus(Purchase.PurchaseStatus.CONFIRMING);
 			} else if (status == Transaction.TransactionStatus.CANCEL || status == Transaction.TransactionStatus.EXPIRE) {
 				purchase.setStatus(Purchase.PurchaseStatus.CANCELLED);

@@ -170,6 +170,18 @@ public class OrderingServiceImpl implements OrderingService {
 			purchase.getEventDate()
 		);
 
+		// Send notification if owner cancels it
+		if (AuthService.isAuthenticatedAdmin()) {
+			Account account = purchase.getTransactions().getLast().getAccount();
+			try {
+				final String message = String.format("Pesanan dengan kode *%s* telah dibatalkan oleh admin. Cek di sini: %n%n%s",
+					purchase.getPurchaseId(), properties.frontend().getBaseUrl());
+				whatsappApiService.send(account.getPhone(), message, "62");
+			} catch (Exception e) {
+				log.error("Failed to send order cancellation notification to {}, error: ", account.getPhone(), e);
+			}
+		}
+
 		return purchaseMapper.toDto(savedPurchase);
 	}
 
@@ -191,7 +203,7 @@ public class OrderingServiceImpl implements OrderingService {
 		transactions.stream()
 			.filter(t ->
 				t.getStatus() == Transaction.TransactionStatus.CAPTURE
-				|| t.getStatus() == Transaction.TransactionStatus.SETTLEMENT)
+					|| t.getStatus() == Transaction.TransactionStatus.SETTLEMENT)
 			.findAny()
 			.orElseThrow(
 				() -> new IllegalOperationException("Transaction for this purchase has not been paid yet")
@@ -199,6 +211,16 @@ public class OrderingServiceImpl implements OrderingService {
 
 		purchase.setStatus(Purchase.PurchaseStatus.CONFIRMED);
 		Purchase savedPurchase = purchaseRepository.save(purchase);
+
+		// Send notification
+		Account account = purchase.getTransactions().getLast().getAccount();
+		try {
+			final String message = String.format("Pesanan dengan kode *%s* telah dikonfirmasi oleh admin. Cek di sini: %n%n%s",
+				purchase.getPurchaseId(), properties.frontend().getBaseUrl());
+			whatsappApiService.send(account.getPhone(), message, "62");
+		} catch (Exception e) {
+			log.error("Failed to send order confirmation notification to {}, error: ", account.getPhone(), e);
+		}
 
 		return purchaseMapper.toDto(savedPurchase);
 	}
