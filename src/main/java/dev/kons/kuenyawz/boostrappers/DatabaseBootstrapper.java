@@ -1,11 +1,9 @@
 package dev.kons.kuenyawz.boostrappers;
 
-import dev.kons.kuenyawz.dtos.account.AccountRegistrationDto;
-import dev.kons.kuenyawz.dtos.account.PrivilegeUpdateDto;
-import dev.kons.kuenyawz.entities.Account;
-import dev.kons.kuenyawz.exceptions.AccountExistsException;
+import dev.kons.kuenyawz.configurations.ApplicationProperties;
+import dev.kons.kuenyawz.repositories.AccountRepository;
 import dev.kons.kuenyawz.repositories.ProductRepository;
-import dev.kons.kuenyawz.services.entity.AccountService;
+import dev.kons.kuenyawz.services.logic.AccountCsvService;
 import dev.kons.kuenyawz.services.logic.ProductCsvService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,66 +15,34 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.ListIterator;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class DatabaseBootstrapper implements ApplicationListener<ApplicationReadyEvent>, CommandLineRunner {
 
-	private final AccountService accountService;
+	private final ApplicationProperties properties;
 	private final ProductCsvService productCsvService;
 	private final ProductRepository productRepository;
+	private final AccountCsvService accountCsvService;
+	private final AccountRepository accountRepository;
 
 	private static final String PATH_TO_PRODUCT_SEEDER = "seeders/Products.csv";
-
-	private final List<AccountRegistrationDto> BOOTSTRAP_ACCOUNTS = List.of(
-		AccountRegistrationDto.builder()
-			.password("testadmin")
-			.fullName("Test Admin")
-			.phone("81100001")
-			.build(),
-		AccountRegistrationDto.builder()
-			.password("user")
-			.fullName("Nara")
-			.phone("81100002")
-			.build(),
-		AccountRegistrationDto.builder()
-			.password("user")
-			.fullName("Emilia")
-			.phone("81100003")
-			.build(),
-		AccountRegistrationDto.builder()
-			.password("user")
-			.fullName("Emilia")
-			.phone("81100004")
-			.build(),
-		AccountRegistrationDto.builder()
-			.password("user")
-			.fullName("Bruh")
-			.phone("81100005")
-			.build()
-	);
+	private static final String PATH_TO_ACCOUNT_SEEDER = "seeders/Accounts.csv";
 
 	public void injectAccounts() {
-		final ListIterator<AccountRegistrationDto> iterator = BOOTSTRAP_ACCOUNTS.listIterator();
-
-		while (iterator.hasNext()) {
-			try {
-				if (!iterator.hasPrevious()) {
-					Account account = accountService.createAccount(iterator.next());
-					accountService.updatePrivilege(account.getAccountId(), new PrivilegeUpdateDto(Account.Privilege.ADMIN));
-				} else {
-					accountService.createAccount(iterator.next());
-				}
-			} catch (AccountExistsException e) {
-				log.warn("Account already exists: {}", iterator.previous().getPhone());
-				iterator.next();
-			}
+		if (accountRepository.count() >= 5) {
+			return;
 		}
 
-		log.info("Database has {} accounts", accountService.getAllAccounts().size());
+		try {
+			ClassPathResource resource = new ClassPathResource(PATH_TO_ACCOUNT_SEEDER);
+
+			File file = resource.getFile();
+			accountCsvService.saveAccountFromFile(file);
+		} catch (IOException e) {
+			log.error("File not found: {}", e.getMessage());
+		}
 	}
 
 	public void injectProducts() {
@@ -107,9 +73,13 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 	}
 
 	private void start() {
-		log.info("Bootstrapping database...");
-		injectAccounts();
-		injectProducts();
-		log.info("Database bootstrapping complete");
+		if (properties.seeder().getSeedAccounts()) {
+			log.info("Injecting accounts...");
+			injectAccounts();
+		}
+		if (properties.seeder().getSeedProducts()) {
+			log.info("Injecting products...");
+			injectProducts();
+		}
 	}
 }
