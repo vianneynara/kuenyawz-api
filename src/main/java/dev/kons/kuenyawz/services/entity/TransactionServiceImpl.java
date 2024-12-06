@@ -26,6 +26,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -116,6 +117,13 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
+	public Transaction getLatestOfPurchaseId(Long purchaseId) {
+		Transaction transaction = transactionRepository.findFirstByPurchase_PurchaseIdOrderByCreatedAtDesc(purchaseId)
+			.orElseThrow(() -> new EntityNotFoundException("Transaction not found for purchase " + purchaseId));
+		return transaction;
+	}
+
+	@Override
 	public TransactionDto fetchTransaction(Long transactionId) {
 		Transaction transaction = transactionRepository.findById(transactionId)
 			.orElseThrow(() -> new EntityNotFoundException("Transaction not found"));
@@ -169,11 +177,12 @@ public class TransactionServiceImpl implements TransactionService {
 		AuthService.validateMatchesId(account.getAccountId());
 
 		Long transactionId = snowFlakeIdGenerator.generateId();
+		BigDecimal paymentFee = BigDecimal.valueOf(properties.vendor().getPaymentFee());
 
 		return Transaction.builder()
 			.transactionId(transactionId)
 			.referenceId(null)
-			.amount(purchase.getTotalPrice().add(purchase.getDeliveryFee()))
+			.amount(purchase.getTotalPrice().add(purchase.getDeliveryFee()).add(paymentFee))
 			.paymentUrl(null)
 			.status(Transaction.TransactionStatus.CREATED)
 			.paymentType(purchase.getPaymentType())

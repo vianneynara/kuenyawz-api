@@ -85,6 +85,15 @@ public interface TransactionService {
 	List<TransactionDto> findByPurchaseId(Long purchaseId);
 
 	/**
+	 * Gets the latest transaction of a purchase.
+	 *
+	 * @param purchaseId {@link Long}
+	 * @return {@link Transaction}
+	 */
+	@Transactional(readOnly = true)
+	Transaction getLatestOfPurchaseId(Long purchaseId);
+
+	/**
 	 * Fetches a transaction by its id.
 	 *
 	 * @param transactionId {@link Long}
