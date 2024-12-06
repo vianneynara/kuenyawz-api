@@ -111,6 +111,9 @@ public class Transaction extends Auditables {
 		@JsonProperty("pending")
         PENDING("Payment yet to be paid"),
 
+		@JsonProperty("SUCCESS")
+		SUCCESS("Transaction has been successful"),
+
 		@JsonProperty("settlement")
         SETTLEMENT("Transaction has been completed"),
 
