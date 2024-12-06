@@ -48,9 +48,10 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 				.bodyToMono(MidtransResponse.class)
 				.block();
 		} catch (WebClientResponseException e) {
+			log.error("WebClientResponseError: {}", e.getResponseBodyAsString());
 			return handleException(e);
 		} catch (WebClientRequestException e) {
-			log.error("Error processing Midtrans transaction", e);
+			log.error("WebClientRequestError", e);
 			throw new MidtransTransactionException("Error processing request to Midtrans");
 		}
 	}
@@ -66,11 +67,7 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 				.bodyToMono(MidtransResponse.class)
 				.block();
 		} catch (WebClientResponseException e) {
-			if (e.getResponseBodyAsString().contains("404 Not Found")) {
-				throw new MidtransTransactionException("Transaction with id " + orderId + " not found in Midtrans");
-			} else {
-				return handleException(e);
-			}
+			return handleException(e);
 		}
 	}
 
@@ -84,11 +81,21 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 				.bodyToMono(MidtransResponse.class)
 				.block();
 		} catch (WebClientResponseException e) {
-			if (e.getResponseBodyAsString().contains("404 Not Found")) {
-				return MidtransResponse.builder().statusCode("404").build();
-			} else {
-				return handleException(e);
-			}
+			return handleException(e);
+		}
+	}
+
+	@Override
+	public MidtransResponse refundTransaction(String orderId) {
+		try {
+			var wc = ofBaseUrl(properties.midtrans().getBaseUrlApi());
+			return wc.post()
+				.uri("/v2/{order_id}/refund", orderId)
+				.retrieve()
+				.bodyToMono(MidtransResponse.class)
+				.block();
+		} catch (WebClientResponseException e) {
+			return handleException(e);
 		}
 	}
 
@@ -96,9 +103,26 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 		return webClient.mutate().baseUrl(baseUrl).build();
 	}
 
+	private WebClient withAppendedNotification(WebClient wc) {
+		return wc.mutate()
+			.defaultHeader("X-Append-Notification",
+				"https://www.google.com","https://www.youtube.com","https://www.github.com"
+			).build();
+	}
+
 	private MidtransResponse handleException(WebClientResponseException e) {
 		try {
-			log.error("Error processing Midtrans transaction: {}", e.getResponseBodyAsString());
+			log.error("Error processing Midtrans call: {}", e.getResponseBodyAsString());
+			if (e.getResponseBodyAsString().contains("404")) {
+				return fromError(e);
+			} else if (e.getResponseBodyAsString().contains("412")) {
+				return fromError(e);
+			} else if (e.getResponseBodyAsString().contains("418")) {
+				return fromError(e);
+			} else if (e.getResponseBodyAsString().contains("500")) {
+				return fromError(e);
+			}
+
 			MidtransResponse response = objectMapper.readValue(
 				e.getResponseBodyAsString(),
 				MidtransResponse.class
@@ -108,5 +132,12 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 			log.error("Error parsing Midtrans error response", parseException);
 			throw new MidtransTransactionException("Error processing Midtrans transaction");
 		}
+	}
+
+	private MidtransResponse fromError(WebClientResponseException e) {
+		return MidtransResponse.builder()
+			.statusCode(e.getStatusCode().toString())
+			.statusMessage(e.getMessage())
+			.build();
 	}
 }
