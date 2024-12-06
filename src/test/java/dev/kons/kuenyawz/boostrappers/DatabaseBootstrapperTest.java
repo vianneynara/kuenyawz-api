@@ -1,7 +1,9 @@
 package dev.kons.kuenyawz.boostrappers;
 
+import dev.kons.kuenyawz.configurations.ApplicationProperties;
+import dev.kons.kuenyawz.repositories.AccountRepository;
 import dev.kons.kuenyawz.repositories.ProductRepository;
-import dev.kons.kuenyawz.services.entity.AccountService;
+import dev.kons.kuenyawz.services.logic.AccountCsvService;
 import dev.kons.kuenyawz.services.logic.ProductCsvService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 class DatabaseBootstrapperTest {
 
 	@Autowired
-	AccountService accountService;
+	ApplicationProperties properties;
 
 	@Autowired
 	ProductCsvService productCsvService;
@@ -26,16 +28,22 @@ class DatabaseBootstrapperTest {
 	@Autowired
 	ProductRepository productRepository;
 
+	@Autowired
+	private AccountCsvService accountCsvService;
+
+	@Autowired
+	private AccountRepository accountRepository;
+
 	DatabaseBootstrapper databaseBootstrapper;
 
 	@BeforeEach
 	void setUp() {
-		databaseBootstrapper = new DatabaseBootstrapper(accountService, productCsvService, productRepository);
+		databaseBootstrapper = new DatabaseBootstrapper(properties, productCsvService, productRepository, accountCsvService, accountRepository);
 	}
 
 	@Test
 	void testOnApplicationEvent() {
-        assertDoesNotThrow(() -> databaseBootstrapper.run());
-        assertThat(productRepository.count()).isGreaterThan(1);
+		assertDoesNotThrow(() -> databaseBootstrapper.run());
+		assertThat(productRepository.count()).isGreaterThan(1);
 	}
 }
