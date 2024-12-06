@@ -5,6 +5,7 @@ import dev.kons.kuenyawz.dtos.product.ProductPostDto;
 import dev.kons.kuenyawz.dtos.product.VariantPostDto;
 import dev.kons.kuenyawz.repositories.ProductRepository;
 import dev.kons.kuenyawz.services.entity.ProductService;
+import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +88,7 @@ class ProductControllerIT {
     @Test
     void testGetAllProducts() throws Exception {
 		// Insert new product
-		testCreateProduct();
+		insertNewProduct("Test Product1");
 
         // Act & Assert
         MvcResult result = mockMvc.perform(get("/api/products"))
@@ -97,5 +98,28 @@ class ProductControllerIT {
 
 		// Assert
 		assertThat(result.getResponse().getContentAsString()).contains("Test Product1");
+	}
+
+	void insertNewProduct(@NotNull String name) {
+		ProductPostDto productPostDto = ProductPostDto.builder()
+			.name(name)
+			.tagline("Test Tagline")
+			.description("Test Description")
+			.category("cake")
+			.build();
+
+		List<VariantPostDto> variantPostDtos = new ArrayList<>(
+			List.of(
+				VariantPostDto.builder()
+					.price(new BigDecimal("10000.00"))
+					.type("Test Type")
+					.minQuantity(1)
+					.maxQuantity(10)
+					.build()
+			)
+		);
+		productPostDto.setVariants(variantPostDtos);
+
+		productService.createProduct(productPostDto);
 	}
 }
