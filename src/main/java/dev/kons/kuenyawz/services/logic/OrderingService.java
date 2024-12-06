@@ -42,6 +42,14 @@ public interface OrderingService {
 	PurchaseDto confirmOrder(Long purchaseId);
 
 	/**
+	 * Refunds an order by its purchase id. Calls the purchase service to refund the order.
+	 *
+	 * @param purchaseId {@link Long}
+	 * @return {@link PurchaseDto}
+	 */
+	PurchaseDto refundOrder(Long purchaseId);
+
+	/**
 	 * Changes the status of an order by its purchase id. Calls the purchase service to change the status.
 	 *
 	 * @param purchaseId {@link Long}

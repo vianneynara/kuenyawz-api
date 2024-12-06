@@ -131,6 +131,22 @@ public class OrderingController {
 		return ResponseEntity.ok(purchaseDto);
 	}
 
+	@Operation(summary = "Refunds an order")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Order refunded successfully"),
+		@ApiResponse(responseCode = "400", description = "Bad request"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized"),
+		@ApiResponse(responseCode = "403", description = "Illegal operation occurred, can not refund order with current status"),
+	})
+	@SecurityRequirement(name = "cookieAuth")
+	@PostMapping("/{purchaseId}/refund")
+	public ResponseEntity<?> refundOrder(
+		@PathVariable Long purchaseId
+	) {
+		PurchaseDto purchaseDto = orderingService.refundOrder(purchaseId);
+		return ResponseEntity.ok(purchaseDto);
+	}
+
 	@Operation(summary = "Get a purchase/order's transaction")
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Transaction fetched successfully"),

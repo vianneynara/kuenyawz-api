@@ -3,6 +3,7 @@ package dev.kons.kuenyawz.controllers;
 import dev.kons.kuenyawz.boostrappers.DatabaseBootstrapper;
 import dev.kons.kuenyawz.dtos.account.AccountRegistrationDto;
 import dev.kons.kuenyawz.dtos.account.AccountSecureDto;
+import dev.kons.kuenyawz.repositories.AccountRepository;
 import dev.kons.kuenyawz.services.entity.AccountService;
 import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,10 +30,14 @@ public class AccountControllerIT {
 	WebApplicationContext webApplicationContext;
 
 	MockMvc mockMvc;
+	@Autowired
+	private AccountRepository accountRepository;
 
 	@BeforeEach
 	void setUp() {
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+		accountRepository.deleteAll();
+		accountRepository.flush();
 	}
 
 	@Test

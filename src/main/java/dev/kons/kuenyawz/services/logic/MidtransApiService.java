@@ -33,4 +33,14 @@ public interface MidtransApiService {
 	 * @return {@link MidtransResponse} transaction response
 	 */
 	MidtransResponse cancelTransaction(String orderId);
+
+	/**
+	 * Refunds a transaction by its order (purchase) id.
+	 * <br>
+	 * {@code POST https://api.sandbox.midtrans.com/v2/{order_id}/refund}
+	 *
+	 * @param orderId {@link String} transaction id
+	 * @return {@link MidtransResponse} transaction response
+	 */
+	MidtransResponse refundTransaction(String orderId);
 }

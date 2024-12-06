@@ -62,7 +62,8 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 		// Update the status of the transaction and purchase
 		if (notFraud(notification)
 			&& (notification.getTransactionStatus().equalsIgnoreCase("capture")
-			|| notification.getTransactionStatus().equalsIgnoreCase("settlement"))
+			|| notification.getTransactionStatus().equalsIgnoreCase("settlement")
+			|| notification.getTransactionStatus().equalsIgnoreCase("success"))
 		) {
 			if (purchase.getStatus().ordinal() >= Purchase.PurchaseStatus.CONFIRMING.ordinal()) {
 				log.warn("Purchase [{}] status is not updated, current status: {}, new status: {}", purchase.getPurchaseId(), purchase.getStatus(), Purchase.PurchaseStatus.CONFIRMING);

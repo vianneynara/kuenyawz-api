@@ -1,6 +1,7 @@
 package dev.kons.kuenyawz.boostrappers;
 
 import dev.kons.kuenyawz.configurations.ApplicationProperties;
+import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.repositories.AccountRepository;
 import dev.kons.kuenyawz.repositories.ProductRepository;
 import dev.kons.kuenyawz.services.logic.AccountCsvService;
@@ -43,6 +44,12 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 		} catch (IOException e) {
 			log.error("File not found: {}", e.getMessage());
 		}
+
+		// Set user with the first id as admin
+		accountRepository.findFirstByPrivilegeOrderByAccountIdAsc(Account.Privilege.USER).ifPresent(account -> {
+			account.setPrivilege(Account.Privilege.ADMIN);
+			accountRepository.save(account);
+		});
 	}
 
 	public void injectProducts() {

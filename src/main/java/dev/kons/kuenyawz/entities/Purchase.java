@@ -101,24 +101,6 @@ public class Purchase extends Auditables {
 	}
 
 	/**
-	 * Checks if the purchase is fully paid.
-	 */
-	public boolean isFullyPaid() {
-		if (paymentType == PaymentType.FULL_PAYMENT) {
-			return transactions.stream()
-				.anyMatch(t -> t.getPaymentType() == PaymentType.FULL_PAYMENT
-					&& t.getStatus() == Transaction.TransactionStatus.SETTLEMENT);
-		} else {
-			return getDownPayment()
-				.filter(dp -> dp.getStatus() == Transaction.TransactionStatus.SETTLEMENT)
-				.isPresent()
-				&& getFulfillmentPayment()
-				.filter(fp -> fp.getStatus() == Transaction.TransactionStatus.SETTLEMENT)
-				.isPresent();
-		}
-	}
-
-	/**
 	 * Checks if the purchase requires cancellation.
 	 */
 	public boolean requiresCancellation() {
@@ -132,7 +114,11 @@ public class Purchase extends Auditables {
 	}
 
 	public boolean isFinished() {
-		return (this.status == PurchaseStatus.DELIVERED || this.status == PurchaseStatus.CANCELLED);
+		return (
+			this.status == PurchaseStatus.DELIVERED
+			|| this.status == PurchaseStatus.CANCELLED
+			|| this.status == PurchaseStatus.REFUNDED
+		);
 	}
 
 	/**
@@ -197,7 +183,10 @@ public class Purchase extends Auditables {
 		DELIVERED("Purchase has been delivered"),
 
 		@JsonProperty("CANCELLED")
-		CANCELLED("Purchase has been cancelled");
+		CANCELLED("Purchase has been cancelled"),
+
+		@JsonProperty("REFUNDED")
+		REFUNDED("Purchase has been refunded");
 
 		private final String description;
 

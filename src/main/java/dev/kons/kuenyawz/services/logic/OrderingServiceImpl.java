@@ -19,6 +19,7 @@ import dev.kons.kuenyawz.services.entity.CartItemService;
 import dev.kons.kuenyawz.services.entity.ClosedDateService;
 import dev.kons.kuenyawz.services.entity.PurchaseService;
 import dev.kons.kuenyawz.services.entity.TransactionService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -111,6 +112,7 @@ public class OrderingServiceImpl implements OrderingService {
 
 		// Send the request to payment gateway
 		MidtransResponse response = midtransApiService.createTransaction(request);
+		log.info("[P{}] Midtrans response: {}", purchase.getPurchaseId(), response);
 
 		// Save the transaction
 		transaction.setPaymentUrl(response.getRedirectUrl());
@@ -130,7 +132,7 @@ public class OrderingServiceImpl implements OrderingService {
 		cartItemService.deleteCartItemsOfAccount(account.getAccountId());
 
 		try {
-			final String message = String.format("Pesanan dengan kode pemesanan %s sudah dibuat. Harap menyelesaikan pembayaran anda untuk mengkonfirmasi jadwal %s",
+			final String message = String.format("Pesanan dengan kode pemesanan *%s* sudah dibuat. Harap menyelesaikan pembayaran anda untuk mengkonfirmasi jadwal: %n%n%s",
 				purchase.getPurchaseId(), response.getRedirectUrl());
 			whatsappApiService.send(account.getPhone(), message, "62");
 		} catch (Exception e) {
@@ -200,10 +202,12 @@ public class OrderingServiceImpl implements OrderingService {
 		}
 
 		List<TransactionDto> transactions = transactionService.findByPurchaseId(purchaseId);
-		transactions.stream()
-			.filter(t ->
-				t.getStatus() == Transaction.TransactionStatus.CAPTURE
-					|| t.getStatus() == Transaction.TransactionStatus.SETTLEMENT)
+		transactions.stream().filter(t -> {
+				var status = t.getStatus();
+				return status == Transaction.TransactionStatus.CAPTURE
+					|| status == Transaction.TransactionStatus.SUCCESS
+					|| status == Transaction.TransactionStatus.SETTLEMENT;
+			})
 			.findAny()
 			.orElseThrow(
 				() -> new IllegalOperationException("Transaction for this purchase has not been paid yet")
@@ -221,6 +225,38 @@ public class OrderingServiceImpl implements OrderingService {
 		} catch (Exception e) {
 			log.error("Failed to send order confirmation notification to {}, error: ", account.getPhone(), e);
 		}
+
+		return purchaseMapper.toDto(savedPurchase);
+	}
+
+	@Override
+	public PurchaseDto refundOrder(Long purchaseId) {
+		AuthService.validateIsAdmin();
+
+		Purchase purchase = purchaseService.getById(purchaseId);
+		Transaction transaction = transactionService.getLatestOfPurchaseId(purchaseId);
+
+		validateRefundEligibility(purchase, transaction);
+
+		// Call Midtrans endpoint to refund the transaction
+		MidtransResponse response = midtransApiService.refundTransaction(transaction.getTransactionId().toString());
+		System.out.println("response = " + response);
+		switch (response.getStatusCode()) {
+			case "404" -> throw new EntityNotFoundException("Transaction not found");
+			case "412" -> throw new IllegalOperationException("Merchant can not modify the transaction status: " + transaction.getStatus());
+			case "418" -> throw new IllegalOperationException("Provider doesn't allow refund within this time");
+			case "500" -> throw new IllegalOperationException("Midtrans internal server error");
+		}
+
+		// Save the transaction
+		transaction.setStatus(Transaction.TransactionStatus.REFUND);
+		transactionRepository.save(transaction);
+
+		purchase.setStatus(Purchase.PurchaseStatus.REFUNDED);
+		Purchase savedPurchase = purchaseRepository.save(purchase);
+
+		// Send notification
+		sendRefundNotification(transaction.getAccount(), purchase);
 
 		return purchaseMapper.toDto(savedPurchase);
 	}
@@ -283,6 +319,33 @@ public class OrderingServiceImpl implements OrderingService {
 			&& !AuthService.isAuthenticatedAdmin()
 		) {
 			throw new IllegalOperationException("You are not authorized to view this transaction");
+		}
+	}
+
+	private void validateRefundEligibility(Purchase purchase, Transaction transaction) {
+		if (purchase.getStatus() == Purchase.PurchaseStatus.REFUNDED) {
+			throw new IllegalOperationException("Purchase is already refunded");
+		}
+		if (purchase.getStatus().ordinal() < Purchase.PurchaseStatus.CONFIRMING.ordinal()) {
+			throw new IllegalOperationException(
+				String.format("Cannot refund unpaid purchase: %s, cancel instead", purchase.getStatus()));
+		}
+		if (transaction.getStatus() == Transaction.TransactionStatus.REFUND) {
+			throw new IllegalOperationException("Transaction already refunded");
+		}
+		if (transaction.getStatus() == Transaction.TransactionStatus.CAPTURE ||
+			transaction.getStatus() == Transaction.TransactionStatus.SUCCESS) {
+			throw new IllegalOperationException("Transaction is captured or successful, cancel instead");
+		}
+	}
+
+	private void sendRefundNotification(Account account, Purchase purchase) {
+		try {
+			String message = String.format("Pesanan dengan kode *%s* telah direfund oleh admin. Cek di sini: %n%n%s",
+				purchase.getPurchaseId(), properties.frontend().getBaseUrl());
+			whatsappApiService.send(account.getPhone(), message, "62");
+		} catch (Exception e) {
+			log.error("Failed to send order refund notification to {}, error: ", account.getPhone(), e);
 		}
 	}
 }
