@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class TransactionSpec {
@@ -25,6 +26,15 @@ public class TransactionSpec {
 				return null;
 
 			return cb.equal(root.get("status"), status);
+		};
+	}
+
+	public static Specification<Transaction> withStatuses(List<Transaction.TransactionStatus> statuses) {
+		return (root, query, cb) -> {
+			if (statuses == null || statuses.isEmpty())
+				return null;
+
+			return root.get("status").in(statuses);
 		};
 	}
 
