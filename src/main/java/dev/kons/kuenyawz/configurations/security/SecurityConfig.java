@@ -52,6 +52,7 @@ public class SecurityConfig {
 
 				// Public endpoints
 				.requestMatchers(HttpMethod.GET,
+					"/static/**",
 					"/api",
 					"/api/status",
 					"/api/images/**",
@@ -59,7 +60,8 @@ public class SecurityConfig {
 					"/api/products/**",
 					"/api/recommender/**",
 					"/api/closure",
-					"/api/closure/**").permitAll()
+					"/api/closure/**",
+					"/api/static/**").permitAll()
 
 				// Public webhooks
 				.requestMatchers(HttpMethod.POST,
