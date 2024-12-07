@@ -16,9 +16,15 @@ public class StaticController {
 	@RequestMapping("/redirect/template")
 	public Object transactionSuccess(
 		@RequestParam(value = "message", required = false) String message,
+		@RequestParam(value = "order_id", required = false) String orderId,
+		@RequestParam(value = "status_code", required = false) String statusCode,
+		@RequestParam(value = "transaction_status", required = false) String transactionStatus,
 		Model model
 	) {
 		model.addAttribute("message", message);
+		model.addAttribute("orderId", orderId);
+		model.addAttribute("statusCode", statusCode);
+		model.addAttribute("transactionStatus", transactionStatus);
 		return "test/transaction/success";
 	}
 }
