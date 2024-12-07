@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class PurchaseSpec {
@@ -62,6 +63,15 @@ public class PurchaseSpec {
 				return null;
 
 			return cb.equal(root.get("status"), status.getStatus());
+		};
+	}
+
+	public static Specification<Purchase> withStatuses(List<Purchase.PurchaseStatus> statuses) {
+		return (root, query, cb) -> {
+			if (statuses == null || statuses.isEmpty())
+				return null;
+
+			return root.get("status").in(statuses);
 		};
 	}
 

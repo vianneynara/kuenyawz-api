@@ -56,7 +56,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
 	private Page<PurchaseDto> findAllHelper(PurchaseSearchCriteria criteria) {
 		Specification<Purchase> spec = PurchaseSpec.withAccountId1(criteria.getAccountId())
-			.and(PurchaseSpec.withStatus(criteria.getStatus()))
+			.and(PurchaseSpec.withStatuses(criteria.getStatuses()))
 			.and(PurchaseSpec.withPaymentType(criteria.getPaymentType()));
 
 		if (criteria.getFrom() != null && criteria.getTo() != null) {

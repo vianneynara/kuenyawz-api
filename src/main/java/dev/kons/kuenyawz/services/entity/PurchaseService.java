@@ -175,7 +175,7 @@ public interface PurchaseService {
 	class PurchaseSearchCriteria {
 
 		private Boolean isAscending;
-		private Purchase.PurchaseStatus status;
+		private List<Purchase.PurchaseStatus> statuses;
 		private PaymentType paymentType;
 		private LocalDate from;
 		private LocalDate to;
@@ -184,13 +184,20 @@ public interface PurchaseService {
 		private Integer page;
 		private Integer pageSize;
 
-		public static PurchaseSearchCriteria of(Boolean isAscending, String status, String paymentType, LocalDate from, LocalDate to, Long accountId, String sortBy, Integer page, Integer pageSize) {
+		public static PurchaseSearchCriteria of(Boolean isAscending, String rawStatuses, String paymentType, LocalDate from, LocalDate to, Long accountId, String sortBy, Integer page, Integer pageSize) {
 			isAscending = (isAscending != null && isAscending);
-			Purchase.PurchaseStatus statusEnum = (status != null) ? Purchase.PurchaseStatus.fromString(status) : null;
+			List<String> statuses = (rawStatuses == null) ? null : List.of(rawStatuses.trim().split(","));
+			List<Purchase.PurchaseStatus> statusEnums = (statuses != null)
+				? statuses.stream()
+				.map(s -> {
+					s = s.trim();
+					return Purchase.PurchaseStatus.fromString(s);
+				}).toList()
+				: null;
 			PaymentType enumPaymentType = (paymentType != null) ? PaymentType.fromString(paymentType) : null;
 			return PurchaseSearchCriteria.builder()
 				.isAscending(isAscending)
-				.status(statusEnum)
+				.statuses(statusEnums)
 				.paymentType(enumPaymentType)
 				.from(from)
 				.to(to)
