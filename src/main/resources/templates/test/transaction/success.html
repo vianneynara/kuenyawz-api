@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Test | Transaction Success</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: "JetBrains Mono Thin",sans-serif;
+    }
+
+    body {
+      /* background image from static/redirection-test-bg.jpg */
+      background-image: url("/static/redirection-test-bg.jpg");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      position: relative;
+      z-index: 1;
+    }
+
+    .purple-bg {
+      background-color: rgba(183, 77, 198, 0.47);
+    }
+
+    .white-bg {
+      background-color: rgba(255, 255, 255, 0.47);
+      color: #dd00ff;
+    }
+
+    .orange-text {
+      color: #ff8c00;
+    }
+
+    .adjust-font {
+      font-size: 1.25rem;
+    }
+
+    .center {
+      display: flex;
+      justify-content: center;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<div class="center purple-bg">
+  <h1>Redirection test</h1>
+</div>
+
+<div class="center white-bg adjust-font">
+  message:&nbsp;<span class="orange-text" th:text="${#strings.isEmpty(message) ? 'I love Emilia' : message}"></span>
+</div>
+
+<div class="footer purple-bg">
+  <a href="http://localhost:8081/api"><h3>Back to home</h3></a>
+</div>
+</body>
+</html>
