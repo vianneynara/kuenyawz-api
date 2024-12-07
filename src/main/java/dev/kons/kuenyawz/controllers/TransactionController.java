@@ -5,6 +5,7 @@ import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.services.entity.TransactionService;
 import dev.kons.kuenyawz.services.logic.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -35,7 +36,7 @@ public class TransactionController {
 	@GetMapping
 	public ResponseEntity<?> getTransactions(
 		@RequestParam(required = false) Boolean asc,
-		@RequestParam(required = false) String status,
+		@RequestParam(required = false) @Schema(description = "statuses, separated by commas") String statuses,
 		@RequestParam(required = false) String paymentType,
 		@RequestParam(required = false) Long purchaseId,
 		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
@@ -44,7 +45,7 @@ public class TransactionController {
 		@RequestParam(required = false) Integer pageSize
 	) {
 		var criteria = TransactionService.TransactionSearchCriteria.of(
-			asc, status, paymentType, purchaseId, from, to, page, pageSize
+			asc, statuses, paymentType, purchaseId, from, to, page, pageSize
 		);
 		Page<TransactionDto> result;
 		if (AuthService.isAuthenticatedUser()) {
