@@ -246,7 +246,7 @@ public class OrderingServiceImpl implements OrderingService {
 
 		// Call Midtrans endpoint to refund the transaction
 		MidtransResponse response = midtransApiService.refundTransaction(transaction.getTransactionId().toString());
-		System.out.println("response = " + response);
+		log.info("[P{}] Midtrans response: {}", purchase.getPurchaseId(), response);
 		switch (response.getStatusCode()) {
 			case "404" -> throw new EntityNotFoundException("Transaction not found");
 			case "412" -> throw new IllegalOperationException("Merchant can not modify the transaction status: " + transaction.getStatus());

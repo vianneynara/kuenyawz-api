@@ -39,7 +39,7 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 		// Validate status ordinal to prevent status downgrade
 		Transaction.TransactionStatus newStatus = Transaction.TransactionStatus.fromString(notification.getTransactionStatus());
 		if (newStatus.ordinal() < transaction.getStatus().ordinal()) {
-			log.warn("Transaction status can't be downgraded, current status: {}, new status: {}", transaction.getStatus(), newStatus);
+			log.warn("Transaction status can't be downgraded, current status: {}, requested status: {}", transaction.getStatus(), newStatus);
 //			return;
 			throw new InvalidRequestBodyValue("Transaction status can't be downgraded");
 		}
@@ -66,7 +66,7 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 			|| notification.getTransactionStatus().equalsIgnoreCase("success"))
 		) {
 			if (purchase.getStatus().ordinal() >= Purchase.PurchaseStatus.CONFIRMING.ordinal()) {
-				log.warn("Purchase [{}] status is not updated, current status: {}, new status: {}", purchase.getPurchaseId(), purchase.getStatus(), Purchase.PurchaseStatus.CONFIRMING);
+				log.warn("Purchase [{}] status is not updated, current status: {}, requested status: {}", purchase.getPurchaseId(), purchase.getStatus(), Purchase.PurchaseStatus.CONFIRMING);
 				return;
 			}
 			transaction.setStatus(newStatus);
@@ -110,8 +110,7 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 
 	private void printNotification(MidtransNotification notification) {
 		try {
-			System.out.printf("Received notification: %s%n",
-				mapper.writerWithDefaultPrettyPrinter().writeValueAsString(notification));
+			log.info("Midtrans notification: {}", mapper.writeValueAsString(notification));
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
