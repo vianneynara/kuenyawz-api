@@ -82,6 +82,9 @@ public class MidtransRequest {
 	@JsonProperty("customer_details")
 	private CustomerDetails customerDetails;
 
+	@JsonProperty("callbacks")
+	private Callbacks callbacks;
+
 	@NotNull
 	@JsonProperty("expiry")
 	private Expiry expiry;
@@ -200,6 +203,36 @@ public class MidtransRequest {
 			}
 
 			return address;
+		}
+	}
+
+	@Data
+	@Builder
+	public static class Callbacks {
+
+		private String finish;
+		private String error;
+
+		public static Callbacks of(String finish, String error) {
+			return Callbacks.builder()
+				.finish(finish)
+				.error(error)
+				.build();
+		}
+
+		public static Callbacks defaultCallbacks() {
+			return Callbacks.builder()
+				.finish(defaultFinish())
+				.error(defaultError())
+				.build();
+		}
+
+		public static String defaultFinish() {
+			return "http://localhost:8081/api/static/redirect/template?message=Transaction completed";
+		}
+
+		public static String defaultError() {
+			return "http://localhost:8081/api/static/redirect/template?message=Transaction failed";
 		}
 	}
 

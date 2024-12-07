@@ -85,9 +85,9 @@ public class ApplicationProperties {
 		this.midtrans.baseUrlApp = getEnv("MIDTRANS_BASE_URL_APP", "https://app.sandbox.midtrans.com", dotenv);
 		this.midtrans.baseUrlApi = getEnv("MIDTRANS_BASE_URL_API", "https://api.sandbox.midtrans.com", dotenv);
 		this.midtrans.notificationUrl = getEnv("MIDTRANS_NOTIFICATION_URL", null, dotenv);
-		this.midtrans.finishUrl = getEnv("MIDTRANS_FINISH_URL", null, dotenv);
-		this.midtrans.unfinishUrl = getEnv("MIDTRANS_UNFINISH_URL", null, dotenv);
-		this.midtrans.errorUrl = getEnv("MIDTRANS_ERROR_URL", null, dotenv);
+		this.midtrans.finishUrl = getEnv("MIDTRANS_FINISH_URL", "http://localhost:8081/api", dotenv);
+		this.midtrans.unfinishUrl = getEnv("MIDTRANS_UNFINISH_URL", "http://localhost:8081/api", dotenv);
+		this.midtrans.errorUrl = getEnv("MIDTRANS_ERROR_URL", "http://localhost:8081/api", dotenv);
 	}
 
 	public String getFullBaseUrl() {

@@ -3,6 +3,7 @@ package dev.kons.kuenyawz.services.logic;
 import dev.kons.kuenyawz.configurations.ApplicationProperties;
 import dev.kons.kuenyawz.dtos.midtrans.MidtransRequest;
 import dev.kons.kuenyawz.dtos.midtrans.MidtransResponse;
+import dev.kons.kuenyawz.dtos.midtrans.PurchaseCallbacksPostDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchaseDto;
 import dev.kons.kuenyawz.dtos.purchase.PurchasePostDto;
 import dev.kons.kuenyawz.dtos.purchase.TransactionDto;
@@ -50,7 +51,7 @@ public class OrderingServiceImpl implements OrderingService {
 	private final CartItemService cartItemService;
 
 	@Override
-	public PurchaseDto processOrder(PurchasePostDto PurchasePostDto) {
+	public PurchaseDto processOrder(PurchasePostDto purchasePostDto) {
 		// Initialize required entities
 		Account account = AuthService.getAuthenticatedAccount();
 
@@ -68,7 +69,7 @@ public class OrderingServiceImpl implements OrderingService {
 			});
 
 		// Checks for date overlap
-		LocalDate eventDate = LocalDate.parse(PurchasePostDto.getEventDate());
+		LocalDate eventDate = LocalDate.parse(purchasePostDto.getEventDate());
 		LocalDate prepDate2 = eventDate.minusDays(1);
 		LocalDate prepDate1 = eventDate.minusDays(2);
 
@@ -81,7 +82,7 @@ public class OrderingServiceImpl implements OrderingService {
 				prepDate1, eventDate));
 		}
 
-		Purchase purchase = purchaseService.create(PurchasePostDto);
+		Purchase purchase = purchaseService.create(purchasePostDto);
 
 		// Build transaction (not saved yet)
 		Transaction transaction = transactionService.build(purchase, account);
@@ -102,11 +103,16 @@ public class OrderingServiceImpl implements OrderingService {
 			.quantity(1)
 			.build());
 
+		PurchaseCallbacksPostDto callbacks = purchasePostDto.getCallbacks();
+
 		// Create the request body
 		MidtransRequest request = MidtransRequest.builder()
 			.transactionDetails(MidtransRequest.TransactionDetails.of(purchase, transaction.getTransactionId(), properties))
 			.itemDetails(items)
 			.customerDetails(MidtransRequest.CustomerDetails.of(purchase, account))
+			.callbacks(callbacks != null
+				? MidtransRequest.Callbacks.of(callbacks.getFinish(), callbacks.getError())
+				: MidtransRequest.Callbacks.defaultCallbacks())
 			.expiry(MidtransRequest.Expiry.defaultExpiry())
 			.build();
 
