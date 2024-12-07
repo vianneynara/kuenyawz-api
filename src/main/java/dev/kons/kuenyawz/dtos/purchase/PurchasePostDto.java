@@ -1,5 +1,6 @@
 package dev.kons.kuenyawz.dtos.purchase;
 
+import dev.kons.kuenyawz.dtos.midtrans.PurchaseCallbacksPostDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -53,4 +54,7 @@ public class PurchasePostDto {
 	@NotNull(message = "Purchase items must not be filled")
     @Size(min = 1, message = "At least one item is required")
 	private List<PurchaseItemPostDto> purchaseItems;
+
+	@Schema(description = "Callbacks for the purchase")
+	private PurchaseCallbacksPostDto callbacks;
 }
