@@ -8,6 +8,7 @@ import dev.kons.kuenyawz.services.entity.PurchaseService;
 import dev.kons.kuenyawz.services.logic.AuthService;
 import dev.kons.kuenyawz.services.logic.OrderingService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -42,7 +43,7 @@ public class OrderingController {
 	@GetMapping
 	public ResponseEntity<?> getOrders(
 		@RequestParam(required = false) Boolean isAscending,
-		@RequestParam(required = false) String status,
+		@RequestParam(required = false) @Schema(description = "statuses, separated by commas") String statuses,
 		@RequestParam(required = false) String paymentType,
 		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
 		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
@@ -53,7 +54,7 @@ public class OrderingController {
 	) {
 		PurchaseService.PurchaseSearchCriteria criteria = PurchaseService.PurchaseSearchCriteria.of(
 			isAscending,
-			status,
+			statuses,
 			paymentType,
 			from,
 			to,
