@@ -58,7 +58,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 	private Page<TransactionDto> findAllHelper(TransactionSearchCriteria criteria) {
 		Specification<Transaction> spec = TransactionSpec.withAccountId(criteria.getAccountId())
-			.and(TransactionSpec.withStatus(criteria.getStatus()))
+			.and(TransactionSpec.withStatuses(criteria.getStatuses()))
 			.and(TransactionSpec.withPaymentType(criteria.getPaymentType()))
 			.and(TransactionSpec.withDateAfter(criteria.getFrom()))
 			.and(TransactionSpec.withDateBefore(criteria.getTo()));
