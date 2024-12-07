@@ -25,7 +25,7 @@ import java.util.LinkedHashMap;
 
 @Tag(name = "Index Routes", description = "Endpoints for checking the status of the API")
 @Controller
-@RequestMapping("/")
+@RequestMapping("")
 @RequiredArgsConstructor
 public class IndexController extends BaseController {
 
@@ -42,11 +42,11 @@ public class IndexController extends BaseController {
 					@Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
 						examples = @ExampleObject(value = """
 							{
-							    "message": "Welcome to Snack N' Bites API",
+							    "message": "KuenyaWZ API",
 							    "status": "running",
 							    "system": {
 							        "version": "1.0",
-							        "repositoryUrl": "https://github.com/vianneynara/wz-snack-n-bites-api",
+							        "repositoryUrl": "https://github.com/vianneynara/kuenyawz-api",
 							        "runningSince": "2024-10-24 19:35:40",
 							        "systemTime": "2024-10-24 19:54:18",
 							        "upTime": "0 days, 0 hours, 18 minutes, 37 seconds"
@@ -62,7 +62,7 @@ public class IndexController extends BaseController {
 			)
 		}
 	)
-	@GetMapping({"/", "/status"})
+	@GetMapping({"", "/", "/status"})
 	public Object status(HttpServletRequest request, Model model) {
 		// Create the JSON response structure
 		LinkedHashMap<String, Object> response = new LinkedHashMap<>();
