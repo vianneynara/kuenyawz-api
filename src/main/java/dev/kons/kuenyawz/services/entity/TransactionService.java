@@ -190,7 +190,7 @@ public interface TransactionService {
 	class TransactionSearchCriteria {
 
 		private Boolean isAscending;
-		private Transaction.TransactionStatus status;
+		private List<Transaction.TransactionStatus> statuses;
 		private PaymentType paymentType;
 		private Long purchaseId;
 		private Long accountId;
@@ -199,10 +199,18 @@ public interface TransactionService {
 		private Integer page;
 		private Integer pageSize;
 
-		public static TransactionSearchCriteria of(Boolean isAscending, String status, String paymentType, Long purchaseId, LocalDate from, LocalDate to, Integer page, Integer pageSize) {
+		public static TransactionSearchCriteria of(Boolean isAscending, String rawStatuses, String paymentType, Long purchaseId, LocalDate from, LocalDate to, Integer page, Integer pageSize) {
+			List<String> statuses = (rawStatuses == null) ? null : List.of(rawStatuses.trim().split(","));
+			List<Transaction.TransactionStatus> statusEnums = (statuses != null)
+				? statuses.stream()
+				.map(s -> {
+					s = s.trim();
+					return Transaction.TransactionStatus.fromString(s);
+				}).toList()
+				: null;
 			return TransactionSearchCriteria.builder()
 				.isAscending(isAscending)
-				.status(status != null ? Transaction.TransactionStatus.fromString(status) : null)
+				.statuses(statusEnums)
 				.paymentType(paymentType != null ? PaymentType.fromString(paymentType) : null)
 				.purchaseId(purchaseId)
 				.from(from)
