@@ -56,6 +56,13 @@
     h1, h2, h3 {
       margin: 0;
     }
+
+    /*add lines*/
+    table, th, td {
+      border-collapse: collapse;
+      border-style: solid;
+      border-color: orange;
+    }
   </style>
 </head>
 <body>
@@ -65,6 +72,24 @@
 
 <div class="center white-bg adjust-font">
   message:&nbsp;<span class="orange-text" th:text="${#strings.isEmpty(message) ? 'I love Emilia' : message}"></span>
+</div>
+
+<!-- if orderId, statsCode, and transactionStatus is not blank, then show it in a table -->
+<div th:if="${!#strings.isEmpty(orderId) and !#strings.isEmpty(statusCode) and !#strings.isEmpty(transactionStatus)}">
+  <div class="center white-bg adjust-font">
+    <table>
+      <tr>
+        <th>Order ID</th>
+        <th>Status Code</th>
+        <th>Transaction Status</th>
+      </tr>
+      <tr>
+        <td th:text="${orderId}"></td>
+        <td th:text="${statusCode}"></td>
+        <td th:text="${transactionStatus}"></td>
+      </tr>
+    </table>
+  </div>
 </div>
 
 <div class="footer purple-bg">
