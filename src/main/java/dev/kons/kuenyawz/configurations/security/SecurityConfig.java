@@ -2,8 +2,10 @@ package dev.kons.kuenyawz.configurations.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,7 +21,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +34,22 @@ public class SecurityConfig {
 	private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
 	@Bean
+	@Order(1)
+	public SecurityFilterChain actuatorSecurityFilterChain(HttpSecurity httpSec) throws Exception {
+		httpSec.securityMatcher(EndpointRequest.toAnyEndpoint())
+			.authorizeHttpRequests(auth -> auth
+				.requestMatchers(EndpointRequest.to("health", "info")).permitAll()
+				.requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("ADMIN")
+			)
+			.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+			.authenticationProvider(authenticationProvider)
+			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+		return httpSec.build();
+	}
+
+	@Bean
+	@Order(2)
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSec) throws Exception {
 		httpSec
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -43,6 +61,10 @@ public class SecurityConfig {
 					"/swagger-ui/**",
 					"/swagger-ui.html",
 					"/favicon.ico").permitAll()
+
+//				// Actuator endpoints
+//				.requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
+//				.requestMatchers(HttpMethod.GET, "/actuator/**").hasRole("ADMIN")
 
 				// H2 Console access
 				.requestMatchers("/h2-console/**").permitAll()
@@ -130,15 +152,17 @@ public class SecurityConfig {
 			.authenticationProvider(authenticationProvider)
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
-			// Special handler for 401 and 403
+			// Special handler for 403
 			.exceptionHandling(exc -> exc
 				.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
 				.accessDeniedHandler((request, response, ex) -> {
 					response.setStatus(HttpStatus.FORBIDDEN.value());
 					response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-					Map<String, Object> body = new HashMap<>();
+					Map<String, Object> body = new LinkedHashMap<>();
 					body.put("message", ex.getMessage());
+					body.put("method", request.getMethod());
+					body.put("path", request.getServletPath());
 
 					ObjectMapper mapper = new ObjectMapper();
 					mapper.writeValue(response.getOutputStream(), body);
