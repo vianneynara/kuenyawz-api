@@ -13,6 +13,8 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.zalando.logbook.Logbook;
+import org.zalando.logbook.spring.webflux.LogbookExchangeFilterFunction;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -29,10 +31,13 @@ public class MidtransApiServiceImpl implements MidtransApiService {
 		final String authorization = properties.midtrans().getServerKey() + ":";
 		final String encodedAuth = Base64.getEncoder().encodeToString(authorization.getBytes());
 
+		LogbookExchangeFilterFunction logbookWebFilter = new LogbookExchangeFilterFunction(Logbook.builder().build());
+
 		this.webClient = webClientBuilder
 			.baseUrl(properties.midtrans().getBaseUrlApp())
 			.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 			.defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + encodedAuth)
+			.filter(logbookWebFilter)
 			.build();
 		this.properties = properties;
 		this.objectMapper = objectMapper;
