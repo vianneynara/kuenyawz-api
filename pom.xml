@@ -62,6 +62,11 @@
             <version>${logbook.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>logbook-spring</artifactId>
+            <version>${logbook.version}</version>
+        </dependency>
+        <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
             <version>${logstash-logback-encoder.version}</version>
