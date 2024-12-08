@@ -15,6 +15,7 @@ import dev.kons.kuenyawz.repositories.ProductSpec;
 import dev.kons.kuenyawz.services.logic.ImageStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
@@ -122,6 +123,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@CacheEvict(value = "productsCache", allEntries = true)
 	public ProductDto createProduct(ProductPostDto productPostDto) {
 		validateProductPostDto(productPostDto);
 
@@ -133,8 +135,8 @@ public class ProductServiceImpl implements ProductService {
 		return productDto;
 	}
 
-	@Cacheable(value = "productDto", key = "#productId")
 	@Override
+	@Cacheable(value = "productCache", key = "#productId")
 	public ProductDto getProduct(long productId) {
 		log.info("Fetching product with ID: {}", productId);
 
