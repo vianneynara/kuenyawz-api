@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -149,6 +150,10 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Caching(evict = {
+		@CacheEvict(value = "productCache", key = "#productId"),
+		@CacheEvict(value = "productsCache", allEntries = true)
+	})
 	public void hardDeleteProduct(Long productId) {
 		Product product = productRepository.findOne(withProductId(productId))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
@@ -158,12 +163,20 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Caching(evict = {
+		@CacheEvict(value = "productCache", allEntries = true),
+		@CacheEvict(value = "productsCache", allEntries = true)
+	})
 	public void hardDeleteAllProducts() {
 		imageStorageService.deleteAll();
 		productRepository.deleteAll();
 	}
 
 	@Override
+	@Caching(evict = {
+		@CacheEvict(value = "productCache", key = "#productId"),
+		@CacheEvict(value = "productsCache", allEntries = true)
+	})
 	public void softDeleteProduct(Long productId) {
 		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
@@ -173,6 +186,10 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Caching(evict = {
+		@CacheEvict(value = "productCache", allEntries = true),
+		@CacheEvict(value = "productsCache", allEntries = true)
+	})
 	public void softDeleteAllProducts() {
 		List<Product> products = productRepository.findAll();
 		products.forEach(product -> {
