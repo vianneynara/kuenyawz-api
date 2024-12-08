@@ -15,6 +15,7 @@ import dev.kons.kuenyawz.repositories.ProductSpec;
 import dev.kons.kuenyawz.services.logic.ImageStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -53,7 +54,22 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Cacheable(
+		value = "productsCache",
+		key = "#root.methodName + '_' + " +
+			"T(java.util.Objects).hash(" +
+			"    #category, " +
+			"    #keyword, " +
+			"    #available, " +
+			"    #page, " +
+			"    #pageSize" +
+			")",
+		condition = "#page != null && #pageSize != null"
+	)
 	public Page<ProductDto> getAllProductsPaginated(String category, String keyword, Boolean available, Integer page, Integer pageSize) {
+		log.info("Fetching products with category: {}, keyword: {}, available: {}, page: {}, pageSize: {}",
+			category, keyword, available, page, pageSize);
+
 		PageRequest pageRequest = buildPageRequest(page, pageSize);
 		Specification<Product> specification = withFilters(category, keyword, available).and(isNotDeleted());
 		Page<Product> products = productRepository.findAll(specification, pageRequest);
@@ -117,8 +133,11 @@ public class ProductServiceImpl implements ProductService {
 		return productDto;
 	}
 
+	@Cacheable(value = "productDto", key = "#productId")
 	@Override
 	public ProductDto getProduct(long productId) {
+		log.info("Fetching product with ID: {}", productId);
+
 		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
