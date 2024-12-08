@@ -17,6 +17,8 @@ import dev.kons.kuenyawz.repositories.PurchaseSpec;
 import dev.kons.kuenyawz.services.logic.AuthService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,6 +34,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PurchaseServiceImpl implements PurchaseService {
 
 	private final PurchaseRepository purchaseRepository;
@@ -41,14 +44,48 @@ public class PurchaseServiceImpl implements PurchaseService {
 	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	private final VariantService variantService;
 
+	/// The caching is specifically targeted for admin
 	@Override
+	@Cacheable(
+		value = "purchasesCache",
+		key = "'admin_' + T(java.util.Objects).hash(" +
+			"    #criteria.statuses, " +
+			"    #criteria.paymentType, " +
+			"    #criteria.from, " +
+			"    #criteria.to, " +
+			"    #criteria.orderBy, " +
+			"    #criteria.page, " +
+			"    #criteria.pageSize, " +
+			"    #criteria.isAscending" +
+			")",
+		condition = "#criteria.page != null && #criteria.pageSize != null"
+	)
 	public Page<PurchaseDto> findAll(PurchaseSearchCriteria criteria) {
+		log.info("Fetching purchases for admin of page: {}, pageSize: {}", criteria.getPage(), criteria.getPageSize());
+
 		AuthService.validateIsAdmin();
 		return findAllHelper(criteria);
 	}
 
+	/// The caching is specifically targeted for user
 	@Override
+	@Cacheable(
+		value = "purchasesCache",
+		key = "'user_' + #accountId + '_' + T(java.util.Objects).hash(" +
+			"    #criteria.statuses, " +
+			"    #criteria.paymentType, " +
+			"    #criteria.from, " +
+			"    #criteria.to, " +
+			"    #criteria.orderBy, " +
+			"    #criteria.page, " +
+			"    #criteria.pageSize, " +
+			"    #criteria.isAscending" +
+			")",
+		condition = "#criteria.page != null && #criteria.pageSize != null"
+	)
 	public Page<PurchaseDto> findAll(Long accountId, PurchaseSearchCriteria criteria) {
+		log.info("Fetching purchases for account of page: {}, pageSize: {}", criteria.getPage(), criteria.getPageSize());
+
 		AuthService.validateMatchesId(accountId);
 		criteria.setAccountId(accountId);
 		return findAllHelper(criteria);
