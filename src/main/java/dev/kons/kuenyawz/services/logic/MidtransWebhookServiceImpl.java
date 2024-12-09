@@ -49,14 +49,14 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 		}
 
 		// Validate merchant id
-		if (!notification.getMerchantId().equals(properties.midtrans().getMerchantId())) {
+		if (notification.getMerchantId() == null || !notification.getMerchantId().equals(properties.midtrans().getMerchantId())) {
 			log.warn("Merchant id is not valid, expected: {}, actual: {}", properties.midtrans().getMerchantId(), notification.getMerchantId());
 			throw new InvalidRequestBodyValue("Merchant id is not valid");
 		}
 
 		// Validate transaction amount, round the decimal to 0 fractional digits
 		final var actualAmount = transaction.getAmount().setScale(0, RoundingMode.UNNECESSARY);
-		if (!notification.getGrossAmount().equals(actualAmount.toString())) {
+		if (notification.getGrossAmount() == null || !notification.getGrossAmount().equals(actualAmount.toString())) {
 			log.warn("Gross amount is not valid, expected: {}, actual: {}", transaction.getAmount(), notification.getGrossAmount());
 			throw new InvalidRequestBodyValue("Gross amount is invalid");
 		}
