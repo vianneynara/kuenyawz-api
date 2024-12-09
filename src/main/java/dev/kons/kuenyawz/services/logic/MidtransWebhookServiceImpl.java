@@ -12,6 +12,7 @@ import dev.kons.kuenyawz.repositories.TransactionRepository;
 import dev.kons.kuenyawz.services.entity.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.math.RoundingMode;
@@ -29,6 +30,7 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 	private final WhatsappApiService whatsappApiService;
 
 	@Override
+	@CacheEvict(value = "purchasesCache", allEntries = true)
 	public void processNotification(MidtransNotification notification) {
 		printNotification(notification); // TODO: remove in production
 		MidtransWebhookService.validateSignatureKey(notification, properties.midtrans().getServerKey());
