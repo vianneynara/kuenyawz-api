@@ -23,6 +23,9 @@ import dev.kons.kuenyawz.services.entity.TransactionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -51,6 +54,7 @@ public class OrderingServiceImpl implements OrderingService {
 	private final CartItemService cartItemService;
 
 	@Override
+	@CacheEvict(value = "purchasesCache", allEntries = true)
 	public PurchaseDto processOrder(PurchasePostDto purchasePostDto) {
 		// Initialize required entities
 		Account account = AuthService.getAuthenticatedAccount();
@@ -149,6 +153,8 @@ public class OrderingServiceImpl implements OrderingService {
 	}
 
 	@Override
+	@CachePut(value = "purchaseCache", key = "#purchaseId")
+	@CacheEvict(value = "purchasesCache", allEntries = true)
 	public PurchaseDto cancelOrder(Long purchaseId) {
 		Purchase purchase = purchaseService.getById(purchaseId);
 
@@ -194,6 +200,8 @@ public class OrderingServiceImpl implements OrderingService {
 	}
 
 	@Override
+	@CachePut(value = "purchaseCache", key = "#purchaseId")
+	@CacheEvict(value = "purchasesCache", allEntries = true)
 	public PurchaseDto confirmOrder(Long purchaseId) {
 		AuthService.validateIsAdmin();
 
@@ -236,6 +244,8 @@ public class OrderingServiceImpl implements OrderingService {
 	}
 
 	@Override
+	@CachePut(value = "purchaseCache", key = "#purchaseId")
+	@CacheEvict(value = "purchasesCache", allEntries = true)
 	public PurchaseDto refundOrder(Long purchaseId) {
 		AuthService.validateIsAdmin();
 
@@ -268,6 +278,8 @@ public class OrderingServiceImpl implements OrderingService {
 	}
 
 	@Override
+	@CachePut(value = "purchaseCache", key = "#purchaseId")
+	@CacheEvict(value = "purchasesCache", allEntries = true)
 	public PurchaseDto changeOrderStatus(Long purchaseId, String status) {
 		AuthService.validateIsAdmin();
 
@@ -276,6 +288,8 @@ public class OrderingServiceImpl implements OrderingService {
 	}
 
 	@Override
+	@CachePut(value = "purchaseCache", key = "#purchaseId")
+	@CacheEvict(value = "purchasesCache", allEntries = true)
 	public PurchaseDto upgradeOrderStatus(Long purchaseId) {
 		AuthService.validateIsAdmin();
 
@@ -301,6 +315,7 @@ public class OrderingServiceImpl implements OrderingService {
 	}
 
 	@Override
+	@Cacheable(value = "purchaseCache", key = "#purchaseId")
 	public PurchaseDto findPurchase(Long purchaseId) {
 		validateOwnershipOrAdmin(purchaseId);
 

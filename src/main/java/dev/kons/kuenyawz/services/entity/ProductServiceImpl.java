@@ -15,7 +15,10 @@ import dev.kons.kuenyawz.repositories.ProductSpec;
 import dev.kons.kuenyawz.services.logic.ImageStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -122,6 +125,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@CacheEvict(value = "productsCache", allEntries = true)
 	public ProductDto createProduct(ProductPostDto productPostDto) {
 		validateProductPostDto(productPostDto);
 
@@ -133,8 +137,8 @@ public class ProductServiceImpl implements ProductService {
 		return productDto;
 	}
 
-	@Cacheable(value = "productDto", key = "#productId")
 	@Override
+	@Cacheable(value = "productCache", key = "#productId")
 	public ProductDto getProduct(long productId) {
 		log.info("Fetching product with ID: {}", productId);
 
@@ -146,6 +150,10 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Caching(evict = {
+		@CacheEvict(value = "productCache", key = "#productId"),
+		@CacheEvict(value = "productsCache", allEntries = true)
+	})
 	public void hardDeleteProduct(Long productId) {
 		Product product = productRepository.findOne(withProductId(productId))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
@@ -155,12 +163,20 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Caching(evict = {
+		@CacheEvict(value = "productCache", allEntries = true),
+		@CacheEvict(value = "productsCache", allEntries = true)
+	})
 	public void hardDeleteAllProducts() {
 		imageStorageService.deleteAll();
 		productRepository.deleteAll();
 	}
 
 	@Override
+	@Caching(evict = {
+		@CacheEvict(value = "productCache", key = "#productId"),
+		@CacheEvict(value = "productsCache", allEntries = true)
+	})
 	public void softDeleteProduct(Long productId) {
 		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
@@ -170,6 +186,10 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Caching(evict = {
+		@CacheEvict(value = "productCache", allEntries = true),
+		@CacheEvict(value = "productsCache", allEntries = true)
+	})
 	public void softDeleteAllProducts() {
 		List<Product> products = productRepository.findAll();
 		products.forEach(product -> {
@@ -179,6 +199,8 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@CachePut(value = "productCache", key = "#productId")
+	@CacheEvict(value = "productsCache", allEntries = true)
 	public ProductDto patchProduct(Long productId, ProductPatchDto productPatchDto) {
 		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
@@ -203,6 +225,8 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@CachePut(value = "productCache", key = "#productId")
+	@CacheEvict(value = "productsCache", allEntries = true)
 	public ProductDto patchAvailability(Long productId, boolean available) {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
