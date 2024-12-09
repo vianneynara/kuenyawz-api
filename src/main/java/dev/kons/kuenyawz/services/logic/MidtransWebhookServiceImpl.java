@@ -13,8 +13,10 @@ import dev.kons.kuenyawz.services.entity.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Service
@@ -28,6 +30,7 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 	private final TransactionRepository transactionRepository;
 	private final ObjectMapper mapper;
 	private final WhatsappApiService whatsappApiService;
+	private final ObjectMapper objectMapper;
 
 	@Override
 	@CacheEvict(value = "purchasesCache", allEntries = true)
@@ -42,14 +45,12 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 		Transaction.TransactionStatus newStatus = Transaction.TransactionStatus.fromString(notification.getTransactionStatus());
 		if (newStatus.ordinal() < transaction.getStatus().ordinal()) {
 			log.warn("Transaction status can't be downgraded, current status: {}, requested status: {}", transaction.getStatus(), newStatus);
-//			return;
 			throw new InvalidRequestBodyValue("Transaction status can't be downgraded");
 		}
 
 		// Validate merchant id
 		if (!notification.getMerchantId().equals(properties.midtrans().getMerchantId())) {
 			log.warn("Merchant id is not valid, expected: {}, actual: {}", properties.midtrans().getMerchantId(), notification.getMerchantId());
-//			return;
 			throw new InvalidRequestBodyValue("Merchant id is not valid");
 		}
 
@@ -57,7 +58,6 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 		final var actualAmount = transaction.getAmount().setScale(0, RoundingMode.UNNECESSARY);
 		if (!notification.getGrossAmount().equals(actualAmount.toString())) {
 			log.warn("Gross amount is not valid, expected: {}, actual: {}", transaction.getAmount(), notification.getGrossAmount());
-//			return;
 			throw new InvalidRequestBodyValue("Gross amount is invalid");
 		}
 
@@ -101,6 +101,64 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 			.build();
 		merchantServerKey = merchantServerKey != null ? merchantServerKey : properties.midtrans().getServerKey();
 		return MidtransWebhookService.generateSignatureKey(notification, merchantServerKey);
+	}
+
+	@Override
+	public String generateNotification(Long purchaseId, String transactionStatus, String fraudStatus) {
+		AuthService.validateIsAdmin();
+
+		// Prepare properties
+		Purchase purchase = purchaseRepository.findById(purchaseId)
+			.orElseThrow(() -> new InvalidRequestBodyValue("Purchase not found"));
+
+		// Get transaction of the purchase
+		Transaction transaction = transactionRepository.findByPurchase_PurchaseId(purchase.getPurchaseId(), Pageable.unpaged())
+			.getContent().getFirst();
+
+		String statusCode = "200";
+		BigDecimal totalGrossAmount = purchase.getTotalPrice()
+			.add(purchase.getDeliveryFee())
+			.add(BigDecimal.valueOf(properties.vendor().getPaymentFee()))
+			.setScale(0, RoundingMode.UNNECESSARY);
+		log.info("Total gross amount: {}", totalGrossAmount);
+		transactionStatus = transactionStatus != null ? transactionStatus : "capture";
+		fraudStatus = fraudStatus != null ? fraudStatus : "accept";
+
+		final var simpleNotification = MidtransNotification.builder()
+			.orderId(transaction.getTransactionId().toString())
+			.statusCode(statusCode)
+			.grossAmount(totalGrossAmount.toString())
+			.build();
+
+		String merchantServerKey = properties.midtrans().getServerKey();
+		String signatureKey = MidtransWebhookService.generateSignatureKey(
+			simpleNotification,
+			merchantServerKey
+		);
+
+		MidtransNotification notification = MidtransNotification.builder()
+			.transactionStatus(transactionStatus)
+			.orderId(transaction.getTransactionId().toString())
+			.statusCode(statusCode)
+			.grossAmount(totalGrossAmount.toString())
+			.signatureKey(signatureKey)
+			.merchantId(properties.midtrans().getMerchantId())
+			.fraudStatus(fraudStatus)
+			.build();
+
+		try {
+			return objectMapper
+				.writerWithDefaultPrettyPrinter()
+				.writeValueAsString(notification);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/// Debugging method
+	private static void simpleNotificationValues(MidtransNotification simpleNotification) {
+		log.info("Notification | orderId: {}, statusCode: {}, grossAmount: {}",
+			simpleNotification.getOrderId(), simpleNotification.getStatusCode(), simpleNotification.getGrossAmount());
 	}
 
 	private boolean notFraud(MidtransNotification notification) {
