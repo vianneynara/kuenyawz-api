@@ -34,6 +34,14 @@ public interface MidtransWebhookService {
 	);
 
 	/**
+	 * Generate notification for the given purchase id.
+	 *
+	 * @param purchaseId {@link Long} the purchase id
+	 * @return {@link String} the generated notification json body.
+	 */
+	String generateNotification(Long purchaseId, String transactionStatus, String fraudStatus);
+
+	/**
 	 * Validate the signature key of the notification. Will throw an exception if the signature key is invalid.
 	 *
 	 * @param notification {@link MidtransNotification}

@@ -52,4 +52,21 @@ public class MidtransWebhookController {
 		final String signatureKey = midtransWebhookService.signatureCreator(orderId, statusCode, grossAmount, merchantServerKey);
 		return ResponseEntity.ok(Map.of("signatureKey", signatureKey));
 	}
+
+	@Operation(summary = "Generate Notification",
+		description = "Used to generate notification for midtrans")
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Notification has been generated"),
+		@ApiResponse(responseCode = "400", description = "Bad request"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized"),
+		@ApiResponse(responseCode = "404", description = "Purchase not found"),
+	})
+	@PostMapping("/generate")
+	public ResponseEntity<String> generateNotification(
+		@RequestParam Long purchaseId,
+		@RequestParam(required = false) String transactionStatus,
+		@RequestParam(required = false) String fraudStatus
+	) {
+		return ResponseEntity.ok(midtransWebhookService.generateNotification(purchaseId, transactionStatus, fraudStatus));
+	}
 }
