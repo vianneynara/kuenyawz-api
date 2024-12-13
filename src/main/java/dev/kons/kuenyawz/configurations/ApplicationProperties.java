@@ -72,7 +72,7 @@ public class ApplicationProperties {
 		this.vendor.paymentFee = Double.parseDouble(getEnv("VENDOR_PAYMENT_FEE", "4000", dotenv));
 		this.vendor.feePerKm = Double.parseDouble(getEnv("VENDOR_FEE_PER_KM", "3500", dotenv));
 
-		this.database.url = getEnv("DB_URL", "jdbc:postgresql://localhost:5432/kuenyawz", dotenv);
+		this.database.url = readDbUrl(dotenv);
 		this.database.username = getEnv("DB_USERNAME", "kuenyawz", dotenv);
 		this.database.password = getEnv("DB_PASSWORD", "kuenyawz", dotenv);
 
@@ -95,6 +95,21 @@ public class ApplicationProperties {
 
 		// Print all properties
 		printAllProperties();
+	}
+
+	/**
+	 * Reads the database URL from the environment variables or dotenv.
+	 * By default, it will use localhost:5432/kuenyawz as the database URL.
+	 */
+	private String readDbUrl(Dotenv dotenv) {
+		var dbHost = getEnv("DB_HOST", "localhost", dotenv);
+		var dbPort = getEnv("DB_PORT", "5432", dotenv);
+		var dbName = getEnv("DB_NAME", "kuenyawz", dotenv);
+
+		return "jdbc:postgresql:"
+			+ "//" + dbHost
+			+ ":" + dbPort
+			+ "/" + dbName;
 	}
 
 	public String getFullBaseUrl() {
