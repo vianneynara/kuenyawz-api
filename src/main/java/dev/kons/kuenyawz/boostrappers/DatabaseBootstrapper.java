@@ -14,7 +14,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
 
 @Component
@@ -38,9 +37,7 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 
 		try {
 			ClassPathResource resource = new ClassPathResource(PATH_TO_ACCOUNT_SEEDER);
-
-			File file = resource.getFile();
-			accountCsvService.saveAccountFromFile(file);
+			accountCsvService.saveAccountFromStream(resource.getInputStream());
 		} catch (IOException e) {
 			log.error("File not found: {}", e.getMessage());
 		}
@@ -61,9 +58,7 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 		// Check if path and the file exists
 		try {
 			ClassPathResource resource = new ClassPathResource(PATH_TO_PRODUCT_SEEDER);
-
-			File file = resource.getFile();
-			productCsvService.saveProductFromFile(file);
+			productCsvService.saveProductFromStream(resource.getInputStream());
 		} catch (IOException e) {
 			log.error("File not found: {}", e.getMessage());
 		}
