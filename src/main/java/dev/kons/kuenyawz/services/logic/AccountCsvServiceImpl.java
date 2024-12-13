@@ -43,6 +43,12 @@ public class AccountCsvServiceImpl implements AccountCsvService {
 		}
 	}
 
+	@Override
+	public void saveAccountFromStream(InputStream inputStream) {
+		List<AccountCsvRecord> records = csvToAccountCsvRecord(inputStream);
+		processAccountRecords(records);
+	}
+
 	private List<AccountCsvRecord> csvToAccountCsvRecord(InputStream inputStream) {
 		return new CsvToBeanBuilder<AccountCsvRecord>(
 			new InputStreamReader(inputStream, StandardCharsets.UTF_8))

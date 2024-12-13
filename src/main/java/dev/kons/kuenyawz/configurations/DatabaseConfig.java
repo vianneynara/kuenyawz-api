@@ -33,6 +33,10 @@ public class DatabaseConfig {
 			.driverClassName("org.postgresql.Driver")
 			.build();
 
+		log.info("Connection URL: {}", applicationProperties.getDatabase().getUrl());
+		log.info("Username: {}", applicationProperties.getDatabase().getUsername());
+		log.info("Password: {}", applicationProperties.getDatabase().getPassword());
+
 		testConnection(dataSource);
 		testAccess(dataSource);
 

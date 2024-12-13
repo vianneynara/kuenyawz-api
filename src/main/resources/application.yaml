@@ -7,6 +7,11 @@ spring:
         # Uncomment to override the default cache configuration
         # caffeine:
         #   spec: maximumSize=300,expireAfterAccess=3m
+    cloud:
+        config:
+            uri: http://localhost:62081
+    config:
+        import: optional:configserver:http://localhost:62081
     datasource:
         hikari:
             pool-name: KuenyaWZ-Pool
@@ -38,11 +43,14 @@ springdoc:
     swagger-ui:
         path: /swagger-ui
         operations-sorter: alpha
+        # Not sure whether this will do anything
+        enabled: true
+        config-url: /docs/v3
     api-docs:
         path: /docs/v3
 
 application:
-    version: 1.0
+    version: 1.0.0
     repositoryUrl: https://github.com/vianneynara/kuenyawz-api
     accepted-image-extensions: png,jpg,jpeg,webp
     max-variant-quantity: 250
@@ -62,6 +70,8 @@ management:
             show-details: when_authorized
         shutdown:
             enabled: true
+        mappings:
+            access: read_only
     health:
         readinessstate:
             enabled: true
@@ -70,9 +80,9 @@ management:
     endpoints:
         web:
             exposure:
-                include: health,info,shutdown
+                include: health,info,shutdown,refresh,mappings
 
 logging:
     level:
         dev.kons.kuenyawz.filters.RequestLoggingFilter: DEBUG
-        org.springframework.security: debug
+#        org.springframework.security: debug
