@@ -4,6 +4,7 @@ import dev.kons.kuenyawz.services.entity.OTPService;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -22,6 +23,7 @@ import java.util.List;
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 @Getter
 @Setter
+@Slf4j
 public class ApplicationProperties {
 
 	// Fields
@@ -90,6 +92,9 @@ public class ApplicationProperties {
 		this.midtrans.finishUrl = getEnv("MIDTRANS_FINISH_URL", "http://localhost:8081/api", dotenv);
 		this.midtrans.unfinishUrl = getEnv("MIDTRANS_UNFINISH_URL", "http://localhost:8081/api", dotenv);
 		this.midtrans.errorUrl = getEnv("MIDTRANS_ERROR_URL", "http://localhost:8081/api", dotenv);
+
+		// Print all properties
+		printAllProperties();
 	}
 
 	public String getFullBaseUrl() {
@@ -105,9 +110,11 @@ public class ApplicationProperties {
 		// Prioritize system environment variables
 		String systemEnvValue = System.getenv(key);
 		if (systemEnvValue != null) {
+			log.info("Using SYSENV for key: {}", key);
 			return systemEnvValue;
 		}
 		// Fallback to Dotenv
+		log.info("Using dotenv for key: {}", key);
 		return dotenv.get(key, defaultValue);
 	}
 
@@ -194,5 +201,59 @@ public class ApplicationProperties {
 		private String finishUrl;
 		private String unfinishUrl;
 		private String errorUrl;
+	}
+
+	private void printAllProperties() {
+		System.out.println("Properties:");
+		System.out.println(" - version: " + version);
+		System.out.println(" - repositoryUrl: " + repositoryUrl);
+		System.out.println(" - productImagesDir: " + productImagesDir);
+		System.out.println(" - baseUrl: " + baseUrl);
+		System.out.println(" - maxVariantQuantity: " + maxVariantQuantity);
+		System.out.println(" - publicIp: " + publicIp);
+		System.out.println(" - httpProtocol: " + httpProtocol);
+		System.out.println(" - timezone: " + timezone);
+		System.out.println(" - otpFormat: " + otpFormat);
+		System.out.println(" - serverPort: " + serverPort);
+		System.out.println(" - acceptedImageExtensions: " + acceptedImageExtensions);
+
+		System.out.println("Frontend:");
+		System.out.println(" - baseUrl: " + frontend.baseUrl);
+
+		System.out.println("Seeder:");
+		System.out.println(" - seedAccounts: " + seeder.seedAccounts);
+		System.out.println(" - seedProducts: " + seeder.seedProducts);
+
+		System.out.println("Vendor:");
+		System.out.println(" - instagram: " + vendor.instagram);
+		System.out.println(" - email: " + vendor.email);
+		System.out.println(" - phone: " + vendor.phone);
+		System.out.println(" - address: " + vendor.address);
+		System.out.println(" - latitude: " + vendor.latitude);
+		System.out.println(" - longitude: " + vendor.longitude);
+		System.out.println(" - paymentFee: " + vendor.paymentFee);
+		System.out.println(" - feePerKm: " + vendor.feePerKm);
+
+		System.out.println("Database:");
+		System.out.println(" - url: " + database.url);
+		System.out.println(" - username: " + database.username);
+		System.out.println(" - password: " + database.password);
+
+		System.out.println("Security:");
+		System.out.println(" - jwtSecret: " + security.jwtSecret);
+		System.out.println(" - jwtTokenExpSeconds: " + security.jwtTokenExpSeconds);
+		System.out.println(" - jwtRefreshDays: " + security.jwtRefreshDays);
+		System.out.println(" - otpPhoneNumber: " + security.otpPhoneNumber);
+		System.out.println(" - fonnteApiToken: " + security.fonnteApiToken);
+		System.out.println(" - otpExpireSeconds: " + security.otpExpireSeconds);
+		System.out.println(" - otpLength: " + security.otpLength);
+
+		System.out.println("Midtrans:");
+		System.out.println(" - merchantId: " + midtrans.merchantId);
+		System.out.println(" - serverKey: " + midtrans.serverKey);
+		System.out.println(" - baseUrlApp: " + midtrans.baseUrlApp);
+		System.out.println(" - baseUrlApi: " + midtrans.baseUrlApi);
+		System.out.println(" - notificationUrl: " + midtrans.notificationUrl);
+		System.out.println(" - finishUrl: " + midtrans.finishUrl);
 	}
 }
