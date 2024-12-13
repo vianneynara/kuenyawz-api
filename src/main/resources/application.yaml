@@ -75,4 +75,4 @@ management:
 logging:
     level:
         dev.kons.kuenyawz.filters.RequestLoggingFilter: DEBUG
-        org.springframework.security: debug
+#        org.springframework.security: debug
