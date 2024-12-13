@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * This is not an explicit configuration class, but a necessary component to read
- * the application properties of 'application' in `application.properties` and helps
+ * the application properties of 'application' in `application.yml` and helps
  * to initialize the properties through dotenv.
  */
 @Component
