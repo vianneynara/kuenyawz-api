@@ -7,6 +7,11 @@ spring:
         # Uncomment to override the default cache configuration
         # caffeine:
         #   spec: maximumSize=300,expireAfterAccess=3m
+    cloud:
+        config:
+            uri: http://localhost:62081
+    config:
+        import: optional:configserver:http://localhost:62081
     datasource:
         hikari:
             pool-name: KuenyaWZ-Pool
@@ -70,7 +75,7 @@ management:
     endpoints:
         web:
             exposure:
-                include: health,info,shutdown
+                include: health,info,shutdown,refresh
 
 logging:
     level:
