@@ -24,12 +24,12 @@ Refer to this **[Swagger Documentation](https://app.swaggerhub.com/apis/Nara-ff7
 
 - Java JDK 21 (This project has not been compiled to JAR yet)
 - Maven 3.9.9+
-- PostgreSQL XX.XX
+- PostgreSQL 13
 
 ## Default configurations
 
 - Database: H2 in memory
-- Port: 8081
+- Spring Boot Port: 8081 (development) | 62081 (docker)
 - Base URL: `http://localhost:8081/api`
 
 ## Installing and running application
