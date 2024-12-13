@@ -42,7 +42,7 @@ springdoc:
         path: /docs/v3
 
 application:
-    version: 1.0
+    version: 1.0.0
     repositoryUrl: https://github.com/vianneynara/kuenyawz-api
     accepted-image-extensions: png,jpg,jpeg,webp
     max-variant-quantity: 250
