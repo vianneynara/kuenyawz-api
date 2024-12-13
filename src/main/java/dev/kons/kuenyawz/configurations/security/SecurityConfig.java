@@ -37,8 +37,11 @@ public class SecurityConfig {
 	@Order(1)
 	public SecurityFilterChain actuatorSecurityFilterChain(HttpSecurity httpSec) throws Exception {
 		httpSec.securityMatcher(EndpointRequest.toAnyEndpoint())
+			.csrf(csrf -> csrf.ignoringRequestMatchers(
+				EndpointRequest.to("shutdown")))
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(EndpointRequest.to("health", "info")).permitAll()
+				.requestMatchers(HttpMethod.POST, "/actuator/shutdown").hasRole("ADMIN")
 				.requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("ADMIN")
 			)
 			.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
