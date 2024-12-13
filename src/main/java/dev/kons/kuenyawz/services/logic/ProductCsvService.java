@@ -4,6 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 public interface ProductCsvService {
 	/**
@@ -16,4 +17,6 @@ public interface ProductCsvService {
 	void saveProductFromFile(String path);
 
 	void saveProductFromFile(File file);
+
+	void saveProductFromStream(InputStream inputStream);
 }

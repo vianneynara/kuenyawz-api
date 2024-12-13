@@ -38,10 +38,12 @@ public class SecurityConfig {
 	public SecurityFilterChain actuatorSecurityFilterChain(HttpSecurity httpSec) throws Exception {
 		httpSec.securityMatcher(EndpointRequest.toAnyEndpoint())
 			.csrf(csrf -> csrf.ignoringRequestMatchers(
-				EndpointRequest.to("shutdown")))
+				EndpointRequest.to("shutdown", "refresh", "health", "info")))
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(EndpointRequest.to("health", "info")).permitAll()
-				.requestMatchers(HttpMethod.POST, "/actuator/shutdown").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.POST,
+					"/actuator/shutdown",
+					"/actuator/refresh").hasRole("ADMIN")
 				.requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("ADMIN")
 			)
 			.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -178,7 +180,7 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+		configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:62080"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(List.of("*"));
 		configuration.setAllowCredentials(true);

@@ -1,6 +1,7 @@
 package dev.kons.kuenyawz.services.logic;
 
 import java.io.File;
+import java.io.InputStream;
 
 public interface AccountCsvService {
 	/**
@@ -16,4 +17,6 @@ public interface AccountCsvService {
 	 * @param file {@link File} CSV file to be imported
 	 */
 	void saveAccountFromFile(File file);
+
+	void saveAccountFromStream(InputStream inputStream);
 }

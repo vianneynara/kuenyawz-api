@@ -68,6 +68,12 @@ public class ProductCsvServiceImpl implements ProductCsvService {
 		}
 	}
 
+	@Override
+	public void saveProductFromStream(InputStream inputStream) {
+		List<ProductCsvRecord> records = csvToProductCsvRecord(inputStream);
+		processProductRecords(records);
+	}
+
 	private List<ProductCsvRecord> csvToProductCsvRecord(InputStream inputStream) {
 		return new CsvToBeanBuilder<ProductCsvRecord>(
 			new InputStreamReader(inputStream, StandardCharsets.UTF_8))
