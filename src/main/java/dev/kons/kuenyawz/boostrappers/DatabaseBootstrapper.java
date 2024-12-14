@@ -9,8 +9,6 @@ import dev.kons.kuenyawz.services.logic.ProductCsvService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +17,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class DatabaseBootstrapper implements ApplicationListener<ApplicationReadyEvent>, CommandLineRunner {
+public class DatabaseBootstrapper implements CommandLineRunner {
 
 	private final ApplicationProperties properties;
 	private final ProductCsvService productCsvService;
@@ -62,11 +60,6 @@ public class DatabaseBootstrapper implements ApplicationListener<ApplicationRead
 		} catch (IOException e) {
 			log.error("File not found: {}", e.getMessage());
 		}
-	}
-
-	@Override
-	public void onApplicationEvent(ApplicationReadyEvent event) {
-//		start();
 	}
 
 	@Override
