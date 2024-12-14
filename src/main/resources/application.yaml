@@ -43,6 +43,9 @@ springdoc:
     swagger-ui:
         path: /swagger-ui
         operations-sorter: alpha
+        # Not sure whether this will do anything
+        enabled: true
+        config-url: /docs/v3
     api-docs:
         path: /docs/v3
 
@@ -67,6 +70,8 @@ management:
             show-details: when_authorized
         shutdown:
             enabled: true
+        mappings:
+            access: read_only
     health:
         readinessstate:
             enabled: true
@@ -75,7 +80,7 @@ management:
     endpoints:
         web:
             exposure:
-                include: health,info,shutdown,refresh
+                include: health,info,shutdown,refresh,mappings
 
 logging:
     level:

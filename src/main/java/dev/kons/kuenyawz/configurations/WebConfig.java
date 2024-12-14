@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
         FilterRegistrationBean<RequestLoggingFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(new RequestLoggingFilter());
-        registrationBean.addUrlPatterns("/*");  // apply to all URLs
+        registrationBean.addUrlPatterns("*");  // apply to all URLs
         registrationBean.setOrder(1);  // high priority
 
         return registrationBean;
