@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +35,12 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 	@CacheEvict(value = "purchasesCache", allEntries = true)
 	public void processNotification(MidtransNotification notification) {
 		printNotification(notification); // TODO: remove in production
+
+		if (notification.getOrderId().startsWith("payment_notif_test_" + properties.midtrans().getMerchantId())) {
+			log.info("Test notification received!");
+			return;
+		}
+
 		MidtransWebhookService.validateSignatureKey(notification, properties.midtrans().getServerKey());
 
 		Transaction transaction = transactionService.getById(Long.valueOf(notification.getOrderId()));
@@ -54,8 +59,7 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 			throw new InvalidRequestBodyValue("Merchant id is not valid");
 		}
 
-		// Validate transaction amount, round the decimal to 0 fractional digits
-		final var actualAmount = transaction.getAmount().setScale(0, RoundingMode.UNNECESSARY);
+		final var actualAmount = transaction.getAmount();
 		if (notification.getGrossAmount() == null || !notification.getGrossAmount().equals(actualAmount.toString())) {
 			log.warn("Gross amount is not valid, expected: {}, actual: {}", transaction.getAmount(), notification.getGrossAmount());
 			throw new InvalidRequestBodyValue("Gross amount is invalid");
@@ -118,8 +122,7 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 		String statusCode = "200";
 		BigDecimal totalGrossAmount = purchase.getTotalPrice()
 			.add(purchase.getDeliveryFee())
-			.add(BigDecimal.valueOf(properties.vendor().getPaymentFee()))
-			.setScale(0, RoundingMode.UNNECESSARY);
+			.add(BigDecimal.valueOf(properties.vendor().getPaymentFee()));
 		log.info("Total gross amount: {}", totalGrossAmount);
 		transactionStatus = transactionStatus != null ? transactionStatus : "capture";
 		fraudStatus = fraudStatus != null ? fraudStatus : "accept";
@@ -170,7 +173,8 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 
 	private void printNotification(MidtransNotification notification) {
 		try {
-			log.info("Midtrans notification: {}", mapper.writeValueAsString(notification));
+			log.info("Midtrans notification: {}",
+				mapper.writerWithDefaultPrettyPrinter().writeValueAsString(notification));
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
