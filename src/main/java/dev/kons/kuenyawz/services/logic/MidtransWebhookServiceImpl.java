@@ -54,8 +54,7 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 			throw new InvalidRequestBodyValue("Merchant id is not valid");
 		}
 
-		// Validate transaction amount, round the decimal to 0 fractional digits
-		final var actualAmount = transaction.getAmount().setScale(0, RoundingMode.UNNECESSARY);
+		final var actualAmount = transaction.getAmount();
 		if (notification.getGrossAmount() == null || !notification.getGrossAmount().equals(actualAmount.toString())) {
 			log.warn("Gross amount is not valid, expected: {}, actual: {}", transaction.getAmount(), notification.getGrossAmount());
 			throw new InvalidRequestBodyValue("Gross amount is invalid");
@@ -170,7 +169,8 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 
 	private void printNotification(MidtransNotification notification) {
 		try {
-			log.info("Midtrans notification: {}", mapper.writeValueAsString(notification));
+			log.info("Midtrans notification: {}",
+				mapper.writerWithDefaultPrettyPrinter().writeValueAsString(notification));
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
