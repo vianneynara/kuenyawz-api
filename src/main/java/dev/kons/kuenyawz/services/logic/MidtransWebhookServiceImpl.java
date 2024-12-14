@@ -36,6 +36,12 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 	@CacheEvict(value = "purchasesCache", allEntries = true)
 	public void processNotification(MidtransNotification notification) {
 		printNotification(notification); // TODO: remove in production
+
+		if (notification.getOrderId().startsWith("payment_notif_test_" + properties.midtrans().getMerchantId())) {
+			log.info("Test notification received!");
+			return;
+		}
+
 		MidtransWebhookService.validateSignatureKey(notification, properties.midtrans().getServerKey());
 
 		Transaction transaction = transactionService.getById(Long.valueOf(notification.getOrderId()));
