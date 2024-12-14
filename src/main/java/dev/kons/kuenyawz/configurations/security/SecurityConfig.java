@@ -63,8 +63,8 @@ public class SecurityConfig {
 				// Docs/Swagger access
 				.requestMatchers(
 					"/api/docs/**",
+					"/swagger/**",
 					"/swagger-ui/**",
-					"/swagger-ui.html",
 					"/favicon.ico").permitAll()
 
 //				// Actuator endpoints
@@ -180,7 +180,16 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:62080"));
+
+		// Allowing a list if possible ports we'll use lol
+		configuration.setAllowedOrigins(List.of(
+			"http://localhost:80",
+			"http://localhost:443",
+			"http://localhost:5173",
+			"http://localhost:8081", // H2/Swagger UI
+			"http://localhost:62080",
+			"http://localhost:62081" // H2/Swagger UI
+		));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(List.of("*"));
 		configuration.setAllowCredentials(true);
