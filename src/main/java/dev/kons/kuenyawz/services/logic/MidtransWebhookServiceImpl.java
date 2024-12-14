@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Service
 @RequiredArgsConstructor
@@ -123,8 +122,7 @@ public class MidtransWebhookServiceImpl implements MidtransWebhookService {
 		String statusCode = "200";
 		BigDecimal totalGrossAmount = purchase.getTotalPrice()
 			.add(purchase.getDeliveryFee())
-			.add(BigDecimal.valueOf(properties.vendor().getPaymentFee()))
-			.setScale(0, RoundingMode.UNNECESSARY);
+			.add(BigDecimal.valueOf(properties.vendor().getPaymentFee()));
 		log.info("Total gross amount: {}", totalGrossAmount);
 		transactionStatus = transactionStatus != null ? transactionStatus : "capture";
 		fraudStatus = fraudStatus != null ? fraudStatus : "accept";
