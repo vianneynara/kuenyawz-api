@@ -1,9 +1,9 @@
 package dev.kons.kuenyawz.controllers;
 
+import dev.kons.kuenyawz.configurations.ApplicationProperties;
 import dev.kons.kuenyawz.configurations.security.JWTAuthenticationFilter;
 import dev.kons.kuenyawz.dtos.account.AccountRegistrationDto;
 import dev.kons.kuenyawz.dtos.account.AccountSecureDto;
-import dev.kons.kuenyawz.dtos.auth.*;
 import dev.kons.kuenyawz.dtos.auth.*;
 import dev.kons.kuenyawz.exceptions.InvalidRefreshTokenException;
 import dev.kons.kuenyawz.services.entity.OTPService;
@@ -38,6 +38,7 @@ public class AuthController {
 
 	private final AuthService authService;
 	private final OTPService otpService;
+	private final ApplicationProperties properties;
 
 	@Operation(summary = "Register a new user")
 	@ApiResponses({
@@ -152,11 +153,15 @@ public class AuthController {
 
 		Cookie accessTokenCookie = new Cookie("accessToken", authResponseDto.getAccessToken());
 		accessTokenCookie.setHttpOnly(true);
+		if (properties.getHttpProtocol().equals("https"))
+			accessTokenCookie.setSecure(true);
 		accessTokenCookie.setPath("/");
 		accessTokenCookie.setMaxAge(60 * 60);
 
 		Cookie refreshTokenCookie = new Cookie("refreshToken", authResponseDto.getRefreshToken());
 		refreshTokenCookie.setHttpOnly(true);
+		if (properties.getHttpProtocol().equals("https"))
+			refreshTokenCookie.setSecure(true);
 		refreshTokenCookie.setPath("/");
 		refreshTokenCookie.setMaxAge(60 * 60 * 24 * 7);
 
@@ -168,8 +173,15 @@ public class AuthController {
 		assert requestAttributes != null : "Request attributes must not be null";
 		HttpServletResponse response = ((ServletRequestAttributes) requestAttributes).getResponse();
 		assert response != null : "Response must not be null";
-		response.addCookie(accessTokenCookie);
-		response.addCookie(refreshTokenCookie);
+//		response.addCookie(accessTokenCookie);
+//		response.addCookie(refreshTokenCookie);
+
+		// Setting SameSite for each cookie MANUALLY
+		final String sameSite = "None";
+		response.addHeader("Set-Cookie", String.format("%s=%s; HttpOnly; Secure; Path=/; Max-Age=%d; SameSite=%s",
+			accessTokenCookie.getName(), accessTokenCookie.getValue(), accessTokenCookie.getMaxAge(), sameSite));
+		response.addHeader("Set-Cookie", String.format("%s=%s; HttpOnly; Secure; Path=/; Max-Age=%d; SameSite=%s",
+			refreshTokenCookie.getName(), refreshTokenCookie.getValue(), refreshTokenCookie.getMaxAge(), sameSite));
 	}
 
 	/**
@@ -178,12 +190,12 @@ public class AuthController {
 	 * @param tokenDto {@link AuthRefreshTokenDto}
 	 * @return refresh token
 	 */
-    private String extractRefreshToken(AuthRefreshTokenDto tokenDto) {
-        if (tokenDto != null && tokenDto.getRefreshToken() != null && !tokenDto.getRefreshToken().isEmpty()) {
-            return tokenDto.getRefreshToken();
-        }
-        return getRefreshTokenFromCookie();
-    }
+	private String extractRefreshToken(AuthRefreshTokenDto tokenDto) {
+		if (tokenDto != null && tokenDto.getRefreshToken() != null && !tokenDto.getRefreshToken().isEmpty()) {
+			return tokenDto.getRefreshToken();
+		}
+		return getRefreshTokenFromCookie();
+	}
 
 	/**
 	 * Extract refresh token from the cookie usingg {@link JWTAuthenticationFilter#extractRefreshTokenFromCookie(HttpServletRequest)}
@@ -191,23 +203,23 @@ public class AuthController {
 	 * @return refresh token
 	 */
 	private String getRefreshTokenFromCookie() {
-        try {
-            RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-            if (requestAttributes == null) {
-                throw new InvalidRefreshTokenException("No request context available");
-            }
+		try {
+			RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+			if (requestAttributes == null) {
+				throw new InvalidRefreshTokenException("No request context available");
+			}
 
-            HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-            String token = JWTAuthenticationFilter.extractRefreshTokenFromCookie(request);
+			HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+			String token = JWTAuthenticationFilter.extractRefreshTokenFromCookie(request);
 
-            if (token == null || token.isEmpty()) {
-                throw new InvalidRefreshTokenException("No refresh token found in cookie");
-            }
+			if (token == null || token.isEmpty()) {
+				throw new InvalidRefreshTokenException("No refresh token found in cookie");
+			}
 
-            return token;
-        } catch (Exception e) {
-            throw new InvalidRefreshTokenException("Failed to extract refresh token from cookie: " + e.getMessage());
-        }
+			return token;
+		} catch (Exception e) {
+			throw new InvalidRefreshTokenException("Failed to extract refresh token from cookie: " + e.getMessage());
+		}
 	}
 
 	/**

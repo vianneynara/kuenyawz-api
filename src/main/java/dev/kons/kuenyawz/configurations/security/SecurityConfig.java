@@ -1,7 +1,9 @@
 package dev.kons.kuenyawz.configurations.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.kons.kuenyawz.configurations.ApplicationProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,10 +30,12 @@ import java.util.Map;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
 	private final AuthenticationProvider authenticationProvider;
 	private final JWTAuthenticationFilter jwtAuthenticationFilter;
+	private final ApplicationProperties properties;
 
 	@Bean
 	@Order(1)
@@ -60,97 +64,97 @@ public class SecurityConfig {
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**"))
 			.authorizeHttpRequests(auth -> auth
-				// Docs/Swagger access
-				.requestMatchers(
-					"/api/docs/**",
-					"/swagger/**",
-					"/swagger-ui/**",
-					"/favicon.ico").permitAll()
+					// Docs/Swagger access
+					.requestMatchers(
+						"/api/docs/**",
+						"/swagger/**",
+						"/swagger-ui/**",
+						"/favicon.ico").permitAll()
 
 //				// Actuator endpoints
 //				.requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
 //				.requestMatchers(HttpMethod.GET, "/actuator/**").hasRole("ADMIN")
 
-				// H2 Console access
-				.requestMatchers("/h2-console/**").permitAll()
+					// H2 Console access
+					.requestMatchers("/h2-console/**").permitAll()
 
-				// Allow preflight requests
-				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+					// Allow preflight requests
+					.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-				// Public endpoints
-				.requestMatchers(HttpMethod.GET,
-					"/static/**",
-					"/api",
-					"/api/status",
-					"/api/images/**",
-					"/api/products",
-					"/api/products/**",
-					"/api/recommender/**",
-					"/api/closure",
-					"/api/closure/**",
-					"/api/static/**").permitAll()
+					// Public endpoints
+					.requestMatchers(HttpMethod.GET,
+						"/static/**",
+						"/api",
+						"/api/status",
+						"/api/images/**",
+						"/api/products",
+						"/api/products/**",
+						"/api/recommender/**",
+						"/api/closure",
+						"/api/closure/**",
+						"/api/static/**").permitAll()
 
-				// Public webhooks
-				.requestMatchers(HttpMethod.POST,
-					"/api/midtrans/notify"
-				).permitAll()
+					// Public webhooks
+					.requestMatchers(HttpMethod.POST,
+						"/api/midtrans/notify"
+					).permitAll()
 
-				// Auth endpoints (all public)
-				.requestMatchers(HttpMethod.POST,
-					"/api/auth/register",
-					"/api/auth/login",
-					"/api/auth/revoke",
-					"/api/auth/refresh",
-					"/api/auth/otp/request",
-					"/api/auth/otp/verify").permitAll()
+					// Auth endpoints (all public)
+					.requestMatchers(HttpMethod.POST,
+						"/api/auth/register",
+						"/api/auth/login",
+						"/api/auth/revoke",
+						"/api/auth/refresh",
+						"/api/auth/otp/request",
+						"/api/auth/otp/verify").permitAll()
 
-				// Simulator endpoints
-				.requestMatchers("/api/sim/**").permitAll()
+					// Simulator endpoints
+					.requestMatchers("/api/sim/**").permitAll()
 
-				// TODO: use .denyAll() in production to reject incoming requests
-				// Experimental endpoints
-				.requestMatchers(HttpMethod.POST, "/api/midtrans/sign").hasRole("ADMIN")
+					// TODO: use .denyAll() in production to reject incoming requests
+					// Experimental endpoints
+					.requestMatchers(HttpMethod.POST, "/api/midtrans/sign").hasRole("ADMIN")
 
-				// Account endpoints
-				.requestMatchers(HttpMethod.GET, "/api/accounts").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.POST, "/api/accounts").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.PATCH, "/api/accounts/{accountId:\\d+}/privilege").hasRole("ADMIN")
-				.requestMatchers("/api/accounts/**").hasAnyRole("ADMIN", "USER")
+					// Account endpoints
+					.requestMatchers(HttpMethod.GET, "/api/accounts").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.POST, "/api/accounts").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.PATCH, "/api/accounts/{accountId:\\d+}/privilege").hasRole("ADMIN")
+					.requestMatchers("/api/accounts/**").hasAnyRole("ADMIN", "USER")
 
-				// Closure endpoints
-				.requestMatchers(HttpMethod.POST, "/api/closure").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.DELETE, "/api/closure**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.PATCH, "/api/closure").hasRole("ADMIN")
+					// Closure endpoints
+					.requestMatchers(HttpMethod.POST, "/api/closure").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.DELETE, "/api/closure**").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.PATCH, "/api/closure").hasRole("ADMIN")
 
-				// Order Processing endpoints
-				.requestMatchers(HttpMethod.GET, "/api/orders/**").hasAnyRole("ADMIN", "USER")
-				.requestMatchers(HttpMethod.POST, "/api/orders").hasRole("USER")
-				.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/cancel").hasAnyRole("ADMIN", "USER")
-				.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/confirm").hasAnyRole("ADMIN")
-				.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/status").hasAnyRole("ADMIN")
-				.requestMatchers(HttpMethod.GET, "/api/orders/{purchaseId:\\d+}/status/next").hasAnyRole("ADMIN", "USER")
-				.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/status/next").hasAnyRole("ADMIN")
-				.requestMatchers(HttpMethod.GET, "/api/orders/{purchaseId:\\d+}/transaction").hasAnyRole("ADMIN", "USER")
+					// Order Processing endpoints
+					.requestMatchers(HttpMethod.GET, "/api/orders/**").hasAnyRole("ADMIN", "USER")
+					.requestMatchers(HttpMethod.POST, "/api/orders").hasRole("USER")
+					.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/cancel").hasAnyRole("ADMIN", "USER")
+					.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/confirm").hasAnyRole("ADMIN")
+					.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/status").hasAnyRole("ADMIN")
+					.requestMatchers(HttpMethod.GET, "/api/orders/{purchaseId:\\d+}/status/next").hasAnyRole("ADMIN", "USER")
+					.requestMatchers(HttpMethod.POST, "/api/orders/{purchaseId:\\d+}/status/next").hasAnyRole("ADMIN")
+					.requestMatchers(HttpMethod.GET, "/api/orders/{purchaseId:\\d+}/transaction").hasAnyRole("ADMIN", "USER")
 
-				// Transaction endpoints
-				.requestMatchers(HttpMethod.GET, "/api/transactions").hasAnyRole("ADMIN", "USER")
-				.requestMatchers(HttpMethod.GET, "/api/transactions/{transactionId:\\d+}").hasAnyRole("ADMIN", "USER")
+					// Transaction endpoints
+					.requestMatchers(HttpMethod.GET, "/api/transactions").hasAnyRole("ADMIN", "USER")
+					.requestMatchers(HttpMethod.GET, "/api/transactions/{transactionId:\\d+}").hasAnyRole("ADMIN", "USER")
 
-				// Product/Image admin endpoints
-				.requestMatchers(HttpMethod.POST, "/api/products/**", "/api/images/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.PUT, "/api/products/**", "/api/images/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.DELETE, "/api/products/**", "/api/images/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole("ADMIN")
+					// Product/Image admin endpoints
+					.requestMatchers(HttpMethod.POST, "/api/products/**", "/api/images/**").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.PUT, "/api/products/**", "/api/images/**").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.DELETE, "/api/products/**", "/api/images/**").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole("ADMIN")
 
-				// Recommender endpoints
-				.requestMatchers(HttpMethod.POST, "/api/recommender/generate").hasRole("ADMIN")
+					// Recommender endpoints
+					.requestMatchers(HttpMethod.POST, "/api/recommender/generate").hasRole("ADMIN")
 
-				// Closure endpoints
-				.requestMatchers(HttpMethod.POST, "/api/closure").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.DELETE, "/api/closure/**").hasRole("ADMIN")
+					// Closure endpoints
+					.requestMatchers(HttpMethod.POST, "/api/closure").hasRole("ADMIN")
+					.requestMatchers(HttpMethod.DELETE, "/api/closure/**").hasRole("ADMIN")
 
-				// Catch-all
-				.anyRequest().authenticated()
+					// Catch-all
+					.anyRequest().authenticated()
 			)
 			.headers(hs -> hs.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
 			.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -181,8 +185,16 @@ public class SecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 
+		String frontEndBaseUrl = properties.getFrontend().getBaseUrl();
+		log.info("CORS Origin allowed for: {}", frontEndBaseUrl);
+
 		// Allowing a list if possible ports we'll use lol
 		configuration.setAllowedOrigins(List.of(
+			frontEndBaseUrl,
+			/* hardcoded here, it's the same as what is supposed to be in frontEndBaseUrl */
+//			"https://natural-hamster-firstly.ngrok-free.app",
+			/* this is pretty much unecessary since it's the current domain being sit by the program*/
+			"https://distinctly-harmless-elephant.ngrok-free.app",
 			"http://localhost:80",
 			"http://localhost:443",
 			"http://localhost:5173",
@@ -190,8 +202,8 @@ public class SecurityConfig {
 			"http://localhost:62080",
 			"http://localhost:62081" // H2/Swagger UI
 		));
+		configuration.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With", "Ngrok-Skip-Browser-Warning"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-		configuration.setAllowedHeaders(List.of("*"));
 		configuration.setAllowCredentials(true);
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

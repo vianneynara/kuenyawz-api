@@ -15,6 +15,9 @@ services:
       - DB_NAME=${DB_NAME}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+      - APP_HTTP_PROTOCOL=${APP_HTTP_PROTOCOL}
+      - APP_SERVER_HOST=${APP_SERVER_HOST}
+      - APP_SERVER_PORT=${APP_SERVER_PORT}
       - APP_VERSION=${APP_VERSION}
       - APP_REPOSITORY_URL=${APP_REPOSITORY_URL}
       - FRONTEND_BASE_URL=${FRONTEND_BASE_URL}
@@ -43,6 +46,8 @@ services:
       - MIDTRANS_ERROR_URL=${MIDTRANS_ERROR_URL}
     depends_on:
       - db
+    volumes:
+      - app_uploads:/app/uploads
 
   db:
     image: 'postgres:latest'
@@ -63,3 +68,4 @@ networks:
 
 volumes:
   postgres_data:
+  app_uploads:
