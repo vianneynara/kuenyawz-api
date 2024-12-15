@@ -3,6 +3,7 @@ package dev.kons.kuenyawz.configurations.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.kons.kuenyawz.configurations.ApplicationProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,7 @@ import java.util.Map;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
 	private final AuthenticationProvider authenticationProvider;
@@ -183,11 +185,16 @@ public class SecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 
-		final String frontEndBaseUrl = properties.frontend().getBaseUrl();
+		String frontEndBaseUrl = properties.getFrontend().getBaseUrl();
+		log.info("CORS Origin allowed for: {}", frontEndBaseUrl);
 
 		// Allowing a list if possible ports we'll use lol
 		configuration.setAllowedOrigins(List.of(
 			frontEndBaseUrl,
+			/* hardcoded here, it's the same as what is supposed to be in frontEndBaseUrl */
+//			"https://natural-hamster-firstly.ngrok-free.app",
+			/* this is pretty much unecessary since it's the current domain being sit by the program*/
+			"https://distinctly-harmless-elephant.ngrok-free.app",
 			"http://localhost:80",
 			"http://localhost:443",
 			"http://localhost:5173",
@@ -195,8 +202,8 @@ public class SecurityConfig {
 			"http://localhost:62080",
 			"http://localhost:62081" // H2/Swagger UI
 		));
+		configuration.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With", "Ngrok-Skip-Browser-Warning"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-		configuration.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With"));
 		configuration.setAllowCredentials(true);
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
