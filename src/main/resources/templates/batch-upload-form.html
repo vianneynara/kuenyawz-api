@@ -11,10 +11,11 @@
 <input type="text" id="token" name="token">
 <br><br>
 <label for="baseUrl">Base URL:</label>
-<input type="text" id="baseUrl" name="baseUrl" value="connected directly to the service" disabled>
-<br><br>
-
+<input type="text" id="baseUrl" name="baseUrl" value="http://localhost:8081">
+<br><br><br>
+<label for="info-conn"></label><input type="text" id="info-conn" name="info conn" value="connected directly to the service" disabled>
 <label for="productId">Product ID:</label>
+<br><br>
 <select id="productId" name="productId" required>
     <option value="">Select a product</option>
     <option th:each="product : ${products.content}"
