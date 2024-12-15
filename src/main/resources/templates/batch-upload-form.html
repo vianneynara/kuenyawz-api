@@ -5,6 +5,15 @@
 </head>
 <body>
 <h1>Batch Image Upload</h1>
+
+<!-- access token input -->
+<label for="token">Access Token:</label>
+<input type="text" id="token" name="token">
+<br><br>
+<label for="baseUrl">Base URL:</label>
+<input type="text" id="baseUrl" name="baseUrl" value="http://localhost:8081">
+<br><br>
+
 <label for="productId">Product ID:</label>
 <select id="productId" name="productId" required></select>
 <button onclick="refreshProductOptions()">Refresh</button>
@@ -22,7 +31,9 @@
     }
 
     function fetchProductIds() {
-        fetch('http://localhost:8081/api/products')
+        const baseUrl = document.getElementById('baseUrl').value;
+
+        fetch(`${baseUrl}/api/products`)
             .then(response => response.json())
             .then(data => {
                 const productSelect = document.getElementById('productId');
@@ -41,8 +52,11 @@
     }
 
     function uploadImages() {
+        const baseUrl = document.getElementById('baseUrl').value;
+
         const productId = document.getElementById('productId').value;
         const fileInput = document.getElementById('file');
+        const accessToken = document.getElementById('token').value;
         const formData = new FormData();
 
         for (const file of fileInput.files) {
@@ -52,8 +66,11 @@
         const responseDiv = document.getElementById('responses');
         responseDiv.innerHTML = '';
 
-        fetch(`http://localhost:8081/api/images/${productId}/batch`, {
+        fetch(`${baseUrl}/api/images/${productId}/batch`, {
             method: 'POST',
+            headers: {
+                "Authorization": "Bearer " + accessToken
+            },
             body: formData
         })
             .then(response => response.json())
