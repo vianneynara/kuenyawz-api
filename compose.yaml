@@ -46,6 +46,8 @@ services:
       - MIDTRANS_ERROR_URL=${MIDTRANS_ERROR_URL}
     depends_on:
       - db
+    volumes:
+      - app_uploads:/app/uploads
 
   db:
     image: 'postgres:latest'
@@ -66,3 +68,4 @@ networks:
 
 volumes:
   postgres_data:
+  app_uploads:
