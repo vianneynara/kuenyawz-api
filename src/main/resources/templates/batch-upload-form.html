@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Batch Image Upload</title>
+    <title>Batch Image Upload</title>
 </head>
 <body>
 <h1>Batch Image Upload</h1>
@@ -11,12 +11,17 @@
 <input type="text" id="token" name="token">
 <br><br>
 <label for="baseUrl">Base URL:</label>
-<input type="text" id="baseUrl" name="baseUrl" value="http://localhost:8081">
+<input type="text" id="baseUrl" name="baseUrl" value="connected directly to the service" disabled>
 <br><br>
 
 <label for="productId">Product ID:</label>
-<select id="productId" name="productId" required></select>
-<button onclick="refreshProductOptions()">Refresh</button>
+<select id="productId" name="productId" required>
+    <option value="">Select a product</option>
+    <option th:each="product : ${products.content}"
+            th:value="${product.productId}"
+            th:text="|${product.productId} - ${product.name} - ${#lists.size(product.images)} images|">
+    </option>
+</select>
 <br><br>
 <label for="file">Files to upload:</label>
 <input type="file" id="file" name="file" multiple required>
@@ -25,35 +30,9 @@
 <br><br>
 <div id="responses"></div>
 
-<script>
-    function refreshProductOptions() {
-        fetchProductIds();
-    }
-
-    function fetchProductIds() {
-        const baseUrl = document.getElementById('baseUrl').value;
-
-        fetch(`${baseUrl}/api/products`)
-            .then(response => response.json())
-            .then(data => {
-                const productSelect = document.getElementById('productId');
-                productSelect.innerHTML = '<option value="">Select a product</option>';
-
-                data.content.forEach(product => {
-                    const option = document.createElement('option');
-                    option.value = product.productId;
-                    option.text = `(${product.productId}) ${product.name} - ${product.images.length} images`;
-                    productSelect.add(option);
-                });
-            })
-            .catch(error => {
-                alert('Error fetching product IDs: ' + error);
-            });
-    }
-
+<script th:inline="javascript">
     function uploadImages() {
         const baseUrl = document.getElementById('baseUrl').value;
-
         const productId = document.getElementById('productId').value;
         const fileInput = document.getElementById('file');
         const accessToken = document.getElementById('token').value;
@@ -75,16 +54,12 @@
         })
             .then(response => response.json())
             .then(data => {
-                responseDiv.innerHTML = `<pre>
-${JSON.stringify(data, null, 2)}
-</pre>`;
+                responseDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
             })
             .catch(error => {
                 responseDiv.innerHTML = 'Error uploading images: ' + error;
             });
     }
-
-    fetchProductIds();
 </script>
 </body>
 </html>
