@@ -55,6 +55,10 @@ public class ApplicationProperties {
 	// Initializing through dotenv
 	@Autowired
 	public void initialize(Dotenv dotenv) {
+		this.httpProtocol = getEnv("APP_HTTP_PROTOCOL", "http", dotenv);
+		this.publicIp = getEnv("APP_PUBLIC_IP", "localhost", dotenv);
+		this.serverPort = getEnv("APP_SERVER_PORT", "8081", dotenv);
+
 		this.version = getEnv("APP_VERSION", "0.0", dotenv);
 		this.repositoryUrl = getEnv("APP_REPOSITORY_URL", "https://github.com/vianneynara/*", dotenv);
 
