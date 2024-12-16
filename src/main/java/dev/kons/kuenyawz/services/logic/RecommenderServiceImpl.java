@@ -50,12 +50,21 @@ public class RecommenderServiceImpl implements RecommenderService {
 
 			Iterator<Long> iterator = recommendedIds.iterator();
 			if (iterator.hasNext()) {
+				if(iterator.next() == null) {
+					apriori.setRecommended1(addOneRandom(productId, recommendedIds));
+				}
 				apriori.setRecommended1(iterator.next());
 			}
 			if (iterator.hasNext()) {
+				if(iterator.next() == null) {
+					apriori.setRecommended2(addOneRandom(productId, recommendedIds));
+				}
 				apriori.setRecommended2(iterator.next());
 			}
 			if (iterator.hasNext()) {
+				if(iterator.next() == null) {
+					apriori.setRecommended3(addOneRandom(productId, recommendedIds));
+				}
 				apriori.setRecommended3(iterator.next());
 			}
 
@@ -74,7 +83,7 @@ public class RecommenderServiceImpl implements RecommenderService {
 	}
 
 	public Map<Long, Set<Long>> convertToAprioriSource(List<Purchase> purchases) {
-		Map<Long, Set<Long>> purchaseIdAndProductIds = new HashMap<>();
+		Map<Long, Set<Long>> purchasesAndProductIds = new HashMap<>();
 
 		// Create set of product ids for each purchase and put it to the map
 		for (Purchase purchase : purchases) {
@@ -132,5 +141,16 @@ public class RecommenderServiceImpl implements RecommenderService {
 		).toList();
 
 		return products.stream().map(productService::convertToDto).toList();
+	}
+
+	private Long addOneRandom(Long productId, Set<Long> excludeSet) {
+		excludeSet.add(productId);
+
+		List<Long> allProductIds = productRepository.findAllIds();
+		List<Long> filteredProductIds = allProductIds.stream()
+				.filter(id -> !excludeSet.contains(id))
+				.collect(Collectors.toList());
+
+		return filteredProductIds.get(new Random().nextInt(filteredProductIds.size()));
 	}
 }

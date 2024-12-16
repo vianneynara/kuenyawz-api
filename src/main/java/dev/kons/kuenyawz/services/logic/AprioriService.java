@@ -20,7 +20,7 @@ public interface AprioriService {
      * @param productId The selected product
      * @return
      */
-    Map<Long, Set<Long>> findFrequentSetItemWith(Map<Long, Set<Long>> orders, Long productId);
+    Set<Long> findFrequentSetItemWith(Map<Long, Set<Long>> orders, Long productId);
 
     /**
      * Find frequent of one item(Product), to find the match frequent item with the selected item
@@ -30,7 +30,7 @@ public interface AprioriService {
      * @param topN Number of frequent item that going to be show
      * @return
      */
-    Map<Long, Set<Long>> findFrequentSetItemWith(Map<Long, Set<Long>> orders, Long productId, int topN);
+    Set<Long> findFrequentSetItemWith(Map<Long, Set<Long>> orders, Long productId, int topN);
 
     /**
      * Find the most buy frequent item
@@ -39,5 +39,5 @@ public interface AprioriService {
      * @param topN Number of frequent item that going to be show
      * @return
      */
-    Map<Long, Set<Long>> getTopN(Map<Long, Set<Long>> orders, int topN);
+    Set<Long> getTopN(Map<Long, Set<Long>> orders, int topN);
 }
