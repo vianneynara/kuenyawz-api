@@ -83,7 +83,7 @@ public class RecommenderServiceImpl implements RecommenderService {
 	}
 
 	public Map<Long, Set<Long>> convertToAprioriSource(List<Purchase> purchases) {
-		Map<Long, Set<Long>> purchasesAndProductIds = new HashMap<>();
+		Map<Long, Set<Long>> purchaseIdAndProductIds = new HashMap<>();
 
 		// Create set of product ids for each purchase and put it to the map
 		for (Purchase purchase : purchases) {
