@@ -11,7 +11,7 @@ public interface AprioriService {
      * @return Set<Map < Long ( ProductId ), Set < Long ( ProductId )>>>
      * @input Set<Map < Long ( OrderId ), Set < Long ( ProductId )>>>
      */
-    Map<Long, Set<Long>> findAllFrequentSetOfItems(Set<Map<Long, Set<Long>>> orders);
+    Map<Long, Set<Long>> findAllFrequentSetOfItems(Map<Long, Set<Long>> orders);
 
     /**
      * Find frequent of one item(Product), to find the match frequent item with the selected item
@@ -20,7 +20,7 @@ public interface AprioriService {
      * @param productId The selected product
      * @return
      */
-    Map<Long, Set<Long>> findFrequentSetItemWith(Set<Map<Long, Set<Long>>> orders, Long productId);
+    Map<Long, Set<Long>> findFrequentSetItemWith(Map<Long, Set<Long>> orders, Long productId);
 
     /**
      * Find frequent of one item(Product), to find the match frequent item with the selected item
@@ -30,7 +30,7 @@ public interface AprioriService {
      * @param topN Number of frequent item that going to be show
      * @return
      */
-    Map<Long, Set<Long>> findFrequentSetItemWith(Set<Map<Long, Set<Long>>> orders, Long productId, int topN);
+    Map<Long, Set<Long>> findFrequentSetItemWith(Map<Long, Set<Long>> orders, Long productId, int topN);
 
     /**
      * Find the most buy frequent item
@@ -39,5 +39,5 @@ public interface AprioriService {
      * @param topN Number of frequent item that going to be show
      * @return
      */
-    Map<Long, Set<Long>> getTopN(Set<Map<Long, Set<Long>>> orders, int topN);
+    Map<Long, Set<Long>> getTopN(Map<Long, Set<Long>> orders, int topN);
 }
