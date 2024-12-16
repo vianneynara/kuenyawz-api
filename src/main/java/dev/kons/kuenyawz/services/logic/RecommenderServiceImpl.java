@@ -90,11 +90,10 @@ public class RecommenderServiceImpl implements RecommenderService {
 			Set<Long> productIds = purchase.getPurchaseItems().stream()
 				.map(purchaseItem -> purchaseItem.getVariant().getProduct().getProductId())
 				.collect(Collectors.toSet());
-
-			Map<Long, Set<Long>> map = Map.of(purchase.getPurchaseId(), productIds);
+			purchaseIdAndProductIds.put(purchase.getPurchaseId(), productIds);
 		}
 
-		return purchasesAndProductIds;
+		return purchaseIdAndProductIds;
 	}
 
 	private List<ProductDto> newRecommender(Long productId) {
