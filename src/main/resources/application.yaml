@@ -1,0 +1,88 @@
+spring:
+    application:
+        name: KuenyaWZ API
+    cache:
+        type: caffeine
+        cache-names: productsCache,productDto,purchasesCache
+        # Uncomment to override the default cache configuration
+        # caffeine:
+        #   spec: maximumSize=300,expireAfterAccess=3m
+    cloud:
+        config:
+            uri: http://localhost:62081
+    config:
+        import: optional:configserver:http://localhost:62081
+    datasource:
+        hikari:
+            pool-name: KuenyaWZ-Pool
+            maximum-pool-size: 5
+            data-source-properties:
+                cachePrepStmts: true
+                prepStmtCacheSize: 250
+                prepStmtCacheSqlLimit: 2048
+                useServerPrepStmts: true
+                useLocalSessionState: true
+                rewriteBatchedStatements: true
+                cacheResultSetMetadata: true
+                cacheServerConfiguration: true
+                elideSetAutoCommits: true
+                maintainTimeStats: false
+    h2:
+        console:
+            enabled: true
+    jpa:
+        show-sql: false
+        properties:
+            hibernate.format_sql: true
+    servlet:
+        multipart:
+            max-file-size: 10MB
+            max-request-size: 15MB
+
+springdoc:
+    swagger-ui:
+        path: /swagger-ui
+        operations-sorter: alpha
+        # Not sure whether this will do anything
+        enabled: true
+        config-url: /docs/v3
+    api-docs:
+        path: /docs/v3
+
+application:
+    version: 1.0.0
+    repositoryUrl: https://github.com/vianneynara/kuenyawz-api
+    accepted-image-extensions: png,jpg,jpeg,webp
+    max-variant-quantity: 250
+    otp-format: numeric
+    seeder:
+        seed-accounts: true
+        seed-products: true
+
+server:
+    port: 8081
+
+management:
+    endpoint:
+        health:
+            probes:
+                enabled: true
+            show-details: when_authorized
+        shutdown:
+            enabled: true
+        mappings:
+            access: read_only
+    health:
+        readinessstate:
+            enabled: true
+        livenessstate:
+            enabled: true
+    endpoints:
+        web:
+            exposure:
+                include: health,info,shutdown,refresh,mappings
+
+logging:
+    level:
+        dev.kons.kuenyawz.filters.RequestLoggingFilter: DEBUG
+#        org.springframework.security: debug
