@@ -38,7 +38,7 @@ public class RecommenderServiceImpl implements RecommenderService {
 	public void generateApriori() {
 		aprioriRepository.deleteAll();
 
-		Set<Map<Long, Set<Long>>> purchaseData = gatherPurchaseData();
+		Map<Long, Set<Long>> purchaseData = gatherPurchaseData();
 		var ruleSets = aprioriService.findAllFrequentSetOfItems(purchaseData);
 
 		for (Map.Entry<Long, Set<Long>> entry : ruleSets.entrySet()) {
@@ -68,25 +68,23 @@ public class RecommenderServiceImpl implements RecommenderService {
 		aprioriRepository.deleteAll();
 	}
 
-	private Set<Map<Long, Set<Long>>> gatherPurchaseData() {
+	private Map<Long, Set<Long>> gatherPurchaseData() {
 		List<Purchase> purchases = purchaseService.getAprioriNeeds();
 		return convertToAprioriSource(purchases);
 	}
 
-	public Set<Map<Long, Set<Long>>> convertToAprioriSource(List<Purchase> purchases) {
-		Set<Map<Long, Set<Long>>> purchasesAndProductIds = new HashSet<>();
+	public Map<Long, Set<Long>> convertToAprioriSource(List<Purchase> purchases) {
+		Map<Long, Set<Long>> purchaseIdAndProductIds = new HashMap<>();
 
 		// Create set of product ids for each purchase and put it to the map
 		for (Purchase purchase : purchases) {
 			Set<Long> productIds = purchase.getPurchaseItems().stream()
 				.map(purchaseItem -> purchaseItem.getVariant().getProduct().getProductId())
 				.collect(Collectors.toSet());
-
-			Map<Long, Set<Long>> map = Map.of(purchase.getPurchaseId(), productIds);
-			purchasesAndProductIds.add(map);
+			purchaseIdAndProductIds.put(purchase.getPurchaseId(), productIds);
 		}
 
-		return purchasesAndProductIds;
+		return purchaseIdAndProductIds;
 	}
 
 	private List<ProductDto> newRecommender(Long productId) {
