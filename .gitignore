@@ -37,3 +37,7 @@ build/
 
 ### ENVIRONMENT ###
 .env
+
+### DOCKER GENERATED ###
+app_uploads/
+postgres_data/
