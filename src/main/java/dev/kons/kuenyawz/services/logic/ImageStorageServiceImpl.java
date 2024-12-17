@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.*;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -47,19 +49,10 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 	@Override
 	@PostConstruct
 	public void init() {
-		productImagesDir = properties.getProductImagesDir();
-		try {
-			Path projectUploadLocation = Path.of(System.getProperty("user.dir"), ROOT_TO_UPLOAD, productImagesDir)
-				.normalize()
-				.toAbsolutePath();
+		Boolean isContainerized = properties.getIsContainerized();
 
-			// Attempt to create directories in the project path
-			Files.createDirectories(projectUploadLocation);
-			uploadLocation = projectUploadLocation;
-
-			log.info("Using project upload directory at: {}", uploadLocation);
-		} catch (IOException | SecurityException projectDirException) {
-			// Fallback to container/docker upload directory
+		if (isContainerized) {
+			// Use container upload directory
 			try {
 				Path containerUploadLocation = Path.of("/app/uploads", productImagesDir)
 					.normalize()
@@ -68,14 +61,42 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 				Files.createDirectories(containerUploadLocation);
 				uploadLocation = containerUploadLocation;
 
-				log.warn("Fallback to container upload directory at: {}", uploadLocation);
-			} catch (IOException containerDirException) {
-				log.error("Failed to create upload directory in both project and container locations", containerDirException);
-				throw new ResourceUploadException("Could not create upload directory in any location");
+				// Set POSIX permissions if possible
+				try {
+					Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxrwxrwx");
+					Files.setPosixFilePermissions(containerUploadLocation, perms);
+				} catch (Exception e) {
+					log.warn("Could not set POSIX permissions", e);
+				}
+
+				// Check write-ability of the containerized upload directory
+				if (!Files.isWritable(containerUploadLocation)) {
+					log.error("Upload directory is not writable: {}", containerUploadLocation);
+					throw new ResourceUploadException("Upload directory is not writable: " + containerUploadLocation);
+				}
+
+				log.warn("Using CONTAINER upload directory at: {}", uploadLocation);
+			} catch (IOException | SecurityException e) {
+				log.error("Failed to create upload directory in container location", e);
+				throw new ResourceUploadException("Could not create upload directory in container location");
+			}
+		} else {
+			// Fallback to local upload directory
+			try {
+				Path projectUploadLocation = Path.of(System.getProperty("user.dir"), ROOT_TO_UPLOAD, productImagesDir)
+					.normalize()
+					.toAbsolutePath();
+
+				Files.createDirectories(projectUploadLocation);
+				uploadLocation = projectUploadLocation;
+
+				log.info("Using LOCAL upload directory at: {}", uploadLocation);
+			} catch (IOException | SecurityException e) {
+				log.error("Failed to create upload directory in local location", e);
+				throw new ResourceUploadException("Could not create upload directory in local location");
 			}
 		}
 
-		// Ensure the directory exists and is writable
 		if (!Files.exists(uploadLocation) || !Files.isWritable(uploadLocation)) {
 			throw new ResourceUploadException("Upload directory is not writable: " + uploadLocation);
 		}
@@ -137,7 +158,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 				throw new ResourceNotFoundException("Resource '" + productId + "/" + resourceUri + "' not found");
 			}
 		} catch (NumberFormatException | MalformedURLException e) {
-			throw new ResourceNotFoundException("Resource '" + productId + "/" + resourceUri + "' not found");
+			throw new ResourceNotFoundException("Resource '" + productId + "/" + resourceUri + "' path unreadable");
 		}
 	}
 
