@@ -12,18 +12,22 @@ COPY src ./src
 # Build the application
 RUN mvn clean package -DskipTests
 
-# Stage 2: Get runtime image
-# https://github.com/GoogleContainerTools/distroless/tree/main/java
+# Stage 2: Prepare uploads directory
+FROM debian:stable-slim AS permissions
+RUN mkdir -p /app/uploads
+RUN chmod 777 /app/uploads
+
+# Stage 3: Final distroless image
 FROM gcr.io/distroless/java21-debian12:nonroot
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the application JAR from the builder stage to /app/
+# Copy the application JAR from the builder stage
 COPY --from=builder /build/target/kuenyawz-api-1.0.0.jar /app/kuenyawz-api.jar
 
-# Create a volume for uploads (product-images)
-VOLUME /app/uploads
+# Copy the prepared uploads directory from the permissions stage
+COPY --from=permissions /app/uploads /app/uploads
 
 # Define and set default environment variables
 ENV SERVER_PORT=8081
