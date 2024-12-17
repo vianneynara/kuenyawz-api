@@ -32,8 +32,9 @@ public class ApplicationProperties {
 	private String productImagesDir = "product-images";
 	private String baseUrl = "http://localhost:8081";
 	private Integer maxVariantQuantity = 250;
-	private String publicIp = "localhost";
+	private Boolean isContainerized = false;
 	private String httpProtocol = "http";
+	private String publicIp = "localhost";
 	private String timezone = "Asia/Jakarta";
 
 	@Value("${application.otp-format:NUMERIC}")
@@ -55,6 +56,7 @@ public class ApplicationProperties {
 	// Initializing through dotenv
 	@Autowired
 	public void initialize(Dotenv dotenv) {
+		this.isContainerized = Boolean.parseBoolean(getEnv("APP_CONTAINERIZED", "false", dotenv));
 		this.httpProtocol = getEnv("APP_HTTP_PROTOCOL", "http", dotenv);
 		this.publicIp = getEnv("APP_SERVER_HOST", "localhost", dotenv);
 		this.serverPort = getEnv("APP_SERVER_PORT", "8081", dotenv);
