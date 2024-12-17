@@ -9,25 +9,25 @@ WORKDIR /build
 COPY pom.xml .
 COPY src ./src
 
+# This might not work and not readable by the spring boot
+# Instead, use compose to define the environment variables.
+COPY .env ./.env
+
 # Build the application
 RUN mvn clean package -DskipTests
 
-# Stage 2: Prepare uploads directory
-FROM debian:stable-slim AS permissions
-RUN mkdir -p /app/uploads
-RUN chmod 777 /app/uploads
-
-# Stage 3: Final distroless image
+# Stage 2: Get runtime image
+# https://github.com/GoogleContainerTools/distroless/tree/main/java
 FROM gcr.io/distroless/java21-debian12:nonroot
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the application JAR from the builder stage
+# Copy the application JAR from the builder stage to /app/
 COPY --from=builder /build/target/kuenyawz-api-1.0.0.jar /app/kuenyawz-api.jar
 
-# Copy the prepared uploads directory from the permissions stage
-COPY --from=permissions /app/uploads /app/uploads
+# Create a volume for uploads (product-images)
+VOLUME /app/uploads
 
 # Define and set default environment variables
 ENV SERVER_PORT=8081
