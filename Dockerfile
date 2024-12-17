@@ -9,10 +9,6 @@ WORKDIR /build
 COPY pom.xml .
 COPY src ./src
 
-# This might not work and not readable by the spring boot
-# Instead, use compose to define the environment variables.
-COPY .env ./.env
-
 # Build the application
 RUN mvn clean package -DskipTests
 
