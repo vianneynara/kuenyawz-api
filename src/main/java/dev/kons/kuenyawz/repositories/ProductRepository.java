@@ -15,9 +15,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
 	List<Product> findAllByCategoryIsAndNameLikeIgnoreCase(Product.Category category, String name);
 
-	@Query("SELECT p.productId FROM Product p")
-	List<Long> findAllIds();
-
 	@Query("SELECT p.productId FROM Product p WHERE p.available=TRUE")
 	List<Long> findAllAvailableIds();
 }
