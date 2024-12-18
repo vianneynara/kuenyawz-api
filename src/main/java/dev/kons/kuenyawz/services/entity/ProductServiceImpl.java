@@ -182,6 +182,7 @@ public class ProductServiceImpl implements ProductService {
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
 
 		product.setDeleted(true);
+		product.setAvailable(false);
 		productRepository.save(product);
 	}
 
@@ -194,6 +195,7 @@ public class ProductServiceImpl implements ProductService {
 		List<Product> products = productRepository.findAll();
 		products.forEach(product -> {
 			product.setDeleted(true);
+			product.setAvailable(false);
 			productRepository.save(product);
 		});
 	}
