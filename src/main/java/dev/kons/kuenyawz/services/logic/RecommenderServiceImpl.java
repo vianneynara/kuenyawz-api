@@ -49,24 +49,10 @@ public class RecommenderServiceImpl implements RecommenderService {
 			apriori.setProductId(productId);
 
 			Iterator<Long> iterator = recommendedIds.iterator();
-			if (iterator.hasNext()) {
-				if(iterator.next() == null) {
-					apriori.setRecommended1(addOneRandom(productId, recommendedIds));
-				}
-				apriori.setRecommended1(iterator.next());
-			}
-			if (iterator.hasNext()) {
-				if(iterator.next() == null) {
-					apriori.setRecommended2(addOneRandom(productId, recommendedIds));
-				}
-				apriori.setRecommended2(iterator.next());
-			}
-			if (iterator.hasNext()) {
-				if(iterator.next() == null) {
-					apriori.setRecommended3(addOneRandom(productId, recommendedIds));
-				}
-				apriori.setRecommended3(iterator.next());
-			}
+			apriori.setRecommended1(iterator.hasNext() ? iterator.next() : addOneRandom(productId, recommendedIds));
+			apriori.setRecommended2(iterator.hasNext() ? iterator.next() : addOneRandom(productId, recommendedIds));
+			apriori.setRecommended3(iterator.hasNext() ? iterator.next() : addOneRandom(productId, recommendedIds));
+
 
 			aprioriRepository.save(apriori);
 		}
