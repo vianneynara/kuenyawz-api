@@ -55,9 +55,6 @@ application:
     accepted-image-extensions: png,jpg,jpeg,webp
     max-variant-quantity: 250
     otp-format: numeric
-    seeder:
-        seed-accounts: true
-        seed-products: true
 
 server:
     port: 8081

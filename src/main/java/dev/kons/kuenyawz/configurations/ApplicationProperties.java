@@ -172,8 +172,8 @@ public class ApplicationProperties {
 	@Getter
 	@Setter
 	public static class Seeder {
-		private Boolean seedAccounts = false;
-		private Boolean seedProducts = false;
+		private Boolean seedAccounts;
+		private Boolean seedProducts;
 	}
 
 	@Getter
