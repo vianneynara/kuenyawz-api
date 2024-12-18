@@ -1,9 +1,11 @@
 package dev.kons.kuenyawz.boostrappers;
 
 import dev.kons.kuenyawz.configurations.ApplicationProperties;
+import dev.kons.kuenyawz.dtos.account.AccountRegistrationDto;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.repositories.AccountRepository;
 import dev.kons.kuenyawz.repositories.ProductRepository;
+import dev.kons.kuenyawz.services.entity.AccountService;
 import dev.kons.kuenyawz.services.logic.AccountCsvService;
 import dev.kons.kuenyawz.services.logic.ProductCsvService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class DatabaseBootstrapper implements CommandLineRunner {
 	private final ProductRepository productRepository;
 	private final AccountCsvService accountCsvService;
 	private final AccountRepository accountRepository;
+	private final AccountService accountService;
 
 	private static final String PATH_TO_PRODUCT_SEEDER = "seeders/Products.csv";
 	private static final String PATH_TO_ACCOUNT_SEEDER = "seeders/Accounts.csv";
@@ -71,7 +74,21 @@ public class DatabaseBootstrapper implements CommandLineRunner {
 		if (properties.seeder().getSeedAccounts()) {
 			log.info("Injecting accounts...");
 			injectAccounts();
+		} else {
+			log.info("Injecting an admin account...");
+			final AccountRegistrationDto accountRegistrationDto = AccountRegistrationDto.builder()
+				.fullName("Admin")
+				.phone("81100001")
+				.password("admin")
+				.build();
+			try {
+				accountService.createAccount(accountRegistrationDto);
+				log.info("Admin account created (id: {})", accountRegistrationDto.getPhone());
+			} catch (Exception e) {
+				log.error("Admin account already exists (id: {})", accountRegistrationDto.getPhone());
+			}
 		}
+
 		if (properties.seeder().getSeedProducts()) {
 			log.info("Injecting products...");
 			injectProducts();
