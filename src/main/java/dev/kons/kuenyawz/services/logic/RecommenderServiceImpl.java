@@ -150,7 +150,7 @@ public class RecommenderServiceImpl implements RecommenderService {
 	private Long addOneRandom(Long productId, Set<Long> excludeSet) {
 		excludeSet.add(productId);
 
-		List<Long> allProductIds = productRepository.findAllIds();
+		List<Long> allProductIds = productRepository.findAllAvailableIds();
 		List<Long> filteredProductIds = allProductIds.stream()
 				.filter(id -> !excludeSet.contains(id))
 				.collect(Collectors.toList());
