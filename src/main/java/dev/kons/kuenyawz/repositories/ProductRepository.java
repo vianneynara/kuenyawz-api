@@ -17,4 +17,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
 	@Query("SELECT p.productId FROM Product p")
 	List<Long> findAllIds();
+
+	@Query("SELECT p.productId FROM Product p WHERE p.available=TRUE")
+	List<Long> findAllAvailableIds();
 }
