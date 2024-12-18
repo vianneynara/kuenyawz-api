@@ -66,7 +66,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
 					Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxrwxrwx");
 					Files.setPosixFilePermissions(containerUploadLocation, perms);
 				} catch (Exception e) {
-					log.warn("Could not set POSIX permissions", e);
+					log.warn("Could not set POSIX permissions, skipping: {}", e.getMessage());
 				}
 
 				// Check write-ability of the containerized upload directory
