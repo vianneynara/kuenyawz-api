@@ -19,7 +19,7 @@ public class AprioriServiceImpl implements AprioriService {
     public Map<Long, Set<Long>> findAllFrequentSetOfItems(Map<Long, Set<Long>> orders) {
         int targetSetSize = 3;
         Map<Long, Set<Long>> result = new HashMap<>();
-        List<Long> productIds = productRepository.findAllIds();
+        List<Long> productIds = productRepository.findAllAvailableIds();
 
         for (Long productId : productIds) {
             Set<Long> currentFrequentSets = findFrequentSetItemWith(orders, productId, targetSetSize);
