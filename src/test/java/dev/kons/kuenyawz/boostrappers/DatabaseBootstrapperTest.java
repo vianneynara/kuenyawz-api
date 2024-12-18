@@ -5,6 +5,7 @@ import dev.kons.kuenyawz.dtos.product.ProductPostDto;
 import dev.kons.kuenyawz.dtos.product.VariantPostDto;
 import dev.kons.kuenyawz.repositories.AccountRepository;
 import dev.kons.kuenyawz.repositories.ProductRepository;
+import dev.kons.kuenyawz.services.entity.AccountService;
 import dev.kons.kuenyawz.services.entity.ProductService;
 import dev.kons.kuenyawz.services.logic.AccountCsvService;
 import dev.kons.kuenyawz.services.logic.ProductCsvService;
@@ -43,12 +44,16 @@ class DatabaseBootstrapperTest {
 	private AccountRepository accountRepository;
 
 	DatabaseBootstrapper databaseBootstrapper;
+
 	@Autowired
 	private ProductService productService;
 
+	@Autowired
+	private AccountService accountService;
+
 	@BeforeEach
 	void setUp() {
-		databaseBootstrapper = new DatabaseBootstrapper(properties, productCsvService, productRepository, accountCsvService, accountRepository);
+		databaseBootstrapper = new DatabaseBootstrapper(properties, productCsvService, productRepository, accountCsvService, accountRepository, accountService);
 	}
 
 	@Test
