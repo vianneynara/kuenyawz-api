@@ -36,7 +36,7 @@ public class RecommenderServiceImpl implements RecommenderService {
 
 	@Override
 	public void generateApriori() {
-		aprioriRepository.deleteAll();
+		clearAprioriRecommendations();
 
 		Map<Long, Set<Long>> purchaseData = gatherPurchaseData();
 		var ruleSets = aprioriService.findAllFrequentSetOfItems(purchaseData);
@@ -74,7 +74,11 @@ public class RecommenderServiceImpl implements RecommenderService {
 
 	@Override
 	public void clearAprioriRecommendations() {
-		aprioriRepository.deleteAll();
+		try {
+			aprioriRepository.deleteAll();
+		} catch (Exception e) {
+			throw new IllegalOperationException("Failed to delete Apriori recommendations");
+		}
 	}
 
 	private Map<Long, Set<Long>> gatherPurchaseData() {
