@@ -36,9 +36,9 @@ public class RecommenderServiceImpl implements RecommenderService {
 
 	@Override
 	public void generateApriori() {
-		aprioriRepository.deleteAll();
+		clearAprioriRecommendations();
 
-		Set<Map<Long, Set<Long>>> purchaseData = gatherPurchaseData();
+		Map<Long, Set<Long>> purchaseData = gatherPurchaseData();
 		var ruleSets = aprioriService.findAllFrequentSetOfItems(purchaseData);
 
 		for (Map.Entry<Long, Set<Long>> entry : ruleSets.entrySet()) {
@@ -49,15 +49,10 @@ public class RecommenderServiceImpl implements RecommenderService {
 			apriori.setProductId(productId);
 
 			Iterator<Long> iterator = recommendedIds.iterator();
-			if (iterator.hasNext()) {
-				apriori.setRecommended1(iterator.next());
-			}
-			if (iterator.hasNext()) {
-				apriori.setRecommended2(iterator.next());
-			}
-			if (iterator.hasNext()) {
-				apriori.setRecommended3(iterator.next());
-			}
+			apriori.setRecommended1(iterator.hasNext() ? iterator.next() : addOneRandom(productId, recommendedIds));
+			apriori.setRecommended2(iterator.hasNext() ? iterator.next() : addOneRandom(productId, recommendedIds));
+			apriori.setRecommended3(iterator.hasNext() ? iterator.next() : addOneRandom(productId, recommendedIds));
+
 
 			aprioriRepository.save(apriori);
 		}
@@ -65,28 +60,30 @@ public class RecommenderServiceImpl implements RecommenderService {
 
 	@Override
 	public void clearAprioriRecommendations() {
-		aprioriRepository.deleteAll();
+		try {
+			aprioriRepository.deleteAll();
+		} catch (Exception e) {
+			throw new IllegalOperationException("Failed to delete Apriori recommendations");
+		}
 	}
 
-	private Set<Map<Long, Set<Long>>> gatherPurchaseData() {
+	private Map<Long, Set<Long>> gatherPurchaseData() {
 		List<Purchase> purchases = purchaseService.getAprioriNeeds();
 		return convertToAprioriSource(purchases);
 	}
 
-	public Set<Map<Long, Set<Long>>> convertToAprioriSource(List<Purchase> purchases) {
-		Set<Map<Long, Set<Long>>> purchasesAndProductIds = new HashSet<>();
+	public Map<Long, Set<Long>> convertToAprioriSource(List<Purchase> purchases) {
+		Map<Long, Set<Long>> purchaseIdAndProductIds = new HashMap<>();
 
 		// Create set of product ids for each purchase and put it to the map
 		for (Purchase purchase : purchases) {
 			Set<Long> productIds = purchase.getPurchaseItems().stream()
 				.map(purchaseItem -> purchaseItem.getVariant().getProduct().getProductId())
 				.collect(Collectors.toSet());
-
-			Map<Long, Set<Long>> map = Map.of(purchase.getPurchaseId(), productIds);
-			purchasesAndProductIds.add(map);
+			purchaseIdAndProductIds.put(purchase.getPurchaseId(), productIds);
 		}
 
-		return purchasesAndProductIds;
+		return purchaseIdAndProductIds;
 	}
 
 	private List<ProductDto> newRecommender(Long productId) {
@@ -134,5 +131,16 @@ public class RecommenderServiceImpl implements RecommenderService {
 		).toList();
 
 		return products.stream().map(productService::convertToDto).toList();
+	}
+
+	private Long addOneRandom(Long productId, Set<Long> excludeSet) {
+		excludeSet.add(productId);
+
+		List<Long> allProductIds = productRepository.findAllAvailableIds();
+		List<Long> filteredProductIds = allProductIds.stream()
+				.filter(id -> !excludeSet.contains(id))
+				.collect(Collectors.toList());
+
+		return filteredProductIds.get(new Random().nextInt(filteredProductIds.size()));
 	}
 }
