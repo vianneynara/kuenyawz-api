@@ -116,10 +116,13 @@ public class SecurityConfig {
 					.requestMatchers(HttpMethod.POST, "/api/midtrans/sign").hasRole("ADMIN")
 
 					// Account endpoints
-					.requestMatchers(HttpMethod.GET, "/api/accounts").hasRole("ADMIN")
-					.requestMatchers(HttpMethod.POST, "/api/accounts").hasRole("ADMIN")
-					.requestMatchers(HttpMethod.PATCH, "/api/accounts/{accountId:\\d+}/privilege").hasRole("ADMIN")
-					.requestMatchers("/api/accounts/**").hasAnyRole("ADMIN", "USER")
+					// Special case: uses master key or authorization to access this endpoint, defined in
+					// the controller. Dangerous if not properly secured.
+//					.requestMatchers(HttpMethod.GET, "/api/accounts").permitAll()
+//					.requestMatchers(HttpMethod.POST, "/api/accounts").permitAll()
+//					.requestMatchers(HttpMethod.DELETE, "/api/accounts/**").permitAll()
+//					.requestMatchers(HttpMethod.PATCH, "/api/accounts/{accountId:\\d+}/privilege").permitAll()
+					.requestMatchers("/api/accounts**").permitAll()
 
 					// Closure endpoints
 					.requestMatchers(HttpMethod.POST, "/api/closure").hasRole("ADMIN")
@@ -194,7 +197,7 @@ public class SecurityConfig {
 			/* hardcoded here, it's the same as what is supposed to be in frontEndBaseUrl */
 //			"https://natural-hamster-firstly.ngrok-free.app",
 			/* this is pretty much unecessary since it's the current domain being sit by the program*/
-			"https://distinctly-harmless-elephant.ngrok-free.app",
+			"https://turkey-glad-orca.ngrok-free.app",
 			"http://localhost:80",
 			"http://localhost:443",
 			"http://localhost:5173",
@@ -202,7 +205,7 @@ public class SecurityConfig {
 			"http://localhost:62080",
 			"http://localhost:62081" // H2/Swagger UI
 		));
-		configuration.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With", "Ngrok-Skip-Browser-Warning"));
+		configuration.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With", "X-Api-Key", "Ngrok-Skip-Browser-Warning"));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 		configuration.setAllowCredentials(true);
 

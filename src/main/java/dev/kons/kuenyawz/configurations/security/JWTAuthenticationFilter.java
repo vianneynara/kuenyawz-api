@@ -99,4 +99,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 		}
 		return null;
 	}
+
+	// May not be used yet
+	public static String extractApiKeyFromHeader(HttpServletRequest request) {
+		return request.getHeader("X-Api-Key");
+	}
 }

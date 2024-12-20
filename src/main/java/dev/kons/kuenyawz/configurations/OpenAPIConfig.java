@@ -27,7 +27,12 @@ public class OpenAPIConfig {
 						.type(SecurityScheme.Type.APIKEY)
 						.in(SecurityScheme.In.COOKIE)
 						.name("refreshToken")
-						.description("HTTP-only refresh token cookie")))
+						.description("HTTP-only refresh token cookie"))
+				.addSecuritySchemes("xApiKey",
+					new SecurityScheme()
+						.type(SecurityScheme.Type.APIKEY)
+						.in(SecurityScheme.In.HEADER)
+						.name("X-Api-Key")))
 			.info(new Info()
 				.title("KuenyaWZ API")
 				.version("1.0.0")
