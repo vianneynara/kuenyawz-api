@@ -7,7 +7,6 @@ import dev.kons.kuenyawz.dtos.auth.AuthRequestDto;
 import dev.kons.kuenyawz.dtos.auth.AuthResponseDto;
 import dev.kons.kuenyawz.entities.Account;
 import dev.kons.kuenyawz.exceptions.UnauthorizedException;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -97,7 +96,7 @@ public interface AuthService {
 		if (principal instanceof Account) {
 			return (Account) principal;
 		}
-		throw new EntityNotFoundException("Account not found");
+		throw new UnauthorizedException("Couldn't get the authenticated account from the request context");
 	}
 
 	/**
@@ -141,8 +140,41 @@ public interface AuthService {
 		return account.getPrivilege() == Account.Privilege.USER;
 	}
 
+	/**
+	 * Check whether the request is using a valid master key.
+	 *
+	 * @param properties invoker class's application properties
+	 * @return {@code true} if the request is using a valid master key, {@code false} otherwise/null
+	 */
+	static boolean isAuthenticatedMaster(ApplicationProperties properties) {
+		if (properties.getMasterKey() == null) {
+			return false;
+		}
+
+		HttpServletRequest request = getCurrentRequest();
+		if (request == null) {
+			return false;
+		}
+
+		String xApiKey = request.getHeader("X-Api-Key");
+		System.out.println("X-Api-Key: " + xApiKey);
+		if (xApiKey == null || xApiKey.isBlank()) {
+			return false;
+		}
+		return xApiKey.equals(properties.getMasterKey());
+	}
+
 	static boolean authenticatedAccountEquals(Long accountId) {
 		Account account = getAuthenticatedAccount();
 		return account.getAccountId().equals(accountId);
+	}
+
+	/**
+	 * Gets current request's servlet request.
+	 * @return {@link HttpServletRequest} the current request
+	 */
+	private static HttpServletRequest getCurrentRequest() {
+		ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		return attributes != null ? attributes.getRequest() : null;
 	}
 }
