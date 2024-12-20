@@ -27,21 +27,24 @@ import java.util.List;
 public class ApplicationProperties {
 
 	// Fields
-	private String version;
-	private String repositoryUrl;
-	private String productImagesDir = "product-images";
 	private String baseUrl = "http://localhost:8081";
-	private Integer maxVariantQuantity = 250;
+
 	private Boolean isContainerized = false;
 	private String httpProtocol = "http";
 	private String publicIp = "localhost";
+	@Value("${server.port:8081}")
+	private String serverPort;
+	private String version;
+	private String repositoryUrl;
+	private String masterKey;
+
+	private String productImagesDir = "product-images";
+	private Integer maxVariantQuantity = 250;
 	private String timezone = "Asia/Jakarta";
 
 	@Value("${application.otp-format:NUMERIC}")
 	private OTPService.OTPType otpFormat = OTPService.OTPType.NUMERIC;
 
-	@Value("${server.port:8081}")
-	private String serverPort;
 
 	@Value("#{'${application.accepted-image-extensions}'.split(',')}")
 	private List<String> acceptedImageExtensions;
@@ -60,9 +63,13 @@ public class ApplicationProperties {
 		this.httpProtocol = getEnv("APP_HTTP_PROTOCOL", "http", dotenv);
 		this.publicIp = getEnv("APP_SERVER_HOST", "localhost", dotenv);
 		this.serverPort = getEnv("APP_SERVER_PORT", "8081", dotenv);
-
 		this.version = getEnv("APP_VERSION", "0.0", dotenv);
 		this.repositoryUrl = getEnv("APP_REPOSITORY_URL", "https://github.com/vianneynara/*", dotenv);
+		this.masterKey = getEnv("APP_MASTER_KEY", null, dotenv);
+
+		// Proper warn, currently used for AccountController
+		if (this.masterKey == null)
+			log.warn("Master key is not set. Endpoints that requires master key may not be able to be accessed.");
 
 		this.frontend.baseUrl = getEnv("FRONTEND_BASE_URL", "http://localhost:5173", dotenv);
 
