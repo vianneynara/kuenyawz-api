@@ -35,7 +35,7 @@ public class OpenAPIConfig {
 						.name("X-Api-Key")))
 			.info(new Info()
 				.title("KuenyaWZ API")
-				.version("1.0.0")
+				.version("1.0.2")
 				.description("Private API to serve KuenyaWZ website")
 				.contact(new Contact()
 					.name("Nara")
