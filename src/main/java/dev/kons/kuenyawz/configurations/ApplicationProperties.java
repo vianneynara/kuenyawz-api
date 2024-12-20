@@ -70,6 +70,8 @@ public class ApplicationProperties {
 		// Proper warn, currently used for AccountController
 		if (this.masterKey == null)
 			log.warn("Master key is not set. Endpoints that requires master key may not be able to be accessed.");
+		else
+			log.info("Master key is set. Keep it secret!");
 
 		this.frontend.baseUrl = getEnv("FRONTEND_BASE_URL", "http://localhost:5173", dotenv);
 
