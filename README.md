@@ -82,7 +82,7 @@ docker build -t kuenyawz-api:latest .
 docker-compose up --build
 ```
 
-### Stop the docker compose
+### Drop the docker compose
 
 ```shell
 docker-compose down
