@@ -16,7 +16,6 @@ import dev.kons.kuenyawz.services.logic.ImageStorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.context.annotation.Primary;
@@ -201,8 +200,10 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	@CachePut(value = "productCache", key = "#productId")
-	@CacheEvict(value = "productsCache", allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "productCache", key = "#productId"),
+		@CacheEvict(value = "productsCache", allEntries = true)
+	})
 	public ProductDto patchProduct(Long productId, ProductPatchDto productPatchDto) {
 		Product product = productRepository.findOne(withProductId(productId).and(isNotDeleted()))
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
@@ -227,8 +228,10 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	@CachePut(value = "productCache", key = "#productId")
-	@CacheEvict(value = "productsCache", allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "productCache", key = "#productId"),
+		@CacheEvict(value = "productsCache", allEntries = true)
+	})
 	public ProductDto patchAvailability(Long productId, boolean available) {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new ResourceNotFoundException("Product with ID '" + productId + "' not found"));
