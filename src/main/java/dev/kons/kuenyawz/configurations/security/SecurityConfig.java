@@ -67,7 +67,6 @@ public class SecurityConfig {
 					// Docs/Swagger access
 					.requestMatchers(
 						"/api/docs/**",
-						"/swagger/**",
 						"/swagger-ui/**",
 						"/favicon.ico").permitAll()
 
