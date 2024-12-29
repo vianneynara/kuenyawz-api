@@ -41,11 +41,9 @@ spring:
 
 springdoc:
     swagger-ui:
-        path: /swagger-ui
         operations-sorter: alpha
         # Not sure whether this will do anything
         enabled: true
-        config-url: /docs/v3
     api-docs:
         path: /docs/v3
 
